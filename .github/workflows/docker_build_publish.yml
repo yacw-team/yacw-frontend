@@ -44,6 +44,14 @@ jobs:
           tags: |
             type=raw,value=${{ env.RELEASE_VERSION }}
             type=raw,value=latest
+
+      - name: Install Node Dependencies
+        run: |
+          npm install
+
+      - name: Build Node App
+        run: |
+          npm run build
             
       - name: Build and push Docker images
         uses: docker/build-push-action@v4
