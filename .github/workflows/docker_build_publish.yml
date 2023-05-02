@@ -42,7 +42,7 @@ jobs:
             laoliu233/yacw-frontend
             ghcr.io/${{ github.repository }}
           tags: |
-            type=raw,value=${{ env.RELEASE_VERSION }}
+            type=raw,value=$GITHUB_REF_NAME
             type=raw,value=latest
 
       - name: Install Node Dependencies
