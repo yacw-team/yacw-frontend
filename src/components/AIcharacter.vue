@@ -34,71 +34,68 @@
     
   </div>
 </template>
+<script lang="ts">
+import { defineComponent, ref } from 'vue';
 
-<script  lang="ts">
-import { ref } from 'vue';
+interface Character {
+  name: string;
+  introduction: string;
+}
 
+export default defineComponent({
+  name: "AIcharacter",
 
-export default {
-    name:"AIcharacter",
-  
-  
   props: {
     characters: {
-      type: Array,
+      type: Array as () => Character[],
       required: true,
       default() {
         return [
           {
             name: 'Career Counselor',
             introduction: 'A career counselor who can helpyou with anything related to yourcaree from job searching to caree',
-           
           },
           {
             name: 'Financial Advisor',
             introduction: 'A financial advisor who can provideadvice on budgeting , savinginvesting , retirement planning , andother financial lssues',
-            
           },
           {
             name: 'Personal Trainer',
             introduction: 'A personal trainer who can help youstay hit and improve your health bycreating personalized fitness plansand providing workout routines .',
-            
           },
           {
-              name:'Software Developer',
-              introduction:'A software developer who can hellyou develop software programs andapplications using programming',
-             
+            name:'Software Developer',
+            introduction:'A software developer who can hellyou develop software programs andapplications using programming',
           },
           {
-              name:'Life Hacker',
-              introduction:'A life hacker who can provideuseful tips and tricks to help youoptimize your daily routines , savetime , and increase productivity',
-              
+            name:'Life Hacker',
+            introduction:'A life hacker who can provideuseful tips and tricks to help youoptimize your daily routines , savetime , and increase productivity',
           },
           {
-              name:' DIY Expert',
-              introduction:'A DIY expert who can proadvice and guidance on doyourself projects , such asand craltin',
-             
+            name:' DIY Expert',
+            introduction:'A DIY expert who can proadvice and guidance on doyourself projects , such asand craltin',
           },
           {
-              name:'Mindfulness Coach',
-              introduction:'A mindfulness coach who canguide you through meditation andrelaxation techniques to help youfocus on the present moment andreduce stress and anxiety .',
-              
+            name:'Mindfulness Coach',
+            introduction:'A mindfulness coach who canguide you through meditation andrelaxation techniques to help youfocus on the present moment andreduce stress and anxiety .',
           },
           {
-              name:'Journalist',
-              introduction:'A journalist who can research andreport on newsworthy events ,conduct interiews and write newsarticles and stories',
-           
+            name:'Journalist',
+            introduction:'A journalist who can research andreport on newsworthy events ,conduct interiews and write newsarticles and stories',
           }
         ];
       }
     }
   },
+
   setup(props) {
     const searchText = ref('');
-    const filteredCharacters = ref(props.characters);
+    const filteredCharacters = ref<Character[]>(props.characters);
 
     function handleSearch() {
-      filteredCharacters.value = props.characters.filter(character => character.name.toLowerCase().includes(searchText.value.toLowerCase()));
+      filteredCharacters.value = props.characters.filter(character =>
+        character.name.toLowerCase().includes(searchText.value.toLowerCase())
+      );
     }
 
     function createCharacter() {
@@ -113,7 +110,7 @@ export default {
       createCharacter
     };
   }
-};
+});
 </script>
 
 <style scoped>
