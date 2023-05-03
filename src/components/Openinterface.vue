@@ -5,7 +5,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Modal from './Modal.vue'
 import AIcharacter from './AIcharacter.vue'
 

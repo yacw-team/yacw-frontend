@@ -35,9 +35,9 @@
   </div>
 </template>
 
-<script>
+<script  lang="ts">
 import { ref } from 'vue';
-// import { ElRow, ElCol, ElCard, ElButton, ElForm, ElFormItem, ElInput } from 'element-plus';
+
 
 export default {
     name:"AIcharacter",
