@@ -1,9 +1,9 @@
 <template>
-  <div style="width:1200px;
-  padding-left:400px;">
-    <el-button type="text" icon="el-icon-close" class="close-btn" @click="$emit('close')"></el-button>
-   <div style="width:800px;
-   padding:10px 150px ;
+  <div style="width:1000px;
+  padding-left:100px;">
+   
+   <div style="width:500px;
+   padding:10px 100px ;
    " 
    >
    <el-form label-position="top">
@@ -16,12 +16,14 @@
       </el-form-item>
     </el-form>
     </div>
+    <div style="padding-left:100px;">
     <el-button  @click="createCharacter">Add Character</el-button>
-    <el-row :gutter="20">
-      <el-col style="padding:20px 20px  ;" :span="12" v-for="(character, index) in filteredCharacters" :key="index">
-        <el-card  shadow="hover" style="padding: 20px; border-radius:25px; ">
+    </div>
+    <el-row :gutter="35">
+      <el-col style="padding:20px 80px  ;" :span="12" v-for="(character, index) in filteredCharacters" :key="index">
+        <el-card  shadow="hover" style="width:350px; padding: 20px; border-radius:25px; ">
         <UserFilled style="width: 1em; height: 1em; margin-right: 8px" />
-          <div style="height: 150px; overflow-y: auto;">
+          <div style="height: 150px; ;overflow-y: auto;">
             <h3>{{ character.name }}</h3>
             <p>{{ character.introduction }}</p>
           </div>
@@ -35,13 +37,11 @@
 
 <script>
 import { ref } from 'vue';
-import { ElRow, ElCol, ElCard, ElButton, ElForm, ElFormItem, ElInput } from 'element-plus';
+// import { ElRow, ElCol, ElCard, ElButton, ElForm, ElFormItem, ElInput } from 'element-plus';
 
 export default {
-  data()
-  {
-      return {componentname: 'AIcharacter',}
-  } , 
+    name:"AIcharacter",
+  
   components: {
     ElRow,
     ElCol,
