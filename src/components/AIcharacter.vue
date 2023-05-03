@@ -42,15 +42,7 @@ import { ref } from 'vue';
 export default {
     name:"AIcharacter",
   
-  components: {
-    ElRow,
-    ElCol,
-    ElCard,
-    ElButton,
-    ElForm,
-    ElFormItem,
-    ElInput
-  },
+  
   props: {
     characters: {
       type: Array,
