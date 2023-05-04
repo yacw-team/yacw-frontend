@@ -13,10 +13,6 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-<<<<<<< HEAD
-=======
-    "axios": "^1.4.0",
->>>>>>> origin/dev
     "@element-plus/icons-vue": "^2.1.0",
     "dexie": "^3.2.3",
     "element-plus": "^2.3.4",
