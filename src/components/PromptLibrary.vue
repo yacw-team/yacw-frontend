@@ -2,14 +2,7 @@
   <div>
     <el-button @click="centerDialogVisible = true">Click to open the Dialog</el-button>
 
-    <el-dialog
-      v-model="centerDialogVisible"
-      :before-close="handleClose"
-      title="Prompt Library"
-      width="30%"
-      align-center
-      center
-    >
+    <el-dialog v-model="centerDialogVisible" title="Prompt Library" width="30%" align-center center>
       <el-row :gutter="50">
         <el-col :span="18">
           <el-input v-model="input" placeholder="Search your library" />
@@ -84,13 +77,14 @@ onMounted(() => {
     return response.data;
   };
   (async () => {
-    const prompts = await fetchprompts();
+    type prompts = Array<Prompt>;
+    // eslint-disable-next-line no-redeclare
+    let prompts = await fetchprompts();
     console.log(prompts);
   })();
 });
 
 type p = Array<Prompt>;
-type prompts = Array<Prompt>;
 
 const p = [
   {
