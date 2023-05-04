@@ -10,6 +10,8 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AIcharacter: typeof import('./src/components/AIcharacter.vue')['default']
+    CreatePersonality: typeof import('./src/components/CreatePersonality.vue')['default']
+    CreatePrompt: typeof import('./src/components/CreatePrompt.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
@@ -26,11 +28,13 @@ declare module '@vue/runtime-core' {
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSubmenu: typeof import('element-plus/es')['ElSubmenu']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    EnterKey: typeof import('./src/components/EnterKey.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     Modal: typeof import('./src/components/Modal.vue')['default']
     ModalItem: typeof import('./src/components/ModalItem.vue')['default']
     Openinterface: typeof import('./src/components/Openinterface.vue')['default']
     OpenInterface: typeof import('./src/components/OpenInterface.vue')['default']
+    PromptLibrary: typeof import('./src/components/PromptLibrary.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SideBar: typeof import('./src/components/SideBar.vue')['default']
