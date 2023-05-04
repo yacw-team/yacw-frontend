@@ -36,7 +36,7 @@ interface Data {
   id: string;
   name: string;
   description: string;
-  prompt: string;
+  prompts: string;
 }
 
 interface Form {
