@@ -1,7 +1,7 @@
 <template>
   <div v-if="show" class="modal">
     <div class="modal-content">
-      <button @click="closeModal">X</button>
+      <button @click.self="closeModal">X</button>
       <div class="modal-body">
         <component :is="componentName"></component>
       </div>
@@ -11,7 +11,7 @@
 
 <script lang="ts">
 export default {
-  name: "Modal",
+  name: "ModalItem",
   props: {
     show: Boolean,
     componentName: String

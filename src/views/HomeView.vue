@@ -5,6 +5,6 @@
 <template>
   <main>
   
-    <Openinterface />
+    <OpenInterface />
   </main>
 </template>

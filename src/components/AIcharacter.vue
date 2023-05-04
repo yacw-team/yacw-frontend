@@ -3,8 +3,7 @@
   padding-left:100px;">
    
    <div style="width:500px;
-   padding:10px 100px ;
-   " 
+   padding:10px 100px ;" 
    >
    <el-form label-position="top">
       <el-form-item > 
@@ -34,83 +33,79 @@
     
   </div>
 </template>
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script setup lang="ts">
+import { defineProps, ref } from 'vue';
 
 interface Character {
   name: string;
   introduction: string;
+};
+
+const props = defineProps({
+  characters: {
+    type: Array as () => Character[],
+    required: true,
+    default() {
+      return [
+        {
+          name: 'Career Counselor',
+          introduction:
+            'A career counselor who can help you with anything related to your career from job searching to career planning.',
+        },
+        {
+          name: 'Financial Advisor',
+          introduction:
+            'A financial advisor who can provide advice on budgeting, saving, investing, retirement planning, and other financial issues.',
+        },
+        {
+          name: 'Personal Trainer',
+          introduction:
+            'A personal trainer who can help you stay fit and improve your health by creating personalized fitness plans and providing workout routines.',
+        },
+        {
+          name: 'Software Developer',
+          introduction:
+            'A software developer who can help you develop software programs and applications using programming languages such as Java, Python, and JavaScript.',
+        },
+        {
+          name: 'Life Hacker',
+          introduction:
+            'A life hacker who can provide useful tips and tricks to help you optimize your daily routines, save time, and increase productivity.',
+        },
+        {
+          name: 'DIY Expert',
+          introduction:
+            'A DIY expert who can provide advice and guidance on do-it-yourself projects, such as woodworking, painting, and crafting.',
+        },
+        {
+          name: 'Mindfulness Coach',
+          introduction:
+            'A mindfulness coach who can guide you through meditation and relaxation techniques to help you focus on the present moment and reduce stress and anxiety.',
+        },
+        {
+          name: 'Journalist',
+          introduction:
+            'A journalist who can research and report on newsworthy events, conduct interviews, and write news articles and stories.',
+        },
+      ];
+    },
+  },
+});
+
+const searchText = ref('');
+const filteredCharacters = ref<Character[]>(props.characters);
+
+function handleSearch() {
+  filteredCharacters.value = props.characters.filter((character) =>
+    character.name.toLowerCase().includes(searchText.value.toLowerCase())
+  );
 }
 
-export default defineComponent({
-  name: "AIcharacter",
+function createCharacter() {
+  // 这里可以使用API调用或其他方式实现创建角色的逻辑
+  console.log('创建角色');
+}
 
-  props: {
-    characters: {
-      type: Array as () => Character[],
-      required: true,
-      default() {
-        return [
-          {
-            name: 'Career Counselor',
-            introduction: 'A career counselor who can helpyou with anything related to yourcaree from job searching to caree',
-          },
-          {
-            name: 'Financial Advisor',
-            introduction: 'A financial advisor who can provideadvice on budgeting , savinginvesting , retirement planning , andother financial lssues',
-          },
-          {
-            name: 'Personal Trainer',
-            introduction: 'A personal trainer who can help youstay hit and improve your health bycreating personalized fitness plansand providing workout routines .',
-          },
-          {
-            name:'Software Developer',
-            introduction:'A software developer who can hellyou develop software programs andapplications using programming',
-          },
-          {
-            name:'Life Hacker',
-            introduction:'A life hacker who can provideuseful tips and tricks to help youoptimize your daily routines , savetime , and increase productivity',
-          },
-          {
-            name:' DIY Expert',
-            introduction:'A DIY expert who can proadvice and guidance on doyourself projects , such asand craltin',
-          },
-          {
-            name:'Mindfulness Coach',
-            introduction:'A mindfulness coach who canguide you through meditation andrelaxation techniques to help youfocus on the present moment andreduce stress and anxiety .',
-          },
-          {
-            name:'Journalist',
-            introduction:'A journalist who can research andreport on newsworthy events ,conduct interiews and write newsarticles and stories',
-          }
-        ];
-      }
-    }
-  },
-
-  setup(props) {
-    const searchText = ref('');
-    const filteredCharacters = ref<Character[]>(props.characters);
-
-    function handleSearch() {
-      filteredCharacters.value = props.characters.filter(character =>
-        character.name.toLowerCase().includes(searchText.value.toLowerCase())
-      );
-    }
-
-    function createCharacter() {
-      // 这里可以使用API调用或其他方式实现创建角色的逻辑
-      console.log('创建角色');
-    }
-
-    return {
-      searchText,
-      filteredCharacters,
-      handleSearch,
-      createCharacter
-    };
-  }
-});
 </script>
 
 <style scoped>

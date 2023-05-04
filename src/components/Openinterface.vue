@@ -1,19 +1,21 @@
 <template>
   <div>
+    <SideBar />
     <el-button @click="showModal = true">AIcharacter</el-button>
-    <Modal :show="showModal" :component-name="componentName" @close="showModal = false"></Modal>
+    <ModalItem :show="showModal" :component-name="componentName" @close="showModal = false"></ModalItem>
+
   </div>
 </template>
 
 <script lang="ts">
-import Modal from './Modal.vue'
-import AIcharacter from './AIcharacter.vue'
+import ModalItem from './ModalItem.vue'
+ import AIcharacter from './AIcharacter.vue'
 
 export default {
-  name: "Open",
+  name: "OpenInterface",
   components: {
-    Modal,
-    AIcharacter,
+    ModalItem,
+    // AIcharacter,
   },
   data() {
     return {
