@@ -94,35 +94,15 @@
 </template>
 
 <script setup lang="ts">
+import { fromLangList } from "./list/fromLang";
+import { toLangList } from "./list/toLang";
+import { emotionList } from "./list/emotion";
+import { styleList } from "./list/style";
 import { Sort } from "@element-plus/icons-vue";
 import { ref } from "vue";
 const textarea = ref("");
-const fromLang = ref("option1");
-const toLang = ref("option1");
-const emotion = ref("option1");
-const style = ref("option1");
-const fromLangList = [
-  {
-    value: "option1",
-    label: "Option1",
-  },
-];
-const toLangList = [
-  {
-    value: "option1",
-    label: "Option1",
-  },
-];
-const emotionList = [
-  {
-    value: "option1",
-    label: "Option1",
-  },
-];
-const styleList = [
-  {
-    value: "option1",
-    label: "Option1",
-  },
-];
+const fromLang = ref("auto");
+const toLang = ref("");
+const emotion = ref("");
+const style = ref("");
 </script>
