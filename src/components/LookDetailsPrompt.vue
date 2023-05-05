@@ -2,25 +2,25 @@
   <e-dialog>
     <el-card class="item">
       <el-card :body-style="{ padding: '20px' }">
-        <div class="background" :style="{ background: Detail.background }">
-          <span class="emoji">{{ Detail.emoji }}</span>
+        <div class="background" :style="{ background: Jsondata.background }">
+          <span class="emoji">{{ Jsondata.emoji }}</span>
         </div>
       </el-card>
 
       <el-card :body-style="{ padding: '10px' }">
         <span class="item2">
           <strong>name: &nbsp;</strong>
-          {{ Detail.name }}
+          {{ Jsondata.name }}
           <br />
         </span>
         <span class="item2">
           <strong>description: &nbsp;</strong>
-          {{ Detail.description }}
+          {{ Jsondata.description }}
           <br />
         </span>
         <span class="item2">
           <strong>detail: &nbsp;</strong>
-          {{ Detail.details }}
+          {{ Jsondata.details }}
           <br />
         </span>
       </el-card>
@@ -29,16 +29,24 @@
 </template>
 
 
-<script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { eventBus } from "../event-bus";
-
-const jsonData = ref({});
-onMounted(() => {
-  eventBus.$on("data", (data) => {
-    jsonData.value = data;
-  });
-});
+<script  lang="ts">
+interface Jsondata {
+  id: string;
+  name: string;
+  description: string;
+  details: string;
+  type: string;
+  background: string;
+  emoji: string;
+}
+export default {
+  props: {
+    Jsondata: {
+      type: Object as () => Jsondata,
+      required: true,
+    },
+  },
+}
 </script>
 
 

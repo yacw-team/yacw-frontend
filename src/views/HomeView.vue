@@ -4,21 +4,29 @@
   <main>
     <HelloWorld />
     <el-button @click="toggle">新建prompt</el-button>
-    <LookDetailsPrompt v-if="lookDetailsPrompt" />
+    <LookDetailsPrompt v-if="lookDetailsPrompt" :Jsondata="Jsondata" />
   </main>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { eventBus } from '../event-bus';
 import HelloWorld from "../components/HelloWorld.vue";
 import LookDetailsPrompt from "@/components/LookDetailsPrompt.vue";
 
 const lookDetailsPrompt = ref(false);
 
-function toggle(this: any) {
+function toggle() {
   lookDetailsPrompt.value = !lookDetailsPrompt.value;
-  const data = {
+  interface Jsondata {
+    id: string;
+    name: string;
+    description: string;
+    details: string;
+    type: string;
+    background: string;
+    emoji: string;
+  }
+  const Jsondata = {
     id: "1",
     name: "2",
     description:
@@ -29,6 +37,6 @@ function toggle(this: any) {
     background: "linear-gradient(to bottom, #f8a5c2, #ffeedd)",
     emoji: "WZV47]@X`42US8)FYV0P3@D.png",
   };
-  eventBus.$emit('data',data);
+  eventBus.$emit("data", data);
 }
 </script>
