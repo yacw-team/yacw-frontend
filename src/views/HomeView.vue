@@ -17,7 +17,10 @@ const lookDetailsPrompt = ref(false);
 
 function toggle() {
   lookDetailsPrompt.value = !lookDetailsPrompt.value;
-  interface Jsondata {
+
+  
+}
+interface Jsondata {
     id: string;
     name: string;
     description: string;
@@ -37,6 +40,4 @@ function toggle() {
     background: "linear-gradient(to bottom, #f8a5c2, #ffeedd)",
     emoji: "WZV47]@X`42US8)FYV0P3@D.png",
   };
-  
-}
 </script>
