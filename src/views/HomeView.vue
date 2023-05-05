@@ -1,9 +1,34 @@
-<script setup lang="ts">
-import HelloWorld from "../components/HelloWorld.vue";
-</script>
+
 
 <template>
   <main>
     <HelloWorld />
+    <el-button @click="toggle">新建prompt</el-button>
+    <LookDetailsPrompt v-if="lookDetailsPrompt" />
   </main>
 </template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import { eventBus } from '../event-bus';
+import HelloWorld from "../components/HelloWorld.vue";
+import LookDetailsPrompt from "@/components/LookDetailsPrompt.vue";
+
+const lookDetailsPrompt = ref(false);
+
+function toggle(this: any) {
+  lookDetailsPrompt.value = !lookDetailsPrompt.value;
+  const data = {
+    id: "1",
+    name: "2",
+    description:
+      "3S就将计就计就将计就计就将计就计斤斤计较经济界2巴巴爸爸不啵啵啵啵啵啵啵啵啵jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj啵啵啵DAS3",
+    details:
+      "asccccccc3S就将计就计就将计就计就将计就计斤斤计较经济界2巴巴爸爸不啵啵啵啵啵啵啵啵啵jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj啵啵啵DAS3",
+    type: "111",
+    background: "linear-gradient(to bottom, #f8a5c2, #ffeedd)",
+    emoji: "WZV47]@X`42US8)FYV0P3@D.png",
+  };
+  eventBus.$emit('data',data);
+}
+</script>
