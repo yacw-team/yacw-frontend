@@ -2,17 +2,24 @@
   <div class="flex flex-col md:flex-row">
     <div class="w-full p-2 md:w-4/5">
       <el-input
-        v-model="textarea"
+        v-model="fromText"
         :rows="8"
         type="textarea"
         resize="none"
         placeholder="请输入待翻译的文本"
+        :readonly="fromTextReadOnly"
+        @blur.stop="handleSubmit"
       />
       <div class="flex">
-        <el-icon size="20" class="flex-1 py-4"><Sort /></el-icon>
+        <el-icon
+          size="20"
+          class="flex-1 py-4 hover:cursor-pointer"
+          @click="handleSwitchText"
+          ><Sort
+        /></el-icon>
       </div>
       <el-input
-        v-model="textarea"
+        v-model="toText"
         :rows="8"
         type="textarea"
         resize="none"
@@ -20,7 +27,9 @@
         placeholder="翻译结果"
       />
     </div>
-    <div class="flex flex-row items-center justify-center w-full p-2 md:w-1/5 md:flex-col">
+    <div
+      class="flex flex-row items-center justify-center w-full p-2 md:w-1/5 md:flex-col"
+    >
       <div class="flex flex-col justify-center flex-1 w-1/2 md:w-full">
         <span>源语言</span>
         <el-select
@@ -94,35 +103,45 @@
 </template>
 
 <script setup lang="ts">
+import { fromLangList } from "./list/fromLang";
+import { toLangList } from "./list/toLang";
+import { emotionList } from "./list/emotion";
+import { styleList } from "./list/style";
 import { Sort } from "@element-plus/icons-vue";
 import { ref } from "vue";
-const textarea = ref("");
-const fromLang = ref("option1");
-const toLang = ref("option1");
-const emotion = ref("option1");
-const style = ref("option1");
-const fromLangList = [
-  {
-    value: "option1",
-    label: "Option1",
-  },
-];
-const toLangList = [
-  {
-    value: "option1",
-    label: "Option1",
-  },
-];
-const emotionList = [
-  {
-    value: "option1",
-    label: "Option1",
-  },
-];
-const styleList = [
-  {
-    value: "option1",
-    label: "Option1",
-  },
-];
+
+import { getTranslateResult } from "@/api/translate/translate";
+import type { GetTranslateResultReq } from "@/api/translate/req";
+import type { GetTranslateResultRes } from "@/api/translate/res";
+
+const fromText = ref("");
+const fromTextReadOnly = ref(false);
+const toText = ref("");
+const fromLang = ref("auto");
+const toLang = ref("");
+const emotion = ref("");
+const style = ref("");
+
+const handleSubmit = async () => {
+  fromTextReadOnly.value = true;
+  const req: GetTranslateResultReq = {
+    apiKey: "", // TODO: 从数据库中获取
+    content: {
+      emotion: emotion.value,
+      style: style.value,
+      preTranslate: fromText.value,
+    },
+    from: fromLang.value,
+    to: toLang.value,
+  };
+  const res: GetTranslateResultRes = await getTranslateResult(req);
+  fromTextReadOnly.value = false;
+  toLang.value = res.content.translated;
+};
+
+const handleSwitchText = () => {
+  const temp = fromText.value;
+  fromText.value = toText.value;
+  toText.value = temp;
+};
 </script>
