@@ -37,6 +37,6 @@ function toggle() {
     background: "linear-gradient(to bottom, #f8a5c2, #ffeedd)",
     emoji: "WZV47]@X`42US8)FYV0P3@D.png",
   };
-  eventBus.$emit("data", data);
+  
 }
 </script>
