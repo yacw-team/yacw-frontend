@@ -136,7 +136,7 @@ const handleSubmit = async () => {
   };
   const res: GetTranslateResultRes = await getTranslateResult(req);
   fromTextReadOnly.value = false;
-  toLang.value = res.to;
+  toLang.value = res.content.translated;
 };
 
 const handleSwitchText = () => {

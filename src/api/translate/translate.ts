@@ -12,9 +12,10 @@ export async function getTranslateResult(
 ): Promise<GetTranslateResultRes> {
   let res: GetTranslateResultRes = {
     content: {
-      emotionId: "",
-      literatureId: "",
+      emotion: "",
+      style: "",
       preTranslate: "",
+      translated: ""
     },
     from: "",
     to: "",
