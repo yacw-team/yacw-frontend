@@ -1,7 +1,7 @@
 <template>
   <div>
     
-      <span @click="handlegotochat">{{ icon1 }}</span>
+      <span @click="handleGoToChat">{{ icon1 }}</span>
       <span>{{conversation.title}}</span>
       <span @click="opendialog">{{ icon2 }}</span>
       <el-dialog v-model="dialogVisible1">
@@ -20,7 +20,7 @@ const icon1 = "📄";
 const icon2 = "✍️";
 
 const input = ref("");
-function handlegotochat() {
+function handleGoToChat() {
   alert(111);
 }
 
