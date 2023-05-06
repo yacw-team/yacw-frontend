@@ -86,11 +86,12 @@ fetchData();
 <style scoped>
     .sidebar-container
          {
-        position:relative;
+        position:fixed;
         display: flex;
         height:100%;
+        width:30%;
         flex-direction: column;
-        border-left: 1px solid #ccc; padding-top:50px;
+        border-left: 1px 0 solid #ccc; padding-top:50px;
         }
 
     .sidebar-footer 
@@ -174,7 +175,10 @@ fetchData();
             white-space: nowrap;
             
                             }
-
+    .el-menu.el-menu--vertical
+        {
+            padding-top:350px;
+        }
     .footer-icons {
         margin-top: 0;
         margin-left: auto;
