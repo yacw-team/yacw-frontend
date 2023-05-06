@@ -1,9 +1,9 @@
 <template>
   <div>
     
-      <span @click="click1">{{ icon1 }}</span>
+      <span @click="handlegotochat">{{ icon1 }}</span>
       <span>{{conversation.title}}</span>
-      <span @click="click2">{{ icon2 }}</span>
+      <span @click="opendialog">{{ icon2 }}</span>
       <el-dialog v-model="dialogVisible1">
         <p class="item">更改标题</p>
         <el-input v-model="input" :placeholder= "conversation.title"/>
@@ -20,13 +20,13 @@ const icon1 = "📄";
 const icon2 = "✍️";
 
 const input = ref("");
-function click1() {
+function handlegotochat() {
   alert(111);
 }
 
 const dialogVisible1 = ref(false);
 
-function click2() {
+function opendialog() {
 
   dialogVisible1.value = true;
 }
