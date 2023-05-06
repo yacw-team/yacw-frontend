@@ -24,7 +24,7 @@
 <span>{{ isCollapsed ? '' : 'Home' }}</span>
     </el-menu-item>
 </el-menu>
-    <div class="sidebar-footer" v-show="!isCollapsed">
+    <!-- <div class="sidebar-footer" v-show="!isCollapsed">
         <el-input v-model="searchText" placeholder="搜索标题"></el-input>
         <el-divider></el-divider>
         <div class="conversation-list">
@@ -34,7 +34,7 @@
     </div>
 </div>
     
-</div>
+</div> -->
         <el-button style="border:none;" class="collapse-btn" :icon="isCollapsed ? 'Expand' : 'Fold'" @click="toggleCollapse" circle></el-button>
 </div>
 </template>
