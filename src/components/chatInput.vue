@@ -23,10 +23,14 @@ const refresh=ref(true);
 //     console.log(route.query.encodedData)
 //   }
 
+// 解析URL中的数据
+// const urlParams = new URLSearchParams(window.location.search);
+// let data = urlParams.get('data') || "";
 
-
-const Jsondata = route.query.data?route.query.data:null;
+const Jsondata = route.query.data ? (Array.isArray(route.query.data) ? route.query.data[0] : route.query.data) : null;
 const prompts = Jsondata ? JSON.parse(Jsondata) : "";
+
+
 const temp=ref<string>(prompts);
 const input = computed({
     get() {
@@ -43,14 +47,14 @@ onMounted(()=>[
 ])
 
 watch(() => route.query.data, (newVal) => {
-  const data = newVal ? JSON.parse(newVal) : '';
+  const dataStr = Array.isArray(newVal) ? newVal[0] : newVal;
+  const data = dataStr ? JSON.parse(dataStr) : '';
   temp.value = data;
 });
 
 
-// 解析URL中的数据
-// const urlParams = new URLSearchParams(window.location.search);
-// let data = urlParams.get('data') || "";
+
+
 
 // // 使用ref创建响应式变量
 // const dataInput = ref(data);
