@@ -21,13 +21,15 @@
 
     </div>
     <div class="footer">
-      <el-button>Use it!</el-button>
+      <el-button @click="handleClick">Use it!</el-button>
     </div>
   </el-card>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, reactive } from 'vue';
+import { useRouter } from 'vue-router';
+
 
 interface Jsondata {
   id: string;
@@ -45,6 +47,21 @@ const props = defineProps({
     required: true,
   },
 });
+const myData = reactive<Jsondata>(props.jsonData);
+const router = useRouter();
+
+
+function handleClick() {
+  // const data = JSON.stringify(myData.prompts);
+  // const encodedData = encodeURIComponent(data);
+  // router.push({ name: 'test2', query: { data:encodedData } });
+  const data = JSON.stringify(myData.prompts);
+  router.push({ name: 'test2', query: { data:data } });
+
+  console.log(data)
+}
+
+
 </script>
 
 <style scoped>
