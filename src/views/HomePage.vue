@@ -1,28 +1,30 @@
 <template>
 
   <div class="chatgpt">
+    <!-- <SideBar style="padding-top:10px;"/> -->
       <div class="chatgpt-api">
         <h1 class="chatgpt-heading">Get started with ChatGPT API</h1>
         <div class="chatgpt-api-input">
-          <el-button  class="button-api" @click="dialogVisible = true">
+          <!-- <el-button  class="button-api" @click="dialogVisible = true">
             Click to open the Dialog
-          </el-button>
-
-          <el-dialog v-model = "dialogVisible" title = "OpenAI key" width = "30%">
-            <el-input v-model = "openAIkey" placeholder="Enter OpenAI key" />
-
-            <el-select style = "width:100%;padding-top:100px;" v-model = "selectedModel" placeholder = "Select ChatGPT model">
+          </el-button> -->
+            <div class="enter-key"><EnterKey /></div>
+            <el-select value="gpt3.5" style = "width:100%;padding-top:100px;" v-model = "selectedModel" placeholder = "Select ChatGPT model">
               <el-option label = "GPT-3.5-TURBO(Default ChatGPT)" value = "gpt3.5" />
               <el-option label = "GPT-4(Limited Beta)" value = "gpt4.0" />
             </el-select>
 
+          <!-- <el-dialog v-model = "dialogVisible" title = "OpenAI key" width = "30%">
+             <el-input v-model = "openAIkey" placeholder="Enter OpenAI key" /> 
+            
+            
             <div class="button-save">
               <el-button  type="primary" size="large" class="button-save-text"  @click="saveApiKey">Save</el-button>
            
             
                 <el-button  class="button-cancel" @click = "dialogVisible=false">cancel</el-button>
             </div>
-          </el-dialog>
+          </el-dialog> -->
         </div>
       </div>
     <el-main class="chatgpt-main">
@@ -90,17 +92,17 @@
 <script setup lang="ts">
 
 import { ref } from 'vue';
-
+import EnterKey from "../components/EnterKey.vue"
 import { ElMain, ElCard, ElButton, ElDialog, ElInput, ElSelect, ElOption } from 'element-plus';
-const openAIkey = ref('');
+// const openAIkey = ref('');
 const selectedModel = ref('');
-const dialogVisible = ref(false);
-
-const saveApiKey = () => {
-  console.log('OpenAI key:', openAIkey.value);
-  console.log('Selected model:', selectedModel.value);
-  dialogVisible.value = false;
-};
+// const dialogVisible = ref(false);
+// import SideBar from "../components/SideBar.vue"
+// const saveApiKey = () => {
+//   console.log('OpenAI key:', openAIkey.value);
+//   console.log('Selected model:', selectedModel.value);
+//   dialogVisible.value = false;
+// };
 </script>
 
 <style scoped>
@@ -166,5 +168,10 @@ const saveApiKey = () => {
 {
     border:none;
     
+}
+.enter-key
+{
+  padding-top:98px;
+  padding-right:30px;
 }
 </style>
