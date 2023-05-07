@@ -53,9 +53,9 @@ interface ChatConversation {
 
 const isCollapsed = ref(false);
 const conversations = reactive<ChatConversation[]>([
-  { SystemPrompt: "p1", Uid  : "1" },
-  { SystemPrompt: "p2", Uid  : "2" },
-  { SystemPrompt: "对话3标题", Uid  : "3" },
+  { SystemPrompt: "p1", Uid  : "1" ,Id:"1",ModelId:"1",PromptId:"1"},
+  { SystemPrompt: "p2", Uid  : "2" ,d:"2",ModelId:"2",PromptId:"2"},
+  { SystemPrompt: "对话3标题", Uid  : "3" ,Id:"3",ModelId:"3",PromptId:"3"},
 ]);
 const searchText = ref("");
 
