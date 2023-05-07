@@ -1,87 +1,129 @@
 <template>
-  <e-dialog>
-    <el-card class="item">
-      <el-card :body-style="{ padding: '20px' }">
-        <div class="background" :style="{ background: Jsondata.background }">
-          <span class="emoji">{{ Jsondata.emoji }}</span>
-        </div>
-      </el-card>
+  <el-card :body-style="{ padding: '20px' }" shadow="always" justify-content="space-between">
+    <div class="background" :style="{ background: jsonData.background }">
+      <span class="emoji">{{ jsonData.icon }}</span>
+      <span class="name">{{ jsonData.name }}</span>
+    </div>
+    <div class="bottom" style="padding: 14px">
 
-      <el-card :body-style="{ padding: '10px' }">
-        <span class="item2">
-          <strong>name: &nbsp;</strong>
-          {{ Jsondata.name }}
-          <br />
-        </span>
-        <span class="item2">
-          <strong>description: &nbsp;</strong>
-          {{ Jsondata.description }}
-          <br />
-        </span>
-        <span class="item2">
-          <strong>detail: &nbsp;</strong>
-          {{ Jsondata.details }}
-          <br />
-        </span>
-      </el-card>
-    </el-card>
-  </e-dialog>
+      <div class="item">
+        <h4>Name:</h4>
+        <p>{{ jsonData.description }}</p>
+      </div>
+      <div class="item">
+        <h4>Description:</h4>
+        <p>{{ jsonData.description }}</p>
+      </div>
+      <div class="item">
+        <h4>Prompts:</h4>
+        <p>{{ jsonData.prompts }}</p>
+      </div>
+
+    </div>
+    <div class="footer">
+      <el-button>Use it!</el-button>
+    </div>
+  </el-card>
 </template>
 
+<script setup lang="ts">
+import { defineProps } from 'vue';
 
-<script  lang="ts">
 interface Jsondata {
   id: string;
   name: string;
   description: string;
-  details: string;
+  prompts: string;
   type: string;
   background: string;
-  emoji: string;
+  icon: string;
 }
-export default {
-  props: {
-    Jsondata: {
-      type: Object as () => Jsondata,
-      required: true,
-    },
+
+const props = defineProps({
+  jsonData: {
+    type: Object as () => Jsondata,
+    required: true,
   },
-}
+});
 </script>
 
-
 <style scoped>
-.item {
-  max-width: 80%;
-  margin-bottom: 5%;
-  max-height: 90%;
-  margin-top: 5%;
-  margin-left: 10%;
+.el-card .background {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  width: 100%;
+}
+
+.el-card .emoji {
+  font-size: 48px;
+}
+
+.el-card {
+  max-width: 60%;
+  min-width: 40%;
+  margin-top: 10%;
+  margin-left: 20%;
+
   border: solid #000000;
   border-radius: 20px;
 }
-.item2 {
-  font-size: large;
-  display: flex;
-  justify-content: center;
-  padding-bottom: 20px;
-}
-.item3 {
-  padding: 0 30%;
-  display: flex;
-  justify-content: center;
-}
-.link-top {
-  height: 1px;
-  border-top: solid #2872cc 1px;
-}
-.text-container {
-  width: 300px;
-  height: 200px;
-  padding: 20px;
+
+
+
+
+
+h4 {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 5px;
+
+
 }
 
-.text-container span {
-  display: inline;
+p {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 0;
+  margin-top: 0;
+
+  flex-direction: column;
+  align-items: flex-start;
+
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.item {
+  font-size: large;
+  display: flex;
+  padding-bottom: 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  /* 分隔每个item */
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  /* 水平居中 */
+  align-items: flex-end;
+  /* 垂直居底 */
+
+  position: relative;
+  /* 设置容器为相对定位 */
+}
+
+.el-button {
+  position: absolute;
+  /* 设置按钮为绝对定位，相对于容器进行定位 */
+  bottom: 0;
+  /* 距离容器底部为0 */
 }
 </style>
