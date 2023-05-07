@@ -20,7 +20,7 @@ const router = createRouter({
     {
       path: "/tanslate",
       name: "tanslate",
-      component: () => import("../views/TranslateView.vue"),
+      component: () => import("../views/Translate/TranslateView.vue"),
     }
   ],
 });

@@ -34,12 +34,6 @@
             <br />
             <span>prompt内容: {{ index.content }}</span>
             <br />
-            <span>prompt描述: {{ index.description }}</span>
-            <br />
-            <span>prompt输入: {{ index.exampleInput}}</span>
-            <br />
-            <span>prompt输出: {{ index.exampleOutput}}</span>
-            <br />
             <el-button @click="getdetails(index.details)">Use it</el-button>
           </el-card>
         </el-col>
