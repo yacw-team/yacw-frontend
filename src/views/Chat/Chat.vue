@@ -1,11 +1,11 @@
 <template>
   <div class="flex">
-    <SideBar2 class="sidebar" />
+    <SideBar2 :updatetitle="updateTitle" class="sidebar" />
 
     <div class="content">
       <div class="chat">
         <div v-infinite-scroll="load" class="messagecontent">
-          <div v-for="(message1,index) in messages" :key="index">
+          <div v-for="(message1,index) in messages[indexnumber].messages" :key="index">
             <el-text
               :class="differentUser(message1.type)"
               :style="{ 'max-width': '300px' }"
@@ -29,7 +29,7 @@
 </template>
 <script setup lang="ts">
 import SideBar2 from "../../components/SideBar2.vue";
-import { ref } from "vue";
+import { onMounted, ref, watch, defineProps, PropType, provide } from "vue";
 import axios from "axios";
 import { useRoute } from "vue-router";
 
@@ -50,12 +50,17 @@ interface getchat {
     assmsgid: string;
   };
 }
-
-
-
-
-
-
+interface firstchat {
+  chatId: string;
+  modelId: string;
+  content: {
+    personalityId: string;
+    promptsId: string;
+    user: string; // user input
+    assistant: string;
+    title: string;
+  };
+}
 
 async function sendmessage() {
   type usermessage = message;
@@ -63,34 +68,54 @@ async function sendmessage() {
     type: "user",
     content: textarea.value,
   };
-  messages.value.push(usermessage);
+  messages[indexnumber.value].messages.push(usermessage);
 
   textarea = ref("");
 
-  isLoading.value=true;
+  isLoading.value = true;
 
-  axios
-    .post("/v1/chat/chat", {
-      apiKey: "string",
-      chatId: "111",
-      content: {
-        user: textarea.value,
-      },
-    })
-    .then((response) => {
-      let getchat = response.data;
-      type assistantmessage = message;
-      const assistantmessage = {
-        type: "assistant",
-        content: getchat.content.assistant,
-      };
-      messages.value.push(assistantmessage)
-     
-    });
-    
-    isLoading.value=false;
-    
-    
+  if (messages[indexnumber.value].chatId == "-1") {
+    //第一次发送时
+    axios
+      .post("/v1/chat/new", {
+        apiKey: "string",
+        modelId: "string,+8",
+        content: {
+          personalityId: "string", //构造system
+          promptsId: "string",
+          user: textarea.value, // user input
+        },
+      })
+      .then((response) => {
+        let firstchat = response.data;
+        const changetitle = {
+          index: indexnumber,
+          id: firstchat.chatId,
+          title: firstchat.content.title,
+        };
+      });
+  } else {
+    //多次发送时
+    axios
+      .post("/v1/chat/chat", {
+        apiKey: "string",
+        chatId: "111",
+        content: {
+          user: textarea.value,
+        },
+      })
+      .then((response) => {
+        let getchat = response.data;
+        type assistantmessage = message;
+        const assistantmessage = {
+          type: "assistant",
+          content: getchat.content.assistant,
+        };
+        messages[indexnumber.value].messages.push(assistantmessage);
+      });
+  }
+
+  isLoading.value = false;
 }
 
 function differentUser(i: string) {
@@ -101,9 +126,33 @@ function differentUser(i: string) {
   }
 }
 
+const route = useRoute();
+type indexnumber = number;
+// eslint-disable-next-line no-redeclare
+const indexnumber = ref(0); //作为具体哪个chatid
+
+watch(
+  () => route.params.id,
+  (newid, oldid) => {
+    const contentid = newid;
+    for (let i = 0; i < messages.length; i++) {
+      if (messages[i].chatId == contentid) {
+        indexnumber.value = i;
+        return;
+      }
+    }
+    const newmessage = {
+      chatId: "-1",
+      messages: [],
+    };
+    messages.push(newmessage);
+    indexnumber.value = messages.length;
+  }
+);
+
 const count = ref(0);
 const load = () => {
-  if (count.value < messages.value.length) {
+  if (count.value < messages[indexnumber.value].messages.length) {
     count.value += 1;
   }
 };
@@ -113,328 +162,371 @@ interface message {
   content: string;
 }
 
-const messages = ref<message[]>([
-  {
-    type: "user",
-    content: "你asssssssssssscassssssssssssssssssssha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-  {
-    type: "user",
-    content: "你ha1",
-  },
-  {
-    type: "assistant",
-    content: "还说你是擦",
-  },
-]);
+const messages = [
+  {
+    chatId: "1",
+    messages: [
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你sha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+    ],
+  },
+  {
+    chatId: "2",
+    messages: [
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你hsssssa1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+    ],
+  },
+  {
+    chatId: "3",
+    messages: [
+      {
+        type: "assistant",
+        content: "还说c你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+      {
+        type: "user",
+        content: "你ha1",
+      },
+      {
+        type: "assistant",
+        content: "还说你是擦",
+      },
+    ],
+  },
+];
 </script>
 
 <style scoped>

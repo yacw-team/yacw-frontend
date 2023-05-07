@@ -47,6 +47,7 @@
             :chatID="conversation.chatID"
             :index="conversations.length-index-1"
             :updateItems="updateItems"
+            
           />
           <el-button @click="showDialog(index)">{{ icon3 }}</el-button>
           <el-dialog v-model="isDialogOpen" @close="closeDialog">
@@ -110,7 +111,7 @@ function handleAddNewChat() {
     chatID: "-1",
     title: "新对话",
   };
-  conversations.push(conversation1)
+  conversations.push(conversation1);
 }
 
 function toggleCollapse(): void {
@@ -143,10 +144,9 @@ function deleteComponent() {
   closeDialog();
 }
 
-const reversesort =computed(()=>{
+const reversesort = computed(() => {
   return conversations.slice().reverse();
-})
-
+});
 
 fetchData();
 </script>

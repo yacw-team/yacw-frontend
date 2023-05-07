@@ -13,15 +13,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, defineProps, PropType } from "vue";
-import { useRouter} from "vue-router";
+import { ref, defineProps, PropType, inject } from "vue";
+import { useRouter } from "vue-router";
 
-const router =useRouter()
+const router = useRouter();
 function handleGoToChat() {
   console.log("conversation:", conversation);
   console.log("conversation.chatID:", conversation.chatID);
 
- 
   console.log("router:", router);
 
   router.push({ name: "chat", params: { id: conversation.chatID } });
@@ -54,7 +53,10 @@ const conversation = defineProps({
     type: Function as PropType<(index: any, newTitle: string) => void>,
     required: true,
   },
+  
 });
+
+
 </script>
 
 <style scoped>
