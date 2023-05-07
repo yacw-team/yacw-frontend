@@ -23,7 +23,7 @@
                 </el-menu-item>
             </el-menu>
         </el-col>
-        <el-col :span="22" >
+        <el-col :span="22">
             <div class="allElement">
                 <el-row :gutter="20" v-for="row in cardColumns" justify-content="space-between">
                     <el-col v-for="col in row" :span="8">
@@ -71,6 +71,8 @@ const PromptsList = reactive({
 
 
 
+
+
 //发送到详情页面的信息
 const jsondata = reactive<Prompt>({
     id: '',
@@ -86,12 +88,14 @@ const jsondata = reactive<Prompt>({
 const currentPage = ref(1);
 const isVisible = ref(false);
 const pageSize = 12;
-
+const promptType = ref('');
 
 
 //事件方法的集合
 
 function changeType(index: string) {
+    promptType.value = index;
+    fetchCards(promptType.value);
     console.log(index);
 }
 
@@ -125,9 +129,17 @@ const getRandomBackground = () => {
 };
 
 
-const fetchCards = async () => {
-    // const res = await fetch('/v1/chat/prompts');
+const fetchCards = async (index: string) => {
+    //根据类型进行请求
+    // let url = '/v1/chat/prompts';
+    // if (index !== null) {
+    //     url += `?type=${index}`;
+    // }
+
+    //const res = await fetch(url); 
     // const data = await res.json();
+
+
     const data = {
         Prompts: [
             {
@@ -142,62 +154,62 @@ const fetchCards = async () => {
             {
                 'id': '2',
                 "name": "222",
-                "description": "stringstringssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssstringssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
-                "prompts": "stringsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+                "description": "大便啊",
+                "prompts": "大便啊",
                 "type": "code",
                 "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
             },
             {
                 'id': '3',
                 "name": "333",
-                "description": "string",
-                "prompts": "string",
+                "description": "我靠",
+                "prompts": "我靠",
                 "type": "code",
                 "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
             }, {
                 'id': '4',
                 "name": "444",
-                "description": "string",
-                "prompts": "string",
+                "description": "你没事把",
+                "prompts": "你没事把",
                 "type": "code",
                 "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
             },
             {
                 'id': '5',
                 "name": "555",
-                "description": "string",
-                "prompts": "string",
+                "description": "哈哈哈哈",
+                "prompts": "哈哈哈哈",
                 "type": "code",
                 "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
             },
             {
                 'id': '6',
                 "name": "666",
-                "description": "string",
-                "prompts": "string",
+                "description": "真是的",
+                "prompts": "真是的",
                 "type": "code",
                 "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
             }, {
                 'id': '7',
                 "name": "777",
-                "description": "string",
-                "prompts": "string",
+                "description": "芜湖",
+                "prompts": "芜湖",
                 "type": "code",
                 "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
             },
             {
                 'id': '8',
                 "name": "888",
-                "description": "string",
-                "prompts": "string",
+                "description": "冲！！！",
+                "prompts": "冲！！！",
                 "type": "code",
                 "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
             },
             {
                 'id': '9',
                 "name": "999",
-                "description": "string",
-                "prompts": "string",
+                "description": "嘻嘻嘻",
+                "prompts": "嘻嘻嘻",
                 "type": "code",
                 "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
             }, {
@@ -281,7 +293,9 @@ const fetchCards = async () => {
 }
 
 
-onMounted(fetchCards);
+onMounted(() => {
+    fetchCards(promptType.value);
+});
 
 const cardColumns = computed(() => {
     //这部分负责把json数据塞入二维数组[][]
@@ -355,8 +369,9 @@ const cardColumns = computed(() => {
     padding-top: 5%;
 }
 
-.el-menu{
+.el-menu {
     width: fit-content;
+    
 }
 
 .footer {
@@ -369,7 +384,7 @@ const cardColumns = computed(() => {
     /* 设置容器为相对定位 */
     right: 0;
     bottom: 0;
-   
+
 }
 
 .MyMenu {
@@ -406,7 +421,4 @@ div {
     font-weight: bold;
     color: aliceblue;
 }
-
-
-
 </style>
