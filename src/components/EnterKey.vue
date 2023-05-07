@@ -23,7 +23,7 @@ const open = async () => {
           inputPlaceholder: 'Please Enter your License Key',
           center: true,
         })
-      const response = await axios.post(`/v1/chat/apikey`, { key: value })
+      const response = await axios.post(`/v1/chat/apikey`,JSON.stringify({key:value}))
       if (response.status === 200) {
         localStorage.setItem('apiKey', value)
         router.push(`/v1/chat/`)
