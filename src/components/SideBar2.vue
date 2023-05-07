@@ -39,13 +39,13 @@
     <div class="sidebar-footer" v-show="!isCollapsed">
       <el-input v-model="searchText" placeholder="搜索标题"></el-input>
       <el-divider></el-divider>
-      <el-button class="createchat">Create new Chat</el-button>
+      <el-button class="createchat" @click="handleAddNewChat">新建对话</el-button>
       <div>
-        <el-card class="flex" v-for="(conversation,index) in conversations" :key="index">
+        <el-card class="flex" v-for="(conversation,index) in reversesort" :key="index">
           <createnewChat
             :title="conversation.title"
             :chatID="conversation.chatID"
-            :index="index"
+            :index="conversations.length-index-1"
             :updateItems="updateItems"
           />
           <el-button @click="showDialog(index)">{{ icon3 }}</el-button>
@@ -75,6 +75,7 @@ import axios from "axios";
 import createnewChat from "./createnewChat.vue";
 import { ElMessageBox } from "element-plus";
 import { ElMessage } from "element-plus";
+import { reverse } from "dns";
 
 interface ChatConversation {
   chatID: string;
@@ -86,8 +87,8 @@ const selectedComponentIndex = ref(-1);
 
 const isCollapsed = ref(false);
 const conversations = reactive<ChatConversation[]>([
-  { chatID: "1", title: "112e1e21e12e" },
-  { chatID: "2", title: "21e21211" },
+  { chatID: "1", title: "1" },
+  { chatID: "2", title: "2" },
   { chatID: "3", title: "112d1d112" },
 ]);
 const searchText = ref("");
@@ -102,11 +103,21 @@ async function fetchData() {
   }
 }
 
+//新建对话
+function handleAddNewChat() {
+  type conversation1 = ChatConversation;
+  const conversation1 = {
+    chatID: "-1",
+    title: "新对话",
+  };
+  conversations.push(conversation1)
+}
+
 function toggleCollapse(): void {
   isCollapsed.value = !isCollapsed.value;
 }
 //修改title
-function updateItems(index: any, newTitle: string) {
+function updateItems(index: number, newTitle: string) {
   conversations[index].title = newTitle;
 }
 
@@ -131,6 +142,11 @@ function deleteComponent() {
   }
   closeDialog();
 }
+
+const reversesort =computed(()=>{
+  return conversations.slice().reverse();
+})
+
 
 fetchData();
 </script>
@@ -229,6 +245,7 @@ fetchData();
   background-color: rgb(25, 30, 59);
   font-size: large;
   font-weight: bolder;
+  margin-bottom: 10%;
 }
 
 .flex {
