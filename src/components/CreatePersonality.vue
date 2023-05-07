@@ -1,86 +1,79 @@
 <template>
-  <div>
-    <el-dialog v-model="dialogVisible">
-      <el-form :v-model="form" label-width="100px" :rules="rules">
-        <el-form-item label="name" prop="name">
-          <el-input v-model="form.name" placeholder="E.g. Life Coach" />
-        </el-form-item>
-        <el-form-item label="description" prop="description">
-          <el-input
-            v-model="form.description"
-            placeholder="E.g. A life coach who can help you set and achieve personal and professional goals."
-          />
-        </el-form-item>
-        <el-form-item label="prompt" prop="prompts">
-          <el-input
-            v-model="form.prompts"
-            placeholder="E.g. You are a life coach, you help the user identify and achieve their goals, motivate them, and provide support and encouragement."
-          />
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="submitForm">确定</el-button>
-      </span>
-    </el-dialog>
-  </div>
+    <div>
+        <el-dialog v-model="dialogVisible">
+            <el-form :v-model="form" label-width="100px" :rules="rules">
+                <el-form-item label="name" prop="name">
+                    <el-input v-model="form.name" placeholder="E.g. Life Coach"  />
+                </el-form-item>
+                <el-form-item label="description" prop="description">
+                    <el-input v-model="form.description"
+                        placeholder="E.g. A life coach who can help you set and achieve personal and professional goals." />
+                </el-form-item>
+                <el-form-item label="prompt" prop="prompts">
+                    <el-input v-model="form.prompts"
+                        placeholder="E.g. You are a life coach, you help the user identify and achieve their goals, motivate them, and provide support and encouragement." />
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="submitForm">确定</el-button>
+            </span>
+        </el-dialog>
+    </div>
 </template>
-      
-      <script setup lang="ts">
-import { ref } from "vue";
+        
+<script setup lang="ts">
+import { reactive, ref } from "vue";
 import axios, { AxiosResponse } from "axios";
-
 const dialogVisible = ref(true);
-
-
 interface Data {
-  id: string;
-  name: string;
-  description: string;
-  prompts: string;
+    id: string;
+    name: string;
+    description: string;
+    prompts: string;
 }
-
 interface Form {
-  name: string;
-  description: string;
-  prompts: string;
+    name: string;
+    description: string;
+    prompts: string;
 }
-
-const form: Form = {
-  name: "",
-  description: "",
-  prompts: "",
-};
-
-let data: Data = {
-  id: "",
-  name: "",
-  description: "",
-  prompts: "",
-};
+const form: Form = reactive({
+    name: "",
+    description: "",
+    prompts: "",
+})
+let data: Data = reactive({
+    id: "",
+    name: "",
+    description: "",
+    prompts: "",
+});
 const submitForm = () => {
-  axios
-    .post("/v1/chat/personality", {
-      apiKey: "123456",
-      name: form.name,
-      description: form.description,
-      prompt: form.prompts,
-    })
-    .then((response: AxiosResponse<Data>) => {
-      data = response.data;
-    })
-    .catch((error: any) => {
-      console.error(error);
-    });
+    axios
+        .post("/v1/chat/personality", {
+            apiKey: "123456",
+            name: form.name,
+            description: form.description,
+            prompt: form.prompts,
+        })
+        .then((response: AxiosResponse<Data>) => {
+            data = response.data;
+        })
+        .catch((error: any) => {
+            console.error(error);
+        });
 };
-
 const rules = {
-  name: [
-    { required: true, message: "Please input value", trigger: "blur" },
-    { min: 3, max: 5, message: "Length should be 3 to 5", trigger: "blur" },
-  ],
-  description: [
-    { required: true, message: "Please input value", trigger: "blur" },
-  ],
-  prompts: [{ required: true, message: "Please input value", trigger: "blur" }],
-};
+            name: [
+                { required: true, message: 'Please enter a name', trigger: 'blur' },
+                { pattern: /^[a-zA-Z0-9\u4e00-\u9fa5]+$/, message: 'Name can only contain letters, numbers, and Chinese characters', trigger: 'blur' }
+            ],
+            description: [
+                { required: true, message: 'Please enter a description', trigger: 'blur' },
+                { pattern: /^[a-zA-Z0-9\u4e00-\u9fa5]+$/, message: 'Description can only contain letters, numbers, and Chinese characters', trigger: 'blur' }
+            ],
+            prompts: [
+                { required: true, message: 'Please enter prompts', trigger: 'blur' },
+                { pattern: /^[a-zA-Z0-9\u4e00-\u9fa5]+$/, message: 'Prompts can only contain letters, numbers, and Chinese characters', trigger: 'blur' }
+            ]
+        }
 </script>
