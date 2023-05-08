@@ -32,7 +32,6 @@ const dialogVisible = ref(false);
 const form = ref({
   key: '',
 });
-const errorMessage = ref('');
 const isLoading = ref(false);
 const buttonText = ref('Enter License Key');
 const selectedModel = ref('');
@@ -91,7 +90,7 @@ const submit = async () => {
           message: 'Unauthorized: Invalid Key',
         });
       }
-    } catch (err) {
+    } catch (error:any) {
       ElMessage({
         type: 'error',
         message: `Failed to submit: ${err.message}`,
