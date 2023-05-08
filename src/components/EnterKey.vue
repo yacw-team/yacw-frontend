@@ -107,7 +107,7 @@ const computedValue = computed<string>({
   get() {
     return form.value.key;
   },
-  set(value) {
+  set(value:string) {
     form.value.key = value;
   },
 }) as { value: string };

@@ -5,12 +5,12 @@ import { ElMessage } from 'element-plus';
 
   
   interface State {
-  apiKey: string |123;
+  apiKey: string | null;
 }
 
 export const useStore = () => {
   const state = reactive<State>({
-    apiKey: localStorage.getItem('apiKey') || 123,
+    apiKey: localStorage.getItem('apiKey') || null,
   });
 
   const setApiKey = async (apiKey: string) => {
