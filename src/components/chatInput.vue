@@ -15,7 +15,7 @@
 import { provide, ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import PromptLibrary from '@/components/PromptLibrary.vue'
-import promptShop from '@/components/promptShop.vue'
+import promptShop from '@/components/PromptShop.vue'
 
 
 const input=ref('')
