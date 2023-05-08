@@ -33,24 +33,30 @@
       </div>
     </div>
     <div class="flex flex-row justify-center">
-        <el-button class="mx-4">取消</el-button>
-        <el-button class="mx-4" type="primary" plain @click="hangleSubmitStyle">提交</el-button>
+      <el-button class="mx-4">取消</el-button>
+      <el-button class="mx-4" type="primary" plain @click="hangleSubmitStyle"
+        >提交</el-button
+      >
     </div>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from "vue";
+import { ref } from "vue";
 import { InfoFilled } from "@element-plus/icons-vue";
 
 defineProps({
   dialogVisiable: Boolean,
 });
 
+const emit = defineEmits<{
+  (e: "submitStyle", styleTitle: string, styleValue: string): void;
+}>();
+
 const styleTitle = ref("");
 const styleValue = ref("");
 
 const hangleSubmitStyle = () => {
-  console.log(styleTitle.value, styleValue.value);
+  emit("submitStyle", styleTitle.value, styleValue.value);
 };
 </script>
