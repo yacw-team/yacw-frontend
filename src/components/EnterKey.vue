@@ -39,6 +39,7 @@ const selectedModel = ref('');
 const open = () => {
   if (apiKey.value) {
     router.push('/v1/chat');
+    console.log(apiKey.value)
   } else {
     dialogVisible.value = true;
   }
@@ -109,7 +110,7 @@ const computedValue = computed<string>({
   set(value) {
     form.value.key = value;
   },
-});
+}) as { value: string };
 
 // 只允许输入字母和数字
 const inputHandler = (event: Event) => {
