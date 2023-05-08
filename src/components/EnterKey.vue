@@ -90,7 +90,7 @@ const submit = async () => {
           message: 'Unauthorized: Invalid Key',
         });
       }
-    } catch (error:any) {
+    } catch (err:any) {
       ElMessage({
         type: 'error',
         message: `Failed to submit: ${err.message}`,
