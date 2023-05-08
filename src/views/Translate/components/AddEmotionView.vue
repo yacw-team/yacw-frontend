@@ -33,24 +33,30 @@
       </div>
     </div>
     <div class="flex flex-row justify-center">
-        <el-button class="mx-4">取消</el-button>
-        <el-button class="mx-4" type="primary" plain @click="hangleSubmitEmotion">提交</el-button>
+      <el-button class="mx-4">取消</el-button>
+      <el-button class="mx-4" type="primary" plain @click="hangleSubmitEmotion"
+        >提交</el-button
+      >
     </div>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from "vue";
+import { ref } from "vue";
 import { InfoFilled } from "@element-plus/icons-vue";
 
 defineProps({
   dialogVisiable: Boolean,
 });
 
+const emit = defineEmits<{
+  (e: "submitEmotion", emotionTitle: string, emotionValue: string): void;
+}>();
+
 const emotionTitle = ref("");
 const emotionValue = ref("");
 
 const hangleSubmitEmotion = () => {
-  console.log(emotionTitle.value, emotionValue.value);
+  emit("submitEmotion", emotionTitle.value, emotionValue.value);
 };
 </script>
