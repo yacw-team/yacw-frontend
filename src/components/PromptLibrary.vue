@@ -49,7 +49,7 @@ import { inject, onMounted, ref } from "vue";
 import Cp from "./CreatePersonality.vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
-import promptShop from '@/components/promptShop.vue'
+import promptShop from '@/components/PromptShop.vue'
 
 //后期与刘少对接
 const centerDialogVisible = ref(false);
