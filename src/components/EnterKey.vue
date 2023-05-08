@@ -24,7 +24,7 @@ import { ElMessage } from 'element-plus';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
-import { useStore } from 'vuex'
+import { useStore } from '../components/store.ts'//引入全局变量apiKey
 const store = useStore()
 const apiKey = computed(() => store.state.apiKey) // 计算属性获取apiKey
 const router = useRouter();
@@ -77,8 +77,8 @@ const submit = async () => {
       const response = await axios.post(`/v1/chat/apikey`, { key: form.value.key });
 
       if (response.status === 200) {
-        store.commit('setApiKey', form.value.key); // 在Vuex store中存储apiKey
-        router.push(`/v1/chat/`);//apikey全局存储
+        store.setApiKey(form.value.key); // 在Vuex store中存储apiKey
+        router.push(`/v1/chat/`);
         dialogVisible.value = false;
         ElMessage({
           type: 'success',
