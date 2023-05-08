@@ -24,7 +24,7 @@ import { ElMessage } from 'element-plus';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
-import { useStore } from '../components/store.ts'//引入全局变量apiKey
+import { useStore } from '../components/store'//引入全局变量apiKey
 const store = useStore()
 const apiKey = computed(() => store.state.apiKey) // 计算属性获取apiKey
 const router = useRouter();
