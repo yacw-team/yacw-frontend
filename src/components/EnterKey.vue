@@ -78,7 +78,7 @@ const submit = async () => {
 
       if (response.status === 200) {
         store.commit('setApiKey', form.value.key); // 在Vuex store中存储apiKey
-        router.push(`/v1/chat/`);
+        router.push(`/v1/chat/`);//apikey全局存储
         dialogVisible.value = false;
         ElMessage({
           type: 'success',
