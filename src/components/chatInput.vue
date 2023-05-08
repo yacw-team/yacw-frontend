@@ -1,69 +1,46 @@
 <template>
-    <div>
-        <h2>Test2</h2>
+
+   <promptShop @changeShow="(msg)=>isVisible=msg" v-if="isVisible"/>
+    <div v-if="!isVisible" @changeShow="(msg)=>isVisible=msg">
+     
+        <h2>对话测试页面</h2>
         <!-- <input type="text" v-model="jsonData.prompts"> -->
         <textarea type="text" v-model="input" ></textarea>
-       
+        <PromptLibrary @response="(msg) => input+= msg"></PromptLibrary>
     </div>
-    <PromptLibrary></PromptLibrary>
+
 </template>
   
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue';
+import { provide, ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import PromptLibrary from '@/components/PromptLibrary.vue'
+import promptShop from '@/components/promptShop.vue'
 
 
-const route = useRoute();
-const refresh=ref(true);
-//也可以获取整个的prompt
-// const queryString = decodeURIComponent(route.query.encodedData);
-//const jsonData = JSON.parse(queryString);
-//   function output(){
-//     console.log(route.query.encodedData)
-//   }
-
-// 解析URL中的数据
-// const urlParams = new URLSearchParams(window.location.search);
-// let data = urlParams.get('data') || "";
-
-const Jsondata = route.query.data ? (Array.isArray(route.query.data) ? route.query.data[0] : route.query.data) : null;
-const prompts = Jsondata ? JSON.parse(Jsondata) : "";
+const input=ref('')
+const prompt=ref()
+const isVisible=ref(false);
 
 
-const temp=ref<string>(prompts);
-const input = computed({
-    get() {
-        
-        return localStorage.getItem('temp')+temp.value;
-    },
-    set(value) {
-        localStorage.setItem('temp', value);
-    }
+// 在组件挂载时从 localStorage 中恢复值
+onMounted(() => {
+  const savedInput = localStorage.getItem('input');
+  if (savedInput) {
+    input.value = savedInput;
+  }
 });
 
-onMounted(()=>[
-    input.value
-])
-
-watch(() => route.query.data, (newVal) => {
-  const dataStr = Array.isArray(newVal) ? newVal[0] : newVal;
-  const data = dataStr ? JSON.parse(dataStr) : '';
-  temp.value = data;
+// 监听用户输入并更新 localStorage 中的值
+input.value = localStorage.getItem('input') || '';
+watch(()=>input.value,(newVal) => {
+  localStorage.setItem('input', newVal);
 });
 
+watch(()=>isVisible.value,(newVal) => {
+ console.log('newVal')
+});
 
-
-
-
-// // 使用ref创建响应式变量
-// const dataInput = ref(data);
-
-// // 监听data变化
-// watch(urlParams, (newVal) => {
-//   const newData = newVal.get("data") || "";
-//   dataInput.value = newData;
-// });
 
 
 
