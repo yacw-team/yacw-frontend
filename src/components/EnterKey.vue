@@ -102,7 +102,7 @@ const submit = async () => {
   }
 };
 
-const computedValue = computed({
+const computedValue = computed<string>({
   get() {
     return form.value.key;
   },
