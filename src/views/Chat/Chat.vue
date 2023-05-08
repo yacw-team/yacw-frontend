@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <SideBar2 :updatetitle="updateTitle" class="sidebar" />
+    <SideBar  class="sidebar" />
 
     <div class="content">
       <div class="chat">
@@ -28,7 +28,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import SideBar2 from "../../components/SideBar2.vue";
+import SideBar from "../../components/SideBar.vue";
 import { onMounted, ref, watch, defineProps, PropType, provide } from "vue";
 import axios from "axios";
 import { useRoute } from "vue-router";
@@ -61,7 +61,16 @@ interface firstchat {
     title: string;
   };
 }
-
+interface changetitle{
+  index:number,
+  id:string,
+  title:string
+}
+let changetitle = ref({
+          index: -1,
+          id: "",
+          title: "",
+        });
 async function sendmessage() {
   type usermessage = message;
   const usermessage = {
@@ -74,47 +83,63 @@ async function sendmessage() {
 
   isLoading.value = true;
 
-  if (messages[indexnumber.value].chatId == "-1") {
-    //第一次发送时
-    axios
-      .post("/v1/chat/new", {
-        apiKey: "string",
-        modelId: "string,+8",
-        content: {
-          personalityId: "string", //构造system
-          promptsId: "string",
-          user: textarea.value, // user input
-        },
-      })
-      .then((response) => {
-        let firstchat = response.data;
-        const changetitle = {
-          index: indexnumber,
-          id: firstchat.chatId,
-          title: firstchat.content.title,
-        };
-      });
-  } else {
-    //多次发送时
-    axios
-      .post("/v1/chat/chat", {
-        apiKey: "string",
-        chatId: "111",
-        content: {
-          user: textarea.value,
-        },
-      })
-      .then((response) => {
-        let getchat = response.data;
-        type assistantmessage = message;
-        const assistantmessage = {
-          type: "assistant",
-          content: getchat.content.assistant,
-        };
-        messages[indexnumber.value].messages.push(assistantmessage);
-      });
-  }
+  // if (messages[indexnumber.value].messages.length == 0) {
 
+   
+  //   //第一次发送时
+  //   axios
+  //     .post("/v1/chat/new", {
+  //       apiKey: "string",
+  //       modelId: "string,+8",
+  //       content: {
+  //         personalityId: "string", //构造system
+  //         promptsId: "string",
+  //         user: textarea.value, // user input
+  //       },
+  //     })
+  //     .then((response) => {
+  //       let firstchat = response.data;
+  //       changetitle = {
+  //         index: indexnumber.value,
+  //         id: firstchat.chatId,
+  //         title: firstchat.content.title,
+  //       };
+
+  //     }
+      
+  //     );
+  // } else {
+  //   //多次发送时
+  //   axios
+  //     .post("/v1/chat/chat", {
+  //       apiKey: "string",
+  //       chatId: "111",
+  //       content: {
+  //         user: textarea.value,
+  //       },
+  //     })
+  //     .then((response) => {
+  //       let getchat = response.data;
+  //       type assistantmessage = message;
+  //       const assistantmessage = {
+  //         type: "assistant",
+  //         content: getchat.content.assistant,
+  //       };
+  //       messages[indexnumber.value].messages.push(assistantmessage);
+  //     });
+  // }
+
+  //下面是模拟发送直接改index为2的chat的标题
+  //成功就可以把上面注释取消
+  changetitle.value.index=2,
+  
+  changetitle.value.id="1",
+  changetitle.value.title="你好新对话",
+
+  provide('newindex',changetitle.value.index)
+  provide('newid',changetitle.value.id)
+  provide('newtitle',changetitle.value.title)
+       
   isLoading.value = false;
 }
 
@@ -142,13 +167,14 @@ watch(
       }
     }
     const newmessage = {
-      chatId: "-1",
+      chatId: route.params.id as string,
       messages: [],
     };
     messages.push(newmessage);
     indexnumber.value = messages.length;
   }
 );
+
 
 const count = ref(0);
 const load = () => {

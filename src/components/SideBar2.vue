@@ -47,7 +47,6 @@
             :chatID="conversation.chatID"
             :index="conversations.length-index-1"
             :updateItems="updateItems"
-            
           />
           <el-button @click="showDialog(index)">{{ icon3 }}</el-button>
           <el-dialog v-model="isDialogOpen" @close="closeDialog">
@@ -71,7 +70,7 @@
 </template>
     
     <script setup lang="ts">
-import { ref, computed, reactive } from "vue";
+import { ref, computed, reactive, defineProps, watch, inject } from "vue";
 import axios from "axios";
 import createnewChat from "./createnewChat.vue";
 import { ElMessageBox } from "element-plus";
@@ -108,7 +107,7 @@ async function fetchData() {
 function handleAddNewChat() {
   type conversation1 = ChatConversation;
   const conversation1 = {
-    chatID: "-1",
+    chatID: "-1" + conversations.length,
     title: "新对话",
   };
   conversations.push(conversation1);
@@ -147,6 +146,22 @@ function deleteComponent() {
 const reversesort = computed(() => {
   return conversations.slice().reverse();
 });
+
+
+const newindex = inject<number>("newindex");
+const newid = inject<string>("newid");
+const newtitle = inject<string>("newtitle");
+
+watch(
+  () => newindex,
+  (newval) => {
+    console.log("values change", newindex, newid, newtitle);
+    if (newval != undefined && newid != undefined && newtitle != undefined) {
+      conversations[newval].chatID = newid;
+      conversations[newval].title = newtitle;
+    }
+  }
+);
 
 fetchData();
 </script>

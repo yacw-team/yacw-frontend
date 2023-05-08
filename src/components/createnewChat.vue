@@ -18,10 +18,7 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 function handleGoToChat() {
-  console.log("conversation:", conversation);
-  console.log("conversation.chatID:", conversation.chatID);
-
-  console.log("router:", router);
+ 
 
   router.push({ name: "chat", params: { id: conversation.chatID } });
 }
