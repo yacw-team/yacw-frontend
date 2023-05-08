@@ -21,6 +21,11 @@ const router = createRouter({
       path: "/tanslate",
       name: "tanslate",
       component: () => import("../views/Translate/TranslateView.vue"),
+    },
+    {
+      path: "/chat/:id",
+      name: "chat",
+      component: () => import("../views/Chat/Chat.vue"),
     }
   ],
 });
