@@ -568,15 +568,15 @@ const messages = ref([
 
 <style scoped>
 .container {
-display: flex;
-justify-content: space-around;
-align-items: flex-start;
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
 }
 
 .column {
-width: 50%;
-text-align:center;
-padding-left:100px;
+    width: 50%;
+    text-align:center;
+    padding-left:100px;
 }
 .title {
 
