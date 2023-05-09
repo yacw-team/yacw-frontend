@@ -2,7 +2,7 @@
   <div v-show="!isCollapsed">
     <el-input v-model="searchText" placeholder="搜索标题"></el-input>
     <el-divider></el-divider>
-    <el-button class="" @click="handleAddNewChat">新建对话</el-button>
+    <el-button class @click="handleAddNewChat">新建对话</el-button>
     <div>
       <div v-for="(conversation, index) in reversedCoversations" :key="index">
         <createNewChat
@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, defineProps, onMounted, watch } from "vue";
 import createNewChat from "./createNewChat.vue";
 
 interface ChatConversation {
@@ -53,6 +53,31 @@ const handleAddNewChat = () => {
   };
   conversations.value.push(newConversation);
 };
+
+onMounted(() => {
+  (newTitle.changeTitle as string) = "新对话";
+});
+
+let newTitle = defineProps({
+  changeTitleId: String,
+  changeTitleIndex: Number,
+  changeTitle: String,
+});
+
+watch(
+  () => newTitle.changeTitle,
+  (newval) => {
+    console.log(newTitle);
+    if (
+      newTitle.changeTitleIndex != undefined &&
+      newTitle.changeTitleId != undefined
+    ) {
+      conversations.value[newTitle.changeTitleIndex].chatID =
+        newTitle.changeTitleId;
+      conversations.value[newTitle.changeTitleIndex].title = newval as string;
+    }
+  }
+);
 
 const updateItems = (index: number, newTitle: string) => {
   conversations.value[index].title = newTitle;

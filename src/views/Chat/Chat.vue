@@ -1,19 +1,19 @@
 <template>
   <div class="flex">
     <SideBar class="sidebar" />
-    <ChatSideBar />
+    <ChatSideBar
+      :changeTitleId="changeTitle.id"
+      :changeTitleIndex="changeTitle.index"
+      :changeTitle="changeTitle.title"
+    />
     <div class="content">
       <div class="chat">
         <div v-infinite-scroll="load" class="messagecontent">
-          <div
-            v-for="(message1, index) in messages[indexnumber].messages"
-            :key="index"
-          >
+          <div v-for="(message1, index) in messages[indexnumber].messages" :key="index">
             <el-text
               :class="differentUser(message1.type)"
               :style="{ 'max-width': '300px' }"
-              >{{ message1.content }}</el-text
-            >
+            >{{ message1.content }}</el-text>
           </div>
         </div>
       </div>
@@ -26,9 +26,11 @@
           placeholder="请输入"
           :span="23"
         />
-        <el-button :span="1" :disabled="!textarea" @click="sendmessage">{{
+        <el-button :span="1" :disabled="!textarea" @click="sendmessage">
+          {{
           send
-        }}</el-button>
+          }}
+        </el-button>
       </div>
     </div>
   </div>
@@ -36,8 +38,9 @@
 <script setup lang="ts">
 import SideBar from "@/components/SideBar.vue";
 import ChatSideBar from "./components/ChatSideBar.vue";
-import { ref, watch, provide } from "vue";
+import { ref, watch, provide,defineProps, onMounted  } from "vue";
 import { useRoute } from "vue-router";
+import axios from "axios";
 
 const send = "✈";
 const isLoading = ref(false);
@@ -95,15 +98,46 @@ async function sendmessage() {
 
   isLoading.value = true;
 
-  //下面是模拟发送直接改index为2的chat的标题
-  (changeTitle.value.index = 2),
-    (changeTitle.value.id = "1"),
-    (changeTitle.value.title = "你好新对话"),
-    provide("newindex", changeTitle.value.index);
-  provide("newid", changeTitle.value.id);
-  provide("newtitle", changeTitle.value.title);
+  if (messages.value[indexnumber.value].messages.length == 0) {
+    //第一次发送时
+    axios
+      .post("/v1/chat/new", {
+        apiKey: "string",
+        modelId: "string,+8",
+        content: {
+          personalityId: "string", //构造system
+          promptsId: "string",
+          user: textarea.value, // user input
+        },
+      })
+      .then((response) => {
+        let firstchat:firstchat = response.data;
+        changeTitle.value.index = indexnumber.value
+        changeTitle.value.id =firstchat.chatId
+        changeTitle.value.title=firstchat.content.title
+      });
+  } else {
+    //多次发送时
+    axios
+      .post("/v1/chat/chat", {
+        apiKey: "string",
+        chatId: "111",
+        content: {
+          user: textarea.value,
+        },
+      })
+      .then((response) => {
+        let getchat = response.data;
+        const assistantmessage :Message = {
+          type: "assistant",
+          content: getchat.content.assistant,
+        };
+        messages.value[indexnumber.value].messages.push(assistantmessage);
+      });
+  }
 
-  isLoading.value = false;
+  //下面是模拟发送直接改index为2的chat的标题
+      (isLoading.value = false);
 }
 
 function differentUser(i: string) {
@@ -134,7 +168,7 @@ watch(
       messages: [],
     };
     messages.value.push(newmessage);
-    indexnumber.value = messages.value.length-1;
+    indexnumber.value = messages.value.length - 1;
   }
 );
 
