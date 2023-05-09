@@ -1,11 +1,15 @@
 <template>
   <div class="flex">
-    <SideBar2 :updatetitle="updateTitle" class="sidebar" />
-
+    <SideBar class="sidebar" />
+    <ChatSideBar
+      :changeTitleId="changeTitle.id"
+      :changeTitleIndex="changeTitle.index"
+      :changeTitle="changeTitle.title"
+    />
     <div class="content">
       <div class="chat">
         <div v-infinite-scroll="load" class="messagecontent">
-          <div v-for="(message1,index) in messages[indexnumber].messages" :key="index">
+          <div v-for="(message1, index) in messages[indexnumber].messages" :key="index">
             <el-text
               :class="differentUser(message1.type)"
               :style="{ 'max-width': '300px' }"
@@ -22,16 +26,21 @@
           placeholder="请输入"
           :span="23"
         />
-        <el-button :span="1" :disabled="!textarea" @click="sendmessage">{{ send }}</el-button>
+        <el-button :span="1" :disabled="!textarea" @click="sendmessage">
+          {{
+          send
+          }}
+        </el-button>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import SideBar2 from "../../components/SideBar2.vue";
-import { onMounted, ref, watch, defineProps, PropType, provide } from "vue";
-import axios from "axios";
+import SideBar from "@/components/SideBar.vue";
+import ChatSideBar from "./components/ChatSideBar.vue";
+import { ref, watch, provide,defineProps, onMounted  } from "vue";
 import { useRoute } from "vue-router";
+import axios from "axios";
 
 const send = "✈";
 const isLoading = ref(false);
@@ -62,19 +71,34 @@ interface firstchat {
   };
 }
 
+interface ChangeTitle {
+  index: number;
+  id: string;
+  title: string;
+}
+let changeTitle = ref<ChangeTitle>({
+  index: -1,
+  id: "",
+  title: "",
+});
+
+interface Message {
+  type: string;
+  content: string;
+}
+
 async function sendmessage() {
-  type usermessage = message;
-  const usermessage = {
+  const userMessage: Message = {
     type: "user",
     content: textarea.value,
   };
-  messages[indexnumber.value].messages.push(usermessage);
+  messages.value[indexnumber.value].messages.push(userMessage);
 
-  textarea = ref("");
+  textarea.value = "";
 
   isLoading.value = true;
 
-  if (messages[indexnumber.value].chatId == "-1") {
+  if (messages.value[indexnumber.value].messages.length == 0) {
     //第一次发送时
     axios
       .post("/v1/chat/new", {
@@ -87,12 +111,10 @@ async function sendmessage() {
         },
       })
       .then((response) => {
-        let firstchat = response.data;
-        const changetitle = {
-          index: indexnumber,
-          id: firstchat.chatId,
-          title: firstchat.content.title,
-        };
+        let firstchat:firstchat = response.data;
+        changeTitle.value.index = indexnumber.value
+        changeTitle.value.id =firstchat.chatId
+        changeTitle.value.title=firstchat.content.title
       });
   } else {
     //多次发送时
@@ -106,16 +128,16 @@ async function sendmessage() {
       })
       .then((response) => {
         let getchat = response.data;
-        type assistantmessage = message;
-        const assistantmessage = {
+        const assistantmessage :Message = {
           type: "assistant",
           content: getchat.content.assistant,
         };
-        messages[indexnumber.value].messages.push(assistantmessage);
+        messages.value[indexnumber.value].messages.push(assistantmessage);
       });
   }
 
-  isLoading.value = false;
+  //下面是模拟发送直接改index为2的chat的标题
+      (isLoading.value = false);
 }
 
 function differentUser(i: string) {
@@ -133,36 +155,31 @@ const indexnumber = ref(0); //作为具体哪个chatid
 
 watch(
   () => route.params.id,
-  (newid, oldid) => {
+  (newid) => {
     const contentid = newid;
-    for (let i = 0; i < messages.length; i++) {
-      if (messages[i].chatId == contentid) {
+    for (let i = 0; i < messages.value.length; i++) {
+      if (messages.value[i].chatId == contentid) {
         indexnumber.value = i;
         return;
       }
     }
     const newmessage = {
-      chatId: "-1",
+      chatId: route.params.id as string,
       messages: [],
     };
-    messages.push(newmessage);
-    indexnumber.value = messages.length;
+    messages.value.push(newmessage);
+    indexnumber.value = messages.value.length - 1;
   }
 );
 
 const count = ref(0);
 const load = () => {
-  if (count.value < messages[indexnumber.value].messages.length) {
+  if (count.value < messages.value[indexnumber.value].messages.length) {
     count.value += 1;
   }
 };
 
-interface message {
-  type: string;
-  content: string;
-}
-
-const messages = [
+const messages = ref([
   {
     chatId: "1",
     messages: [
@@ -526,7 +543,7 @@ const messages = [
       },
     ],
   },
-];
+]);
 </script>
 
 <style scoped>
