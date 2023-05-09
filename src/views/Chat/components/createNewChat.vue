@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <el-card>
     <span @click="handleGoToChat">{{ icon1 }}</span>
-    <span>{{conversation.title}}</span>
+    <span>{{ conversation.title }}</span>
     <span @click="opendialog">{{ icon2 }}</span>
     <el-dialog v-model="dialogVisible1">
       <p class="item">更改标题</p>
@@ -10,16 +10,15 @@
         <el-button class="item2" @click="closedialog">确定</el-button>
       </template>
     </el-dialog>
-  </div>
+  </el-card>
 </template>
 <script setup lang="ts">
-import { ref, defineProps, PropType, inject } from "vue";
+import { ref, defineProps } from "vue";
 import { useRouter } from "vue-router";
+import type { PropType } from "vue";
 
 const router = useRouter();
 function handleGoToChat() {
- 
-
   router.push({ name: "chat", params: { id: conversation.chatID } });
 }
 
@@ -47,13 +46,10 @@ const conversation = defineProps({
   index: Number,
 
   updateItems: {
-    type: Function as PropType<(index: any, newTitle: string) => void>,
+    type: Function as PropType<(index: number, newTitle: string) => void>,
     required: true,
   },
-  
 });
-
-
 </script>
 
 <style scoped>

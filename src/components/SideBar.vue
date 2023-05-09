@@ -8,59 +8,36 @@
               <ChatRound />
             </router-link>
           </i>
-          <span>{{ isCollapsed ? '' : 'Conversation' }}</span>
+          <span>{{ isCollapsed ? "" : "Conversation" }}</span>
         </el-menu-item>
       </router-link>
       <el-menu-item index="2">
         <i :class="isCollapsed ? 'el-icon-s-flag' : 'el-icon-s-platform'">
           <Help />
         </i>
-        <span>{{ isCollapsed ? '' : 'PsychologyConversation' }}</span>
+        <span>{{ isCollapsed ? "" : "PsychologyConversation" }}</span>
       </el-menu-item>
       <el-menu-item index="3">
         <i :class="isCollapsed ? 'el-icon-s-custom' : 'el-icon-data-analysis'">
           <SwitchFilled />
         </i>
-        <span>{{ isCollapsed ? '' : 'Game' }}</span>
+        <span>{{ isCollapsed ? "" : "Game" }}</span>
       </el-menu-item>
       <el-menu-item index="4">
         <i :class="isCollapsed ? 'el-icon-s-comment' : 'el-icon-phone-outline'">
           <Document />
         </i>
-        <span>{{ isCollapsed ? '' : 'Translation' }}</span>
+        <span>{{ isCollapsed ? "" : "Translation" }}</span>
       </el-menu-item>
       <el-menu-item index="5">
         <i :class="isCollapsed ? 'el-icon-s-promotion' : 'el-icon-picture'">
           <HomeFilled />
         </i>
-        <span>{{ isCollapsed ? '' : 'Home' }}</span>
+        <span>{{ isCollapsed ? "" : "Home" }}</span>
       </el-menu-item>
     </el-menu>
-    <div class="sidebar-footer" v-show="!isCollapsed">
-      <el-input v-model="searchText" placeholder="搜索标题"></el-input>
-      <el-divider></el-divider>
-      <el-button class="createchat" @click="handleAddNewChat">新建对话</el-button>
-      <div>
-        <el-card class="flex" v-for="(conversation,index) in reversesort" :key="index">
-          <createnewChat
-            :title="conversation.title"
-            :chatID="conversation.chatID"
-            :index="conversations.length-index-1"
-            :updateItems="updateItems"
-          />
-          <el-button @click="showDialog(index)">{{ icon3 }}</el-button>
-          <el-dialog v-model="isDialogOpen" @close="closeDialog">
-            <h2>是否要删除?</h2>
-            <template #footer>
-              <el-button @click="deleteComponent">是</el-button>
-              <el-button @click="closeDialog">否</el-button>
-            </template>
-          </el-dialog>
-        </el-card>
-      </div>
-    </div>
     <el-button
-      style="border:none;"
+      style="border: none"
       class="collapse-btn"
       :icon="isCollapsed ? 'Expand' : 'Fold'"
       @click="toggleCollapse"
@@ -70,39 +47,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from "vue";
+import { ref, reactive, watch, inject } from "vue";
+import { ChatRound, Help, SwitchFilled, Document, HomeFilled } from "@element-plus/icons-vue";
 import axios from "axios";
-
-// interface ChatConversation {
-//   Id: number;
-//   SystemPrompt: string;
-//   Uid: string;
-//   ModelId: number;
-//   PromptId: number;
-// }
 
 interface ChatConversation {
   chatID: string;
   title: string;
 }
 
-const isDialogOpen = ref(false);
-const selectedComponentIndex = ref(-1);
-
 const isCollapsed = ref(false);
-// const conversations = reactive<ChatConversation[]>([
-//   { SystemPrompt: "p1", Uid: "1", Id: 1, ModelId: 1, PromptId: 1 },
-//   { SystemPrompt: "p2", Uid: "2", Id: 2, ModelId: 2, PromptId: 2 },
-//   { SystemPrompt: "对话3标题", Uid: "3", Id: 3, ModelId: 3, PromptId: 3 },
-// ]);
-
 const conversations = reactive<ChatConversation[]>([
   { chatID: "1", title: "1" },
   { chatID: "2", title: "2" },
   { chatID: "3", title: "112d1d112" },
 ]);
-
-const searchText = ref("");
 
 async function fetchData() {
   try {
@@ -114,61 +73,35 @@ async function fetchData() {
   }
 }
 
-//新建对话
-function handleAddNewChat() {
-  type conversation1 = ChatConversation;
-  const conversation1 = {
-    chatID: "-1",
-    title: "新对话",
-  };
-  conversations.push(conversation1);
-}
-
 function toggleCollapse(): void {
   isCollapsed.value = !isCollapsed.value;
 }
 
-function updateItems(index: number, newTitle: string) {
-  conversations[index].title = newTitle;
-}
+const newindex = inject<number>("newindex");
+const newid = inject<string>("newid");
+const newtitle = inject<string>("newtitle");
 
-//删除某一个chat
-const icon3 = "🗑";
-function showDialog(index: number) {
-  selectedComponentIndex.value = index;
-  isDialogOpen.value = true;
-}
-
-function closeDialog() {
-  selectedComponentIndex.value = -1;
-  isDialogOpen.value = false;
-}
-
-function deleteComponent() {
-  if (
-    selectedComponentIndex.value >= 0 &&
-    selectedComponentIndex.value < conversations.length
-  ) {
-    conversations.splice(selectedComponentIndex.value, 1);
+watch(
+  () => newindex,
+  (newval) => {
+    console.log("values change", newindex, newid, newtitle);
+    if (newval != undefined && newid != undefined && newtitle != undefined) {
+      conversations[newval].chatID = newid;
+      conversations[newval].title = newtitle;
+    }
   }
-  closeDialog();
-}
-
-const reversesort = computed(() => {
-  return conversations.slice().reverse();
-});
+);
 
 fetchData();
 </script>
 
 <style scoped>
 .sidebar-container {
-  position: fixed;
+  position: relative;
   display: flex;
   height: 100%;
-  width: 30%;
   flex-direction: column;
-  border-left: 1px 0 solid #ccc;
+  border-left: 1px solid #ccc;
   padding-top: 50px;
 }
 
@@ -239,9 +172,7 @@ fetchData();
     margin-left: 5px;
     white-space: nowrap;
   }
-  .el-menu.el-menu--vertical {
-    padding-top: 350px;
-  }
+
   .footer-icons {
     margin-top: 0;
     margin-left: auto;
@@ -250,5 +181,19 @@ fetchData();
   .conversation-list {
     margin-left: 20px;
   }
+}
+
+.createchat {
+  padding: 10px 0;
+  width: 100%;
+  background-color: rgb(25, 30, 59);
+  font-size: large;
+  font-weight: bolder;
+  margin-bottom: 10%;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
 }
 </style>
