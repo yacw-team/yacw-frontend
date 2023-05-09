@@ -1,12 +1,12 @@
 <template>
 
-   <promptShop @changeShow="(msg)=>isVisible=msg" v-if="isVisible"/>
+   <promptShop @changeShow="(msg:string)=>isVisible=msg" v-if="isVisible"/>
     <div v-if="!isVisible" >
      
         <h2>对话测试页面</h2>
         <!-- <input type="text" v-model="jsonData.prompts"> -->
         <textarea type="text" v-model="input" ></textarea>
-        <PromptLibrary @response="(msg) => input+= msg"></PromptLibrary>
+        <PromptLibrary @response="(msg:string) => input+= msg"></PromptLibrary>
     </div>
 
 </template>
