@@ -56,8 +56,8 @@
 </template>
 
 <script setup lang="ts">
-import SideBar from "@/components/SideBar.vue";
-import ChatSideBar from "./components/ChatSideBar.vue";
+import SideBar from "../components/SideBar.vue";
+// import ChatSideBar from "./components/ChatSideBar.vue";
 import { ref, watch, provide,defineProps, onMounted  } from "vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
