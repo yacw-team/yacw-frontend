@@ -16,10 +16,9 @@
         <el-col :span="12">
           <el-text>
             Get more prompt please visit
-            <router-link to="/">
-              <el-text type="primary">prompt shop</el-text>
-            </router-link>
           </el-text>
+          <button @click="changeComponent" style="color: rgb(122, 127, 212);">
+            prompt shop</button>
         </el-col>
         <el-col :span="12">
           <el-button @click="toggle">新建prompt</el-button>
@@ -42,19 +41,18 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { inject, onMounted, ref } from "vue";
 import Cp from "./CreatePersonality.vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
+import promptShop from '@/components/PromptShop.vue'
+
 //后期与刘少对接
-
 const centerDialogVisible = ref(false);
-
 const createdialog = ref(false);
-
 function toggle() {
   createdialog.value = !createdialog.value;
 }
-
 interface Prompt {
   id: string;
   name: string;
@@ -64,7 +62,6 @@ interface Prompt {
   exampleOutput: string;
   content: string;
 }
-
 onMounted(() => {
   const fetchprompts = async (): Promise<Prompt[]> => {
     const response = await axios.get<Prompt[]>("API/v1/chat/prompts");
@@ -77,9 +74,7 @@ onMounted(() => {
     console.log(prompts);
   })();
 });
-
 type p = Array<Prompt>;
-
 const p = [
   {
     id: "1",
@@ -101,9 +96,24 @@ const p = [
   },
 ];
 
+const router = useRouter();
+const emit = defineEmits(['response', 'changeShow']);
+
+
 function getdetails(detail: string) {
-  console.log(detail);
+
+  emit('response', detail);
+  centerDialogVisible.value = false;
+
 }
+
+function changeComponent() {
+  centerDialogVisible.value = false;
+  emit('changeShow', true);
+
+  console.log("成功发出事件")
+}
+
 
 const input = ref("");
 </script>
