@@ -16,13 +16,9 @@
         <el-col :span="12">
           <el-text>
             Get more prompt please visit
-
-            <button  @click="changeComponent"
-            style="color: rgb(122, 127, 212);">
-              prompt shop</button>
-
-
           </el-text>
+          <button @click="changeComponent" style="color: rgb(122, 127, 212);">
+            prompt shop</button>
         </el-col>
         <el-col :span="12">
           <el-button @click="toggle">新建prompt</el-button>
@@ -101,7 +97,7 @@ const p = [
 ];
 
 const router = useRouter();
-const emit = defineEmits(['response','changeShow']);
+const emit = defineEmits(['response', 'changeShow']);
 
 
 function getdetails(detail: string) {
@@ -112,8 +108,9 @@ function getdetails(detail: string) {
 }
 
 function changeComponent() {
-  emit('changeShow',true);
   centerDialogVisible.value = false;
+  emit('changeShow', true);
+
   console.log("成功发出事件")
 }
 
