@@ -137,7 +137,7 @@
         <div class="flex flex-row items-center justify-center">
           <ModelSelectCard
             v-for="model in models"
-            @submit-model="(modelValue) => handleSelectModelSubmit(modelValue)"
+            @submit-model="(modelValue: string) => handleSelectModelSubmit(modelValue)"
             v-bind:key="model.id"
             class="w-1/2 m-2"
             :model-image="model.modelImage"
