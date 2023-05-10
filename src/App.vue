@@ -1,10 +1,9 @@
+<template>
+  <SideBar />
+  <RouterView />
+</template>
+
 <script setup lang="ts">
 import { RouterView } from "vue-router";
-
+import SideBar from "@/components/SideBar.vue";
 </script>
-
-<template>
-  <RouterView />
-  <!-- <RouterLink to="/about" class="p-2 bg-gray-300 border-black border-2">About</RouterLink> -->
-  
-</template>
