@@ -20,6 +20,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ElMessage } from 'element-plus';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
