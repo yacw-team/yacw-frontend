@@ -1,6 +1,6 @@
 <template>
   <el-button text @click="open" round style="background-color: bisque;" :disabled="isLoading">{{ buttonText }}</el-button>
-  <el-dialog v-model="dialogVisible" title="Enter License Key" v-model:visible="dialogVisible">
+  <el-dialog v-model="dialogVisible" title="Enter License Key" >
     <el-form :model="form" >
       <el-form-item prop="key">
         <el-input v-model="computedValue" placeholder="Please enter your license key" @input="inputHandler"></el-input>
@@ -20,7 +20,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ElMessage } from 'element-plus';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { ref, computed } from 'vue';
