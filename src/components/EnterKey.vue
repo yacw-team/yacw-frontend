@@ -41,7 +41,7 @@ import axios from "axios";
 import { useRouter } from "vue-router";
 import { ref, computed } from "vue";
 import { useStore } from "../components/store"; //引入全局变量apiKey
-import { db } from "../database/db.ts";
+//import { db } from "../database/db.ts";
 
 const store = useStore();
 const apiKey = computed(() => store.state.apiKey); // 计算属性获取apiKey
@@ -87,17 +87,17 @@ const submit = async () => {
   } else {
     isLoading.value = true;
     buttonText.value = "Loading...";
-
+/*
     await db.Apikey.clear();
     await db.Apikey.add({
       apikey: form.value.key,
       model: selectedModel.value,
     });
-
-     const data = await db.messagetitles.toArray();
+*/
+  //   const data = await db.messagetitles.toArray();
     isLoading.value = false;
     buttonText.value = "Has entered";
-    console.log(data);
+   // console.log(data);
   }
 };
 
