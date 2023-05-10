@@ -50,10 +50,12 @@
         </el-col>
     </el-row>
     <teleport to=".mask">
+
         <Details :jsondataicon="jsondata.icon" :jsondataprompts="jsondata.prompts"  
         :jsondatabackground="jsondata.background" :jsondataname="jsondata.name" 
         :jsondatadescription="jsondata.description" 
         v-if="isVisible" @close="isVisible = false" v-model="isVisible" />
+
     </teleport>
     <div class="footer">
         <el-pagination background layout="prev, pager, next" :total="PromptsList.Prompts.length" :current-page="currentPage"
@@ -62,7 +64,7 @@
 </template>
   
 <script setup lang="ts">
-import { reactive, onMounted, computed, ref } from 'vue'
+import { reactive, onMounted, computed, ref, watch } from 'vue'
 import Details from '@/components/LookDetailsPrompt.vue'
 import axios from 'axios';
 
@@ -96,7 +98,10 @@ const jsondata = reactive<Prompt>({
 const currentPage = ref(1);
 const isVisible = ref(false);
 const pageSize = 12;
-const promptType = ref();
+
+const promptType = ref('');
+const emit = defineEmits(['sendPrompt', 'changeShow1']);
+const promptMessage = ref();  //传递给输入框的prompt信息，来自LookDetailsPrompt
 
 
 //事件方法的集合
@@ -122,6 +127,12 @@ function sendMessage(col: Prompt) {
     jsondata.icon = col.icon;
     jsondata.prompts = col.prompts;
     isVisible.value = true;
+}
+
+//选择好prompt后，接收到，此时可以回传
+function finishChoosePrompt(msg: string) {
+    emit('sendPrompt', msg);
+    emit('changeShow1', false)
 }
 
 // 随机生成渐变颜色和 emoji
@@ -186,6 +197,8 @@ const cardColumns = computed(() => {
 });
 
 
+
+
 </script>
   
 <style>
@@ -236,7 +249,7 @@ const cardColumns = computed(() => {
 
 .el-menu {
     width: fit-content;
-    
+
 }
 
 .footer {

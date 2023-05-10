@@ -27,6 +27,7 @@
 </template>
 
 <script setup lang="ts">
+import { emitChangeFn } from 'element-plus';
 import { defineProps, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -56,19 +57,29 @@ const myData = reactive<Jsondata>({
     background: props.jsondatabackground as string,
     icon: props.jsondataicon as string,
 });
-const router = useRouter();
 
 
-function handleClick() {
-  // const data = JSON.stringify(myData.prompts);
-  // const encodedData = encodeURIComponent(data);
-  // router.push({ name: 'test2', query: { data:encodedData } });
-  const data = JSON.stringify(myData.prompts);
-  router.push({ name: 'test2', query: { data:data } });
+const emit = defineEmits(['usePrompt']);
+const myData = reactive<Jsondata>(props.jsonData);
 
-  console.log(data)
+
+//原本的实现方式-----使用router.push传递参数
+
+// const router = useRouter();
+
+// function handleClick() {
+//   const data = JSON.stringify(myData.prompts);
+//   //const encodedData = encodeURIComponent(data);
+//   router.push({ name: 'chatInput1', query: { data:data } });
+//   // const data = JSON.stringify(myData.prompts);
+//   // router.push({ name: 'test3', query: { data:data } });
+
+//   console.log(data)
+// }
+
+function handleClick(){
+  emit('usePrompt',myData.prompts);
 }
-
 
 </script>
 
