@@ -1,7 +1,9 @@
 <template>
-  <div style="width:1000px;
+ <el-button @click="open">AIcharacter</el-button>
+  <div style="width:1200px;
         padding-left:100px;">
-   
+       
+   <el-dialog style="width:1200px;" v-model="dialogVisible">
    <div style = "width:500px;
    padding:10px 100px;" >
    <el-form label-position="top">
@@ -29,7 +31,7 @@
       </el-col>
     </el-row>
     <br>
-    
+  </el-dialog>  
   </div>
 </template>
 <script setup lang="ts">
@@ -45,8 +47,12 @@ interface Personality {
 	Uid       :string
 	Designer  :number
 }
-
-
+const  dialogVisible = ref(false);
+const open = () => {
+   
+    dialogVisible.value = true;
+  
+};
 const props = defineProps({
   personalities: {
     type: Array as () => Personality[],
