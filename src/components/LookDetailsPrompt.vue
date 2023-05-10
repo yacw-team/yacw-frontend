@@ -60,7 +60,7 @@ const myData = reactive<Jsondata>({
 
 
 const emit = defineEmits(['usePrompt']);
-const myData = reactive<Jsondata>(props.jsonData);
+
 
 
 //原本的实现方式-----使用router.push传递参数
