@@ -1,22 +1,22 @@
 <template>
   <el-card :body-style="{ padding: '20px' }" shadow="always" justify-content="space-between">
-    <div class="background" :style="{ background: jsonData.background }">
-      <span class="emoji">{{ jsonData.icon }}</span>
-      <span class="name">{{ jsonData.name }}</span>
+    <div class="background" :style="{ background: myData.background }">
+      <span class="emoji">{{ myData.icon }}</span>
+      <span class="name">{{ myData.name }}</span>
     </div>
     <div class="bottom" style="padding: 14px">
 
       <div class="item">
         <h4>Name:</h4>
-        <p>{{ jsonData.description }}</p>
+        <p>{{ myData.description }}</p>
       </div>
       <div class="item">
         <h4>Description:</h4>
-        <p>{{ jsonData.description }}</p>
+        <p>{{ myData.description }}</p>
       </div>
       <div class="item">
         <h4>Prompts:</h4>
-        <p>{{ jsonData.prompts }}</p>
+        <p>{{ myData.prompts }}</p>
       </div>
 
     </div>
@@ -33,24 +33,34 @@ import { useRouter } from 'vue-router';
 
 
 interface Jsondata {
-  id: string;
+  
   name: string;
   description: string;
   prompts: string;
-  type: string;
+ 
   background: string;
   icon: string;
 }
 
 const props = defineProps({
-  jsonData: {
-    type: Object as () => Jsondata,
-    required: true,
-  },
+  jsondataicon:String, 
+  jsondataname:String, 
+  jsondatadescription:String, 
+  jsondatabackground:String, 
+  jsondataprompts:String, 
+});
+const myData = reactive<Jsondata>({
+    
+    name: props.jsondataname as string,
+    description:props.jsondatadescription as string, 
+    prompts: props.jsondataprompts as string,
+    background: props.jsondatabackground as string,
+    icon: props.jsondataicon as string,
 });
 
+
 const emit = defineEmits(['usePrompt']);
-const myData = reactive<Jsondata>(props.jsonData);
+
 
 
 //原本的实现方式-----使用router.push传递参数

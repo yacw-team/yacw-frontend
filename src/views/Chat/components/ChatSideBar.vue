@@ -54,6 +54,7 @@ const handleAddNewChat = () => {
 
 onMounted(() => {
   (newTitle.changeTitle as string) = "新对话";
+  
 });
 
 let newTitle = defineProps({
