@@ -8,12 +8,15 @@
     <div class="content">
       <div class="chat">
         <div v-infinite-scroll="load" class="messagecontent">
-          <div v-for="(message1, index) in messages[indexnumber].messages" :key="index">
-            <el-text
-              :class="differentUser(message1.type)"
-              :style="{ 'max-width': '300px' }"
-            >{{ message1.content }}</el-text>
+          <div v-if="messages[indexnumber]">
+            <div v-for="(message1, index) in messages[indexnumber].messages" :key="index">
+              <el-text
+                :class="differentUser(message1.type)"
+                :style="{ 'max-width': '300px' }"
+              >{{ message1.content }}</el-text>
+            </div>
           </div>
+          <div v-else>Loading...</div>
         </div>
       </div>
       <div class="sendchat">
@@ -35,12 +38,11 @@
   </div>
 </template>
 <script setup lang="ts">
-
 import ChatSideBar from "./components/ChatSideBar.vue";
 import { ref, watch, provide, defineProps, onMounted, type Ref } from "vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
-import {  db, check } from "../../database/db";
+import { db, check } from "../../database/db";
 
 const send = "✈";
 const isLoading = ref(false);
@@ -54,7 +56,6 @@ interface getchat {
     user: string;
     assistant: string;
   };
-
 }
 interface firstchat {
   chatId: string;
@@ -82,9 +83,9 @@ interface Message {
   type: string;
   content: string;
 }
-interface Chat{
-  chatId:string;
-  messages:Message[];
+interface Chat {
+  chatId: string;
+  messages: Message[];
 }
 
 async function sendmessage() {
@@ -103,7 +104,7 @@ async function sendmessage() {
       axios
         .post("/api/v1/chat/new", {
           apiKey: firstcord.apikey,
-          modelId: firstcord.model,
+          modelId: "0",
           content: {
             personalityId: "string", //构造system
             user: textarea.value, // user input
@@ -196,39 +197,40 @@ watch(
 );
 
 const count = ref(0);
-const load = () => {
+const load = ref(() => {
   if (count.value < messages.value[indexnumber.value].messages.length) {
     count.value += 1;
   }
-};
-const messages:Ref<Chat[]> =ref([]);
-onMounted(async () => {
-  await db.open()
-  if((await db.messages.toArray()).length !=0){
-    const chatIds =await db.messages.orderBy('chatId').uniqueKeys();
-      for(const chatid of chatIds ){
-        const messagesForChat = await db.messages.where('chatId').equals(chatid).toArray();
-        const messages1:Chat ={
-          chatId: chatid.toString(),
-          messages:[]
-        }
-        messagesForChat.forEach(
-          (message)=>{
-          messages1.messages.push({
-            type:"user",
-            content:message.userContent,
-          });
-          messages1.messages.push({
-            type:"assistant",
-            content:message.assistantContent,
-          });
-        }
-        )
-        messages.value.push(messages1)
-      } 
+});
+const messages: Ref<Chat[]> = ref([]);
 
+onMounted(async () => {
+  await db.open();
+  if ((await db.messages.toArray()).length != 0) {
+    const chatIds = await db.messages.orderBy("chatId").uniqueKeys();
+    for (const chatid of chatIds) {
+      const messagesForChat = await db.messages
+        .where("chatId")
+        .equals(chatid)
+        .toArray();
+      const messages1: Chat = {
+        chatId: chatid.toString(),
+        messages: [],
+      };
+      messagesForChat.forEach((message) => {
+        messages1.messages.push({
+          type: "user",
+          content: message.userContent,
+        });
+        messages1.messages.push({
+          type: "assistant",
+          content: message.assistantContent,
+        });
+      });
+      messages.value.push(messages1);
+    }
   }
-})
+});
 // const messages = ref([
 //   {
 //     chatId: "1",

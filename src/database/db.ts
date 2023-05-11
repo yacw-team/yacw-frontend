@@ -1,3 +1,4 @@
+import { count } from 'console';
 import Dexie from 'dexie';
 
 interface Apikey {
@@ -6,12 +7,12 @@ interface Apikey {
   model: string
 }
 interface MessageTitle {
-  id?:number;
+  id?: number;
   chatId: string;
   title: string;
 }
 interface Message {
-  id?:number;
+  id?: number;
   chatId: string;
   userContent: string;
   assistantContent: string;
@@ -49,3 +50,90 @@ export function check(): boolean {
   return true;
 }
 
+db.Apikey.clear();
+
+db.transaction('rw', db.messages, async function () {
+  if (await db.messages.count() == 0) {
+    db.messages.bulkAdd([
+      {
+        chatId: "1",
+        userContent: "你好1/1/1",
+        assistantContent: "你好1/2/1",
+      },
+      {
+        chatId: "1",
+        userContent: "你好1/1/2",
+        assistantContent: "你好1/2/2",
+
+      },
+      {
+        chatId: "1",
+        userContent: "你好1/1/3",
+        assistantContent: "你好1/2/3",
+      },
+
+    ]).then(function () {
+      console.log('初始化数据添加成功');
+    }).catch(function (error) {
+      console.error(error.stack || error);
+    });
+  }
+  else {
+    await db.messages.clear();
+    db.messages.bulkAdd([
+      {
+        chatId: "1",
+        userContent: "你好1/1/1",
+        assistantContent: "你好1/2/1",
+      },
+      {
+        chatId: "1",
+        userContent: "你好1/1/2",
+        assistantContent: "你好1/2/2",
+
+      },
+      {
+        chatId: "1",
+        userContent: "你好1/1/3",
+        assistantContent: "你好1/2/3",
+      },
+
+    ]).then(function () {
+      console.log('初始化数据添加成功');
+    }).catch(function (error) {
+      console.error(error.stack || error);
+    });
+  }
+
+}
+)
+db.transaction('rw', db.messagetitles, async function () {
+  if (await db.messagetitles.count() == 0) {
+
+    db.messagetitles.bulkAdd([
+      {
+        chatId: "1",
+        title: "标题1",
+      },
+
+    ]).then(function () {
+      console.log('初始化数据添加成功22');
+    }).catch(function (error) {
+      console.error(error.stack || error);
+    })
+  } else {
+    await db.messagetitles.clear();
+    db.messagetitles.bulkAdd([
+      {
+        chatId: "1",
+        title: "标题1",
+      },
+
+    ]).then(function () {
+      console.log('初始化数据添加成功22');
+    }).catch(function (error) {
+      console.error(error.stack || error);
+    })
+  }
+}
+);
