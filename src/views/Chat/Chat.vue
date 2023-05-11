@@ -64,7 +64,6 @@ interface firstchat {
   modelId: string;
   content: {
     personalityId: string;
-    promptsId: string;
     user: string; // user input
     assistant: string;
     title: string;
@@ -94,19 +93,16 @@ async function sendmessage() {
   };
   messages.value[indexnumber.value].messages.push(userMessage);
 
-  textarea.value = "";
-
   isLoading.value = true;
 
-  if (messages.value[indexnumber.value].messages.length == 0) {
+  if (messages.value[indexnumber.value].messages.length == 1) {
     //第一次发送时
     axios
-      .post("/v1/chat/new", {
+      .post("/api/v1/chat/new", {
         apiKey: "string",
-        modelId: "string,+8",
+        modelId: "1",
         content: {
           personalityId: "string", //构造system
-          promptsId: "string",
           user: textarea.value, // user input
         },
       })
@@ -115,13 +111,20 @@ async function sendmessage() {
         changeTitle.value.index = indexnumber.value
         changeTitle.value.id =firstchat.chatId
         changeTitle.value.title=firstchat.content.title
+
+
+        messages.value[indexnumber.value].chatId=firstchat.chatId
+        messages.value[indexnumber.value].messages.push({
+          type:"assistant",
+          content:firstchat.content.assistant
+        })
       });
   } else {
     //多次发送时
     axios
-      .post("/v1/chat/chat", {
+      .post("/api/v1/chat/chat", {
         apiKey: "string",
-        chatId: "111",
+        chatId: messages.value[indexnumber.value].chatId,
         content: {
           user: textarea.value,
         },
@@ -138,6 +141,7 @@ async function sendmessage() {
 
   //下面是模拟发送直接改index为2的chat的标题
       (isLoading.value = false);
+      textarea.value = "";
 }
 
 function differentUser(i: string) {

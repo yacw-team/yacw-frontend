@@ -56,6 +56,7 @@ const handleAddNewChat = () => {
 
 onMounted(() => {
   (newTitle.changeTitle as string) = "新对话";
+  
 });
 
 let newTitle = defineProps({
@@ -93,7 +94,7 @@ const deleteComponent = () => {
     selectedComponentIndex.value >= 0 &&
     selectedComponentIndex.value < conversations.value.length
   ) {
-    conversations.value.splice(selectedComponentIndex.value, 1);
+    conversations.value.splice(conversations.value.length-selectedComponentIndex.value-1, 1);
   }
   closeDialog();
 };
