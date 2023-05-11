@@ -98,7 +98,7 @@ async function sendmessage() {
   if (messages.value[indexnumber.value].messages.length == 1) {
     //第一次发送时
     axios
-      .post("api/v1/chat/new", {
+      .post("/api/v1/chat/new", {
         apiKey: "string",
         modelId: "1",
         content: {
@@ -122,7 +122,7 @@ async function sendmessage() {
   } else {
     //多次发送时
     axios
-      .post("api/v1/chat/chat", {
+      .post("/api/v1/chat/chat", {
         apiKey: "string",
         chatId: messages.value[indexnumber.value].chatId,
         content: {
