@@ -1,7 +1,7 @@
 <template>
-  <div class="flex">
-    <SideBar class="sidebar" />
+  <div class="flex flex-row">
     <ChatSideBar
+      class="pr-4"
       :changeTitleId="changeTitle.id"
       :changeTitleIndex="changeTitle.index"
       :changeTitle="changeTitle.title"
@@ -9,11 +9,15 @@
     <div class="content">
       <div class="chat">
         <div v-infinite-scroll="load" class="messagecontent">
-          <div v-for="(message1, index) in messages[indexnumber].messages" :key="index">
+          <div
+            v-for="(message1, index) in messages[indexnumber].messages"
+            :key="index"
+          >
             <el-text
               :class="differentUser(message1.type)"
               :style="{ 'max-width': '300px' }"
-            >{{ message1.content }}</el-text>
+              >{{ message1.content }}</el-text
+            >
           </div>
         </div>
       </div>
@@ -27,18 +31,15 @@
           :span="23"
         />
         <el-button :span="1" :disabled="!textarea" @click="sendmessage">
-          {{
-          send
-          }}
+          {{ send }}
         </el-button>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import SideBar from "@/components/SideBar.vue";
 import ChatSideBar from "./components/ChatSideBar.vue";
-import { ref, watch, provide,defineProps, onMounted  } from "vue";
+import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
 
@@ -47,18 +48,6 @@ const isLoading = ref(false);
 
 let textarea = ref("");
 
-interface getchat {
-  chatId: string;
-
-  content: {
-    user: string;
-    assistant: string;
-  };
-  id: {
-    usermsgid: string;
-    assmsgid: string;
-  };
-}
 interface firstchat {
   chatId: string;
   modelId: string;
@@ -131,7 +120,7 @@ async function sendmessage() {
       })
       .then((response) => {
         let getchat = response.data;
-        const assistantmessage :Message = {
+        const assistantmessage: Message = {
           type: "assistant",
           content: getchat.content.assistant,
         };
@@ -551,12 +540,6 @@ const messages = ref([
 </script>
 
 <style scoped>
-.flex {
-  display: flex;
-}
-.sidebar {
-  flex: 1;
-}
 .content {
   flex: 3;
   display: flex;

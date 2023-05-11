@@ -1,24 +1,22 @@
 <template>
   <div v-show="!isCollapsed">
-    <el-input v-model="searchText" placeholder="搜索标题"></el-input>
-    <el-divider></el-divider>
-    <el-button class @click="handleAddNewChat">新建对话</el-button>
+    <el-button class="w-full my-4" @click="handleAddNewChat" type="primary">
+      <el-icon>
+        <Plus class="mb-1" size="20" />
+      </el-icon>
+      <p class="pl-1 text-base">新建对话</p>
+    </el-button>
+    <el-input v-model="searchText" placeholder="搜索标题" disabled />
+    <el-divider />
     <div>
       <div v-for="(conversation, index) in reversedCoversations" :key="index">
-        <createNewChat
+        <CreateNewChat
           :title="conversation.title"
           :chatID="conversation.chatID"
           :index="conversations.length - index - 1"
           :updateItems="updateItems"
+          @deleteChat="(chatId: string) => handleDeleteChat(chatId)"
         />
-        <el-button @click="showDialog(index)">🗑</el-button>
-        <el-dialog v-model="isDialogOpen" @close="closeDialog">
-          <h2>是否要删除?</h2>
-          <template #footer>
-            <el-button @click="deleteComponent">是</el-button>
-            <el-button @click="closeDialog">否</el-button>
-          </template>
-        </el-dialog>
       </div>
     </div>
   </div>
@@ -26,14 +24,14 @@
 
 <script setup lang="ts">
 import { computed, ref, defineProps, onMounted, watch } from "vue";
-import createNewChat from "./createNewChat.vue";
+import { Plus } from "@element-plus/icons-vue";
+import CreateNewChat from "./CreateNewChat.vue";
 
 interface ChatConversation {
   chatID: string;
   title: string;
 }
-const isDialogOpen = ref(false);
-const selectedComponentIndex = ref(-1);
+
 const isCollapsed = ref(false);
 const searchText = ref("");
 const conversations = ref<ChatConversation[]>([
@@ -84,23 +82,7 @@ const updateItems = (index: number, newTitle: string) => {
   conversations.value[index].title = newTitle;
 };
 
-const showDialog = (index: number) => {
-  selectedComponentIndex.value = index;
-  isDialogOpen.value = true;
-};
-
-const deleteComponent = () => {
-  if (
-    selectedComponentIndex.value >= 0 &&
-    selectedComponentIndex.value < conversations.value.length
-  ) {
-    conversations.value.splice(conversations.value.length-selectedComponentIndex.value-1, 1);
-  }
-  closeDialog();
-};
-
-const closeDialog = () => {
-  selectedComponentIndex.value = -1;
-  isDialogOpen.value = false;
+const handleDeleteChat = (chatId: string) => {
+  console.log("delete" + chatId);
 };
 </script>
