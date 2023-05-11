@@ -22,9 +22,14 @@ const router = createRouter({
       component: () => import("@/views/Translate/TranslateView.vue"),
     },
     {
+      path: "/chat",
+      name: "chatHomePage",
+      component: () => import("@/views/Chat/ChatHomePage.vue"),
+    },
+    {
       path: "/chat/:id",
       name: "chat",
-      component: () => import("@/views/Chat/Chat.vue"),
+      component: () => import("@/views/Chat/ChatView.vue"),
     }
   ],
 });
