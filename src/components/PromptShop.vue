@@ -5,22 +5,22 @@
         <el-col :span="2" class="MyMenu">
             <el-menu default-active="2" class="el-menu-vertical-demo">
                 <el-menu-item index="All" @click="changeType('All')">
-                    <span>All</span>
+                    <span>全部</span>
                 </el-menu-item>
-                <el-menu-item index="Ads" @click="changeType('Ads')">
-                    <span>Ads</span>
+                <el-menu-item index="IT/编程" @click="changeType('IT/编程')">
+                    <span>IT/编程</span>
                 </el-menu-item>
-                <el-menu-item index="Business" @click="changeType('Business')">
-                    <span>Business</span>
+                <el-menu-item index="生活质量" @click="changeType('生活质量')">
+                    <span>生活质量</span>
                 </el-menu-item>
-                <el-menu-item index="Chatbot" @click="changeType('Chatbot')">
-                    <span>Chatbot</span>
+                <el-menu-item index="趣味知识" @click="changeType('趣味知识')">
+                    <span>趣味知识</span>
                 </el-menu-item>
-                <el-menu-item index="Coach" @click="changeType('Coach')">
-                    <span>Coach</span>
+                <el-menu-item index="自然百科" @click="changeType('自然百科')">
+                    <span>自然百科</span>
                 </el-menu-item>
-                <el-menu-item index="Code" @click="changeType('Code')">
-                    <span>Code</span>
+                <el-menu-item index="医生" @click="changeType('医生')">
+                    <span>医生</span>
                 </el-menu-item>
             </el-menu>
         </el-col>

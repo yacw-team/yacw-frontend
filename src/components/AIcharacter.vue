@@ -41,8 +41,8 @@
             >
               <UserFilled style="width: 1em; height: 1em; margin-right: 8px" />
               <div style="height: 150px; ;overflow-y: auto;">
-                <h3>{{ personalities.ModelName }}</h3>
-                <p>{{ personalities.Details }}</p>
+                <h3>{{ personalities.name}}</h3>
+                <p>{{ personalities.description }}</p>
               </div>
             </el-card>
           </el-col>
@@ -55,17 +55,16 @@
  <script setup lang="ts">
 import { defineProps, onMounted, ref } from "vue";
 import axios from "axios";
-import { error } from "console";
+
 
 interface Personality {
-  Id: string;
-  ModelName: string;
-  Details: string;
-  Prompt: string;
-  Uid: string;
-  Designer: number;
+  id: string;
+  name: string;
+  description	: string;
+  prompts: string;
 }
-
+const searchText = ref("");
+const filteredPersonalities = ref<Personality[]>();
 const emit = defineEmits(["getCharacter"]);
 const dialogVisible = ref(false);
 const open = () => {
@@ -134,21 +133,22 @@ onMounted(() => {
   axios
     .get("/api/v1/chat/personality")
     .then((response) => {
+      console.log('send success')
       filteredPersonalities.value = response.data;
+      console.log("获取的后端personality"+filteredPersonalities.value)
     })
     .catch((error) => {
       console.log(error);
     });
 });
 
-const searchText = ref("");
-const filteredPersonalities = ref<Personality[]>();
+
 
 async function handleSearch() {
   const response = await axios.get("");
   const personalities: Personality[] = response.data;
   filteredPersonalities.value = personalities.filter((personality) =>
-    personality.ModelName.toLowerCase().includes(searchText.value.toLowerCase())
+    personality.name.toLowerCase().includes(searchText.value.toLowerCase())
   );
 }
 

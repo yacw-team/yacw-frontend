@@ -86,11 +86,11 @@ watch(
       conversations.value[newTitle.changeTitleIndex].chatId =
         newTitle.changeTitleId;
       conversations.value[newTitle.changeTitleIndex].title = newval as string;
-      router.push({
-        name: "chat",
-        params: { id: conversations.value[newTitle.changeTitleIndex].chatId },
-      });
-      location.reload();
+      // router.push({
+      //   name: "chat",
+      //   params: { id: conversations.value[newTitle.changeTitleIndex].chatId },
+      // });
+      // location.reload();
     }
   }
 );
@@ -100,6 +100,11 @@ const updateItems = (index: number, newTitle: string) => {
 };
 
 const handleDeleteChat = (chatId: string) => {
-  console.log("delete" + chatId);
+  const indexToDelete = conversations.value.findIndex(
+    (conversation) => conversation.chatId === chatId
+  );
+  if (indexToDelete !== -1) {
+    conversations.value.splice(indexToDelete, 1);
+  }
 };
 </script>

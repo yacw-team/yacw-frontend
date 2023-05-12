@@ -1,58 +1,37 @@
 <template>
   <div>
-    <promptShop
-      @changeShow="(msg: boolean) => isVisible = msg"
-      v-if="isVisible"
-      @changeShow1="(msg: boolean) => isVisible = msg"
-      @sendPrompt="(msg: string) => input += msg"
-    />
+    <promptShop @changeShow="(msg: boolean) => isVisible = msg" v-if="isVisible"
+      @changeShow1="(msg: boolean) => isVisible = msg" @sendPrompt="(msg: string) => textarea = msg" />
     <div v-if="!isVisible">
       <div class="flex flex-row">
-        <ChatSideBar
-          class="pr-4"
-          :changeTitleId="changeTitle.id"
-          :changeTitleIndex="changeTitle.index"
-          :changeTitle="changeTitle.title"
-        />
+        <ChatSideBar class="pr-4" :changeTitleId="changeTitle.id" :changeTitleIndex="changeTitle.index"
+          :changeTitle="changeTitle.title" />
         <div class="content">
           <div class="chat">
             <div class="messagecontent">
               <div v-if="messages[indexnumber]">
                 <pre v-for="(message1, index) in messages[indexnumber].messages" :key="index">
-                  <el-text
-                    :class="differentUser(message1.type)"
-                    :style="{ 'max-width': '300px' }"
-                  >{{ message1.content }}</el-text>
-                </pre>
+                    <el-text
+                      :class="differentUser(message1.type)"
+                      :style="{ 'max-width': '300px' }"
+                    >{{ message1.content }}</el-text>
+                  </pre>
               </div>
-              <div v-else>Loading...</div>
+              <div v-else><HomePage/></div>
             </div>
           </div>
-          <div>
-            <PromptLibrary
-              @response="(msg: string) => textarea += msg"
-              @changeShow="(msg: boolean) => isVisible = msg"
-            />
+          <div style="display: flex; flex-direction: row;">
+            <PromptLibrary @response="(msg: string) => textarea += msg" @changeShow="(msg: boolean) => isVisible = msg" />
             <Alcharacter @getCharacter="(msg: Personality) => getCharacterinfo(msg)" />
             <br />
-            <div
-              v-if="isShowCharacter"
-              style="background-color: aquamarine; width: fit-content;  border-radius: 10px;"
-            >
+            <div v-if="isShowCharacter" style="background-color: aquamarine; width: fit-content;  border-radius: 10px;">
               <el-text>You are chatting with a</el-text>
-              <text style="font-weight: bold;">{{ Character.ModelName }}</text>
+              <text style="font-weight: bold;">{{ Character.name }}</text>
             </div>
             <br />
           </div>
           <div class="sendchat">
-            <el-input
-              v-model="textarea"
-              :rows="3"
-              type="textarea"
-              :disabled="isLoading"
-              placeholder="请输入"
-              :span="23"
-            />
+            <el-input v-model="textarea" :rows="3" type="textarea" :disabled="isLoading" placeholder="请输入" :span="23" />
             <el-button :span="1" :disabled="!textarea" @click="sendmessage">{{ send }}</el-button>
           </div>
         </div>
@@ -69,6 +48,7 @@ import { db } from "../../database/db";
 import PromptLibrary from "@/components/PromptLibrary.vue";
 import promptShop from "@/components/PromptShop.vue";
 import Alcharacter from "@/components/AIcharacter.vue";
+import HomePage from "@/views/Chat/ChatHomePage.vue";
 
 const send = "✈";
 const isLoading = ref(false);
@@ -92,13 +72,12 @@ type indexnumber = number;
 const indexnumber = ref(0); //作为具体哪个chatid
 
 interface Personality {
-  Id: string;
-  ModelName: string;
-  Details: string;
-  Prompt: string;
-  Uid: string;
-  Designer: number;
+  id: string;
+  name: string;
+  description	: string;
+  prompts: string;
 }
+
 
 interface getchat {
   chatId: string;
@@ -152,21 +131,23 @@ async function sendmessage() {
 
     if (messages.value[indexnumber.value].messages.length == 1) {
       //第一次发送时
-
+      console.log(model.value)
       axios
         .post("/api/v1/chat/new", {
           apiKey: apikey.value,
           modelId: model.value,
           content: {
-            personalityId: Character.value.Id, //构造system
+            personalityId: characterid.value, //构造system
             user: textarea.value, // user input
           },
         })
         .then(async (response) => {
           let firstchat: firstchat = response.data;
+          messages.value[indexnumber.value].chatId=firstchat.chatId;
           changeTitle.value.index = indexnumber.value;
           changeTitle.value.id = firstchat.chatId;
           changeTitle.value.title = firstchat.content.title;
+         
           try {
             await db.open();
             db.messagetitles.add({
@@ -278,7 +259,7 @@ watch(
 );
 
 function getCharacterinfo(msg: Personality) {
-  characterid.value = msg.Id;
+  characterid.value = msg.id;
   console.log(characterid.value)
   console.log(msg);
   Character.value = msg;
@@ -696,9 +677,11 @@ onMounted(async () => {
 .flex {
   display: flex;
 }
+
 .sidebar {
   flex: 1;
 }
+
 .content {
   flex: 3;
   display: flex;
@@ -718,6 +701,7 @@ onMounted(async () => {
   font-size: larger;
   color: #212121;
 }
+
 .assistant {
   border-radius: 5px;
   display: flex;
@@ -733,17 +717,23 @@ onMounted(async () => {
 }
 
 .chat {
-  height: 80%; /* 设置高度为视口高度的80% */
+  height: 80%;
+  /* 设置高度为视口高度的80% */
   background-color: #f5f5f5;
 }
+
 .sendchat {
   display: flex;
   height: 20%;
 }
+
 .messagecontent {
-  height: 800px; /* 设置固定的高度 */
-  overflow-y: scroll; /* 启用竖向滚动条 */
+  height: 800px;
+  /* 设置固定的高度 */
+  overflow-y: scroll;
+  /* 启用竖向滚动条 */
 }
+
 .auto-width {
   width: auto;
 }
