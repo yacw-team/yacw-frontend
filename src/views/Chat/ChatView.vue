@@ -1,37 +1,43 @@
 <template>
-
-  <div class="flex flex-row">
+  <div class="flex flex-row bg-gray-50">
     <ChatSideBar
-      class="pr-4"
+      class="w-1/4 px-4 py-2 bg-white border border-gray-200 rounded-md"
       :changeTitleId="changeTitle.id"
       :changeTitleIndex="changeTitle.index"
       :changeTitle="changeTitle.title"
     />
-    <div class="content">
-      <div class="chat">
-        <div v-infinite-scroll="load" class="messagecontent">
-          <div v-if="messages[indexnumber]">
-            <div v-for="(message1, index) in messages[indexnumber].messages" :key="index">
-              <el-text
-                :class="differentUser(message1.type)"
-                :style="{ 'max-width': '300px' }"
-              >{{ message1.content }}</el-text>
-            </div>
-          </div>
-          <div v-else>Loading...</div>
+    <div class="flex flex-col w-3/4">
+      <div
+        id="chat-messages"
+        class="flex-1 mx-4 overflow-y-scroll no-scrollbar"
+      >
+        <div
+          v-for="(message, index) in messages[indexnumber].messages"
+          :key="index"
+        >
+          <ChatMessage
+            class="mb-2"
+            :role="message.type"
+            :chatContent="message.content"
+          />
         </div>
       </div>
-      <div class="sendchat">
+      <div id="input-slot" class="flex flex-row mx-4 my-6">
         <el-input
           v-model="textarea"
-          :rows="3"
-          type="textarea"
           :disabled="isLoading"
           placeholder="请输入"
-          :span="23"
         />
-        <el-button :span="1" :disabled="!textarea" @click="sendmessage">
-          {{ send }}
+        <el-button
+          class="ml-4"
+          type="primary"
+          :disabled="!textarea"
+          @click="sendmessage"
+        >
+          <div class="flex flex-row items-center">
+            <span>发送</span>
+            <el-icon class="ml-1"><ArrowRightBold /></el-icon>
+          </div>
         </el-button>
       </div>
     </div>
@@ -39,12 +45,17 @@
 </template>
 <script setup lang="ts">
 import ChatSideBar from "./components/ChatSideBar.vue";
-import { ref, watch, provide, defineProps, onMounted, type Ref } from "vue";
+import { ref, watch, onMounted } from "vue";
+import type { Ref } from "vue";
+import { ArrowRightBold } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
-import { db, check } from "../../database/db";
+import { db } from "@/database/db";
 
-const send = "✈";
+import ChatMessage from "./components/ChatMessage.vue";
+
+const messages: Ref<Chat[]> = ref([]);
+
 const isLoading = ref(false);
 
 let textarea = ref("");
@@ -57,11 +68,13 @@ interface getchat {
     assistant: string;
   };
 }
+
 interface firstchat {
   chatId: string;
   modelId: string;
   content: {
     personalityId: string;
+    promptsId: string;
     user: string; // user input
     assistant: string;
     title: string;
@@ -83,6 +96,7 @@ interface Message {
   type: string;
   content: string;
 }
+
 interface Chat {
   chatId: string;
   messages: Message[];
@@ -173,13 +187,6 @@ async function sendmessage() {
     alert("没输入apikey和选择模型，请选择");
   }
 }
-function differentUser(i: string) {
-  if (i == "user") {
-    return "user";
-  } else {
-    return "assistant";
-  }
-}
 
 const apikey = ref("");
 const model = ref("");
@@ -209,12 +216,11 @@ watch(
 );
 
 const count = ref(0);
-const load = ref(() => {
+const load = () => {
   if (count.value < messages.value[indexnumber.value].messages.length) {
     count.value += 1;
   }
-});
-const messages: Ref<Chat[]> = ref([]);
+};
 
 onMounted(async () => {
   try {
@@ -256,426 +262,17 @@ onMounted(async () => {
     db.close();
   }
 });
-// const messages = ref([
-//   {
-//     chatId: "1",
-//     messages: [
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你sha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//     ],
-//   },
-//   {
-//     chatId: "2",
-//     messages: [
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你hsssssa1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//     ],
-//   },
-//   {
-//     chatId: "3",
-//     messages: [
-//       {
-//         type: "assistant",
-//         content: "还说c你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//       {
-//         type: "user",
-//         content: "你ha1",
-//       },
-//       {
-//         type: "assistant",
-//         content: "还说你是擦",
-//       },
-//     ],
-//   },
-// ]);
 </script>
 
 <style scoped>
-.flex {
-  display: flex;
-}
-.sidebar {
-  flex: 1;
-}
-.content {
-  flex: 3;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-.user {
-  border-radius: 5px;
-  background-color: #8bc34a;
-  display: flex;
-
-  justify-self: flex-end;
-  margin-left: auto;
-  margin-right: 20px;
-  margin-bottom: 20px;
-  font-size: larger;
-  color: #212121;
-}
-.assistant {
-  border-radius: 5px;
-  display: flex;
-  justify-self: flex-start;
-  margin-left: 20px;
-  margin-right: auto;
-  max-width: 150px;
-  width: auto;
-  background-color: #9e9e9e;
-  font-size: larger;
-  color: #212121;
-  margin-bottom: 20px;
-}
-
-.chat {
-  height: 80%; /* 设置高度为视口高度的80% */
-  background-color: #f5f5f5;
-}
-.sendchat {
-  display: flex;
-  height: 20%;
-}
-.messagecontent {
-  height: 800px; /* 设置固定的高度 */
-  overflow-y: scroll; /* 启用竖向滚动条 */
-}
-.auto-width {
-  width: auto;
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 </style>
