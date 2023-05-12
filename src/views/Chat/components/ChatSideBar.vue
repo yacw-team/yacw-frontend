@@ -9,7 +9,7 @@
     <el-input v-model="searchText" placeholder="搜索标题" disabled />
     <el-divider />
     <div>
-      <div v-for="(conversation, index) in reversedCoversations" :key="index">
+      <div v-for="(conversation, index) in reversedConversations" :key="index">
         <CreateNewChat
           :title="conversation.title"
           :chatID="conversation.chatId"

@@ -42,7 +42,7 @@ import ChatSideBar from "./components/ChatSideBar.vue";
 import { ref, watch, provide, defineProps, onMounted, type Ref } from "vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
-import { db, check } from "../../database/db";
+import { db } from "../../database/db";
 
 const send = "✈";
 const isLoading = ref(false);
