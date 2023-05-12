@@ -74,7 +74,7 @@ let textarea = ref("");
 const prompt = ref();
 const isVisible = ref(false); //组件切换显示
 const Character = ref();
-const characterid = ref("a");
+const characterid = ref("");
 
 const isShowCharacter = ref(false);
 
