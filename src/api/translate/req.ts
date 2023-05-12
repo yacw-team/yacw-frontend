@@ -1,5 +1,6 @@
 export interface GetTranslateResultReq {
     apiKey: string;
+    modelId:string;
     content: {
         emotion: string;
         style: string;

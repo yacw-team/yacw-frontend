@@ -152,14 +152,14 @@ const models = [
     id: "0",
     modelImage: "/gpt3.5.svg",
     modelName: "GPT-3.5",
-    modelValue: "gpt3.5",
+    modelValue: "0",
     modelDescription: "快速，准确度令人满意",
   },
   {
     id: "1",
     modelImage: "/gpt4.svg",
     modelName: "GPT-4",
-    modelValue: "gpt4",
+    modelValue: "1",
     modelDescription: "超乎想象的准确，但缓慢",
   },
 ];

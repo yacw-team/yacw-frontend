@@ -9,7 +9,7 @@
           <span>{{ isCollapsed ? "" : "主页" }}</span>
         </el-menu-item>
       </router-link>
-      <router-link to="/chat">
+      <router-link to="/chat/1">
         <el-menu-item index="2">
           <i :class="isCollapsed ? 'el-icon-s-home' : 'el-icon-s-management'">
             <ChatRound />
