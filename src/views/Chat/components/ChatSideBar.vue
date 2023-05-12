@@ -100,6 +100,14 @@ const updateItems = (index: number, newTitle: string) => {
 };
 
 const handleDeleteChat = (chatId: string) => {
-  console.log("delete" + chatId);
+  const indexToDelete = conversations.value.findIndex(
+    (conversation) => conversation.chatId === chatId
+  );
+  if (indexToDelete !== -1) {
+    conversations.value.splice(indexToDelete, 1);
+  }
 };
+
+
+
 </script>
