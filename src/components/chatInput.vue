@@ -25,7 +25,7 @@ import { provide, ref, onMounted, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import PromptLibrary from '@/components/PromptLibrary.vue'
 import promptShop from '@/components/PromptShop.vue'
-import Alcharacter from './Alcharacter.vue';
+import Alcharacter from './AIcharacter.vue';
 
 const input = ref('')
 const prompt = ref()
