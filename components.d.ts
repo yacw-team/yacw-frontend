@@ -11,6 +11,7 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     AIcharacter: typeof import('./src/components/AIcharacter.vue')['default']
     ChatInput: typeof import('./src/components/chatInput.vue')['default']
+    ClickPop: typeof import('./src/components/ClickPop.vue')['default']
     CreatePersonality: typeof import('./src/components/CreatePersonality.vue')['default']
     CreatePrompt: typeof import('./src/components/CreatePrompt.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']

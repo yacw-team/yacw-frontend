@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row">
+  <div class="flex flex-row h-screen">
     <SideBar />
     <RouterView class="w-full p-4 py-8" />
   </div>
