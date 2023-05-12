@@ -139,7 +139,6 @@ import { ref } from "vue";
 import { Coin, User, MagicStick } from "@element-plus/icons-vue";
 import ModelSelectCard from "@/views/HomePage/components/ModelSelectCard.vue";
 import { db } from "../../database/db";
-import func from "../../../vue-temp/vue-editor-bridge";
 
 const addKeyDialogVisiable = ref(false);
 const selectModelDialogVisiable = ref(false);
