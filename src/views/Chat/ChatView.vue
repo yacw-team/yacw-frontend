@@ -1,38 +1,61 @@
 <template>
-
-  <div class="flex flex-row">
-    <ChatSideBar
-      class="pr-4"
-      :changeTitleId="changeTitle.id"
-      :changeTitleIndex="changeTitle.index"
-      :changeTitle="changeTitle.title"
+  <div>
+    <promptShop
+      @changeShow="(msg: boolean) => isVisible = msg"
+      v-if="isVisible"
+      @changeShow1="(msg: boolean) => isVisible = msg"
+      @sendPrompt="(msg: string) => input += msg"
     />
-    <div class="content">
-      <div class="chat">
-        <div v-infinite-scroll="load" class="messagecontent">
-          <div v-if="messages[indexnumber]">
-            <div v-for="(message1, index) in messages[indexnumber].messages" :key="index">
-              <el-text
-                :class="differentUser(message1.type)"
-                :style="{ 'max-width': '300px' }"
-              >{{ message1.content }}</el-text>
+    <div v-if="!isVisible">
+      <div class="flex flex-row">
+        <ChatSideBar
+          class="pr-4"
+          :changeTitleId="changeTitle.id"
+          :changeTitleIndex="changeTitle.index"
+          :changeTitle="changeTitle.title"
+        />
+        <div class="content">
+          <div class="chat">
+            <div class="messagecontent">
+              <div v-if="messages[indexnumber]">
+                <pre v-for="(message1, index) in messages[indexnumber].messages" :key="index">
+                  <el-text
+                    :class="differentUser(message1.type)"
+                    :style="{ 'max-width': '300px' }"
+                  >{{ message1.content }}</el-text>
+                </pre>
+              </div>
+              <div v-else>Loading...</div>
             </div>
           </div>
-          <div v-else>Loading...</div>
+          <div>
+            <PromptLibrary
+              @response="(msg: string) => textarea += msg"
+              @changeShow="(msg: boolean) => isVisible = msg"
+            />
+            <Alcharacter @getCharacter="(msg: Personality) => getCharacterinfo(msg)" />
+            <br />
+            <div
+              v-if="isShowCharacter"
+              style="background-color: aquamarine; width: fit-content;  border-radius: 10px;"
+            >
+              <el-text>You are chatting with a</el-text>
+              <text style="font-weight: bold;">{{ Character.ModelName }}</text>
+            </div>
+            <br />
+          </div>
+          <div class="sendchat">
+            <el-input
+              v-model="textarea"
+              :rows="3"
+              type="textarea"
+              :disabled="isLoading"
+              placeholder="请输入"
+              :span="23"
+            />
+            <el-button :span="1" :disabled="!textarea" @click="sendmessage">{{ send }}</el-button>
+          </div>
         </div>
-      </div>
-      <div class="sendchat">
-        <el-input
-          v-model="textarea"
-          :rows="3"
-          type="textarea"
-          :disabled="isLoading"
-          placeholder="请输入"
-          :span="23"
-        />
-        <el-button :span="1" :disabled="!textarea" @click="sendmessage">
-          {{ send }}
-        </el-button>
       </div>
     </div>
   </div>
@@ -43,11 +66,39 @@ import { ref, watch, provide, defineProps, onMounted, type Ref } from "vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
 import { db } from "../../database/db";
+import PromptLibrary from "@/components/PromptLibrary.vue";
+import promptShop from "@/components/PromptShop.vue";
+import Alcharacter from "@/components/AIcharacter.vue";
 
 const send = "✈";
 const isLoading = ref(false);
 
 let textarea = ref("");
+const messages: Ref<Chat[]> = ref([]);
+
+const prompt = ref();
+const isVisible = ref(false); //组件切换显示
+const Character = ref();
+const characterid = ref("a");
+
+const isShowCharacter = ref(false);
+
+const apikey = ref("");
+const model = ref("");
+
+const route = useRoute();
+type indexnumber = number;
+// eslint-disable-next-line no-redeclare
+const indexnumber = ref(0); //作为具体哪个chatid
+
+interface Personality {
+  Id: string;
+  ModelName: string;
+  Details: string;
+  Prompt: string;
+  Uid: string;
+  Designer: number;
+}
 
 interface getchat {
   chatId: string;
@@ -89,6 +140,7 @@ interface Chat {
 }
 
 async function sendmessage() {
+  console.log(characterid.value);
   if (apikey.value != "" && model.value != "") {
     const userMessage: Message = {
       type: "user",
@@ -100,12 +152,13 @@ async function sendmessage() {
 
     if (messages.value[indexnumber.value].messages.length == 1) {
       //第一次发送时
+
       axios
         .post("/api/v1/chat/new", {
           apiKey: apikey.value,
           modelId: model.value,
           content: {
-            personalityId: "1", //构造system
+            personalityId: Character.value.Id, //构造system
             user: textarea.value, // user input
           },
         })
@@ -181,14 +234,6 @@ function differentUser(i: string) {
   }
 }
 
-const apikey = ref("");
-const model = ref("");
-
-const route = useRoute();
-type indexnumber = number;
-// eslint-disable-next-line no-redeclare
-const indexnumber = ref(0); //作为具体哪个chatid
-
 watch(
   () => route.params.id,
   (newid) => {
@@ -214,7 +259,31 @@ const load = ref(() => {
     count.value += 1;
   }
 });
-const messages: Ref<Chat[]> = ref([]);
+
+// 在组件挂载时从 localStorage 中恢复值
+onMounted(() => {
+  const savedInput = localStorage.getItem("input");
+  if (savedInput) {
+    textarea.value = savedInput;
+  }
+});
+
+// 监听用户输入并更新 localStorage 中的值
+textarea.value = localStorage.getItem("input") || "";
+watch(
+  () => textarea.value,
+  (newVal) => {
+    localStorage.setItem("input", newVal);
+  }
+);
+
+function getCharacterinfo(msg: Personality) {
+  characterid.value = msg.Id;
+  console.log(characterid.value)
+  console.log(msg);
+  Character.value = msg;
+  isShowCharacter.value = true;
+}
 
 onMounted(async () => {
   try {

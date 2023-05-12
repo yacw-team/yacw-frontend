@@ -61,8 +61,8 @@ const rules = {
 
 const submitForm = () => {
   axios
-    .post("/v1/chat/personality", {
-      apiKey: "123456",
+    .post("/api/v1/chat/personality", {
+      apiKey: "sk-xbuiasuxbasbxia",
       name: form.value.name,
       description: form.value.description,
       prompt: form.value.prompts,

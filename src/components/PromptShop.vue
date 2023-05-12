@@ -1,31 +1,31 @@
 <template>
     <div class="mask" v-show="isVisible" @click="isVisible = false"></div>
+    <div style="width: 100%;">
     <el-row class="all">
         <el-col :span="2" class="MyMenu">
             <el-menu default-active="2" class="el-menu-vertical-demo">
-                <el-menu-item index="All" @click="changeType">
+                <el-menu-item index="All" @click="changeType('All')">
                     <span>All</span>
                 </el-menu-item>
-                <el-menu-item index="Ads" @click="changeType">
+                <el-menu-item index="Ads" @click="changeType('Ads')">
                     <span>Ads</span>
                 </el-menu-item>
-                <el-menu-item index="Business" @click="changeType">
+                <el-menu-item index="Business" @click="changeType('Business')">
                     <span>Business</span>
                 </el-menu-item>
-                <el-menu-item index="Chatbot" @click="changeType">
+                <el-menu-item index="Chatbot" @click="changeType('Chatbot')">
                     <span>Chatbot</span>
                 </el-menu-item>
-                <el-menu-item index="Coach" @click="changeType">
+                <el-menu-item index="Coach" @click="changeType('Coach')">
                     <span>Coach</span>
                 </el-menu-item>
-                <el-menu-item index="Code" @click="changeType">
+                <el-menu-item index="Code" @click="changeType('Code')">
                     <span>Code</span>
                 </el-menu-item>
             </el-menu>
         </el-col>
         <el-col :span="22">
-            <div v-if=" isDataLoaded">
-                 <div class="allElement">
+            <div class="allElement">
                 <el-row :gutter="20" v-for="row in cardColumns" justify-content="space-between">
                     <el-col v-for="col in row" :span="8">
                         <el-card :body-style="{ padding: '0px' }" @click="sendMessage(col)">
@@ -40,33 +40,29 @@
                     </el-col>
                 </el-row>
             </div>
-            </div>
-            <div v-else>
-                <p>Loading...</p>
-            </div>
-           
 
 
         </el-col>
     </el-row>
     <teleport to=".mask">
-
         <Details :jsondataicon="jsondata.icon" :jsondataprompts="jsondata.prompts"  
         :jsondatabackground="jsondata.background" :jsondataname="jsondata.name" 
         :jsondatadescription="jsondata.description" 
-        v-if="isVisible" @close="isVisible = false" v-model="isVisible" />
-
+        v-if="isVisible" @close="isVisible = false" v-model="isVisible"
+            @usePrompt="(msg: string) => finishChoosePrompt(msg)" />
     </teleport>
     <div class="footer">
         <el-pagination background layout="prev, pager, next" :total="PromptsList.Prompts.length" :current-page="currentPage"
             :page-size="12" @current-change="updatePage" />
-    </div>
+    </div></div>
 </template>
   
 <script setup lang="ts">
 import { reactive, onMounted, computed, ref, watch } from 'vue'
 import Details from '@/components/LookDetailsPrompt.vue'
-import axios from 'axios';
+
+import axios from 'axios'
+
 
 interface Prompt {
     id: string,
@@ -75,7 +71,7 @@ interface Prompt {
     prompts: string,
     background: string,
     icon: string
-}
+};
 const PromptsList = reactive({
     Prompts: [] as Prompt[],
 })
@@ -98,16 +94,16 @@ const jsondata = reactive<Prompt>({
 const currentPage = ref(1);
 const isVisible = ref(false);
 const pageSize = 12;
-
-const promptType = ref('');
+const promptType = ref();
 const emit = defineEmits(['sendPrompt', 'changeShow1']);
 const promptMessage = ref();  //传递给输入框的prompt信息，来自LookDetailsPrompt
-
 
 //事件方法的集合
 
 function changeType(index: string) {
+    if(index!='All')
     promptType.value = index;
+    else  promptType.value = null;
     fetchCards(promptType.value);
     console.log(index);
 }
@@ -146,7 +142,7 @@ const getRandomBackground = () => {
     return { background, icon };
 };
 
-const isDataLoaded=ref(false);
+const data = ref({ Prompts: [] as Prompt[] });
 const fetchCards = async (index: string) => {
     //根据类型进行请求
     let url = '/api/v1/chat/prompts';
@@ -154,26 +150,95 @@ const fetchCards = async (index: string) => {
         url += `?type=${index}`;
     }
 
-    axios.get(url)
-    .then((response)=>{
-        let data =response.data; 
-        PromptsList.Prompts = data.Prompts.map((prompt:Prompt) => {
-        const { background, icon } = getRandomBackground();
-        console.log(data)
-        return { ...prompt, background, icon };
-       
-    });
+    // try {
+    //     console.log("发出请求，来获得shop资源");
+    //     const res = await fetch(url);
+    //     data.value = await axios.get(url);
+
+
+    // } catch (error) {
+    //     console.log("获取失败,使用默认值")
+    //     data.value = {
+    //         Prompts: [
+    //             {
+    //                 'id': '1',
+    //                 "name": "111",
+    //                 "description": "string",
+    //                 "prompts": "string",
+    //                 "icon": '',
+    //                 "background": ''
+    //             },
+    //             {
+    //                 'id': '2',
+    //                 "name": "222",
+    //                 "description": "大便啊",
+    //                 "prompts": "大便啊",
+    //                 "icon": '',
+    //                 "background": ''
+    //             },
+    //             {
+    //                 'id': '3',
+    //                 "name": "333",
+    //                 "description": "我靠",
+    //                 "prompts": "我靠",
+    //                 "icon": '',
+    //                 "background": ''
+    //             },
+    //         ]
+    //     };
+
+    // }
+    axios.get(url).then(response => {
+        console.log("发出请求,来获得shop资源");
+         data.value = response.data;
+        PromptsList.Prompts = data.value.Prompts.map((prompt: Prompt) => {
+            const { background, icon } = getRandomBackground();
+            console.log(data)
+            return { ...prompt, background, icon };
+        })
+    },error=>{
+        console.log("获取失败,使用默认值")
+        data.value = {
+            Prompts: [
+                {
+                    'id': '1',
+                    "name": "111",
+                    "description": "string",
+                    "prompts": "string",
+                    "icon": '',
+                    "background": ''
+                },
+                {
+                    'id': '2',
+                    "name": "222",
+                    "description": "大便啊",
+                    "prompts": "大便啊",
+                    "icon": '',
+                    "background": ''
+                },
+                {
+                    'id': '3',
+                    "name": "333",
+                    "description": "我靠",
+                    "prompts": "我靠",
+                    "icon": '',
+                    "background": ''
+                },
+            ]
+        };
     })
-    
-    isDataLoaded.value = true;
 }
 
 
 onMounted(() => {
+    console.log("shop的Mount时刻");
     fetchCards(promptType.value);
+    console.log("此时已经获取资源")
 });
 
 const cardColumns = computed(() => {
+
+
     //这部分负责把json数据塞入二维数组[][]
     const columns = [];
     let column = [];
@@ -182,6 +247,10 @@ const cardColumns = computed(() => {
 
     const start = (currentPage.value - 1) * pageSize;
     const end = start + pageSize;
+    PromptsList.Prompts = data.value.Prompts.map((prompt: Prompt) => {
+        const { background, icon } = getRandomBackground();
+        return { ...prompt, background, icon };
+    });
 
     for (let i = start; i < PromptsList.Prompts.length && i < end; i++) {
         column.push(PromptsList.Prompts[i]);
@@ -196,7 +265,12 @@ const cardColumns = computed(() => {
     return columns;
 });
 
-
+watch(() => data, (newVal) => {
+    PromptsList.Prompts = data.value.Prompts.map((prompt: Prompt) => {
+        const { background, icon } = getRandomBackground();
+        return { ...prompt, background, icon };
+    });
+})
 
 
 </script>
@@ -268,6 +342,7 @@ const cardColumns = computed(() => {
 .MyMenu {
     height: 100vh;
     padding-right: 5%;
+   
 }
 
 .mask {
