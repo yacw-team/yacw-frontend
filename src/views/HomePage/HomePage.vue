@@ -3,26 +3,17 @@
     <div class="pt-16 text-center">
       <h1 class="text-4xl font-bold">Get started with ChatGPT API</h1>
       <div class="flex flex-row items-center justify-center p-16">
-        <el-button
-          class="mx-2"
-          type="warning"
-          round
-          @click="addKeyDialogVisiable = true"
-          >输入 API Key</el-button
-        >
+        <el-button class="mx-2" type="warning" round @click="addKeyDialogVisiable = true">输入 API Key</el-button>
         <el-button
           class="mx-2"
           type="primary"
           round
           @click="selectModelDialogVisiable = true"
-          >选择 ChatGPT 模型</el-button
-        >
+        >选择 ChatGPT 模型</el-button>
       </div>
     </div>
     <el-main>
-      <div
-        class="flex flex-row flex-wrap items-center justify-center mx-2 h-max"
-      >
+      <div class="flex flex-row flex-wrap items-center justify-center mx-2 h-max">
         <el-card class="w-1/3 mx-4 md:w-1/5 md:mx-10 md:p-4">
           <template #header>
             <div class="flex flex-row justify-center">
@@ -50,9 +41,7 @@
             </div>
           </template>
           <div>
-            <p>
-              我们非常注重用户隐私和数据保护，我们不会收集任何敏感信息，并采取了多种措施确保所有数据的安全性。
-            </p>
+            <p>我们非常注重用户隐私和数据保护，我们不会收集任何敏感信息，并采取了多种措施确保所有数据的安全性。</p>
           </div>
         </el-card>
 
@@ -89,13 +78,10 @@
           <a
             class="text-blue-500"
             href="https://platform.openai.com/account/api-keys"
-            >OpenAI Key Management</a
-          >
+          >OpenAI Key Management</a>
           页面获取 OpenAI API Key.
         </div>
-        <div class="my-1">
-          您的 Key 将会被保存在本地浏览器中，我们不会收集您的 Key.
-        </div>
+        <div class="my-1">您的 Key 将会被保存在本地浏览器中，我们不会收集您的 Key.</div>
       </div>
       <div id="add-key-input" class="my-6">
         <el-input
@@ -117,11 +103,8 @@
             openAIkey = '';
             addKeyInputError = false;
           "
-          >取消</el-button
-        >
-        <el-button class="ml-2" type="primary" @click="handleAddKeySubmit"
-          >保存</el-button
-        >
+        >取消</el-button>
+        <el-button class="ml-2" type="primary" @click="handleAddKeySubmit">保存</el-button>
       </div>
     </div>
   </el-dialog>
@@ -155,6 +138,7 @@
 import { ref } from "vue";
 import { Coin, User, MagicStick } from "@element-plus/icons-vue";
 import ModelSelectCard from "@/views/HomePage/components/ModelSelectCard.vue";
+import { db } from "../../database/db";
 
 const addKeyDialogVisiable = ref(false);
 const selectModelDialogVisiable = ref(false);
@@ -166,34 +150,70 @@ const selectedModel = ref("");
 const models = [
   {
     id: "0",
-    modelImage:
-      "/gpt3.5.svg",
+    modelImage: "/gpt3.5.svg",
     modelName: "GPT-3.5",
     modelValue: "gpt3.5",
     modelDescription: "快速，准确度令人满意",
   },
   {
     id: "1",
-    modelImage:
-      "/gpt4.svg",
+    modelImage: "/gpt4.svg",
     modelName: "GPT-4",
     modelValue: "gpt4",
     modelDescription: "超乎想象的准确，但缓慢",
   },
 ];
 
-const handleAddKeySubmit = () => {
+const handleAddKeySubmit = async () => {
   // check key format
   if (openAIkey.value.slice(0, 3) != "sk-" || openAIkey.value.length !== 51) {
     addKeyInputError.value = true;
     return;
   }
   console.log(openAIkey.value);
+  try {
+    await db.open();
+    const firstRecord = await db.Apikey.toCollection().first();
+
+    if (firstRecord) {
+      await db.Apikey.update(firstRecord.id as number, {
+        apikey: openAIkey.value,
+      });
+      //console.log(firstRecord);
+    } else {
+      await db.Apikey.add({
+        apikey: openAIkey.value,
+        model: "",
+      });
+      console.log(firstRecord);
+    }
+  } finally {
+    db.close();
+  }
+
+
   addKeyDialogVisiable.value = false;
 };
 
-const handleSelectModelSubmit = (modelValue: string) => {
+const handleSelectModelSubmit = async (modelValue: string) => {
   selectedModel.value = modelValue;
+  try {
+    await db.open();
+    const firtRecord = await db.Apikey.toCollection().first();
+    if (firtRecord) {
+      await db.Apikey.update(firtRecord.id as number, { model: modelValue });
+     // console.log(firtRecord);
+    } else {
+      await db.Apikey.add({
+        apikey: "",
+        model: modelValue,
+      });
+      console.log(firtRecord);
+    }
+  } finally {
+    db.close();
+  }
+
   selectModelDialogVisiable.value = false;
 };
 </script>
