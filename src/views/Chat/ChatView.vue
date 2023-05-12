@@ -89,43 +89,45 @@ interface Chat {
 }
 
 async function sendmessage() {
-  const userMessage: Message = {
-    type: "user",
-    content: textarea.value,
-  };
-  messages.value[indexnumber.value].messages.push(userMessage);
+  if (apikey.value != "" && model.value != "") {
+    const userMessage: Message = {
+      type: "user",
+      content: textarea.value,
+    };
+    messages.value[indexnumber.value].messages.push(userMessage);
 
-  isLoading.value = true;
-  if (check()) {
-    const data = await db.Apikey.toArray();
-    const firstcord = data[0];
+    isLoading.value = true;
+
     if (messages.value[indexnumber.value].messages.length == 1) {
       //第一次发送时
       axios
         .post("/api/v1/chat/new", {
-          apiKey: firstcord.apikey,
-          modelId: "0",
+          apiKey: apikey.value,
+          modelId: model.value,
           content: {
-            personalityId: "string", //构造system
+            personalityId: "1", //构造system
             user: textarea.value, // user input
           },
         })
-        .then((response) => {
+        .then(async (response) => {
           let firstchat: firstchat = response.data;
           changeTitle.value.index = indexnumber.value;
           changeTitle.value.id = firstchat.chatId;
           changeTitle.value.title = firstchat.content.title;
-
-          db.messagetitles.add({
-            chatId: firstchat.chatId,
-            title: firstchat.content.title,
-          });
-          db.messages.add({
-            chatId: firstchat.chatId,
-            userContent: firstchat.content.user,
-            assistantContent: firstchat.content.assistant,
-          });
-
+          try {
+            await db.open();
+            db.messagetitles.add({
+              chatId: firstchat.chatId,
+              title: firstchat.content.title,
+            });
+            db.messages.add({
+              chatId: firstchat.chatId,
+              userContent: firstchat.content.user,
+              assistantContent: firstchat.content.assistant,
+            });
+          } finally {
+            db.close();
+          }
           messages.value[indexnumber.value].chatId = firstchat.chatId;
           messages.value[indexnumber.value].messages.push({
             type: "assistant",
@@ -136,23 +138,29 @@ async function sendmessage() {
       //多次发送时
       axios
         .post("/api/v1/chat/chat", {
-          apiKey: firstcord.apikey,
-          chatId: firstcord.model,
+          apiKey: apikey.value,
+          chatId: messages.value[indexnumber.value].chatId,
           content: {
             user: textarea.value,
           },
         })
-        .then((response) => {
+        .then(async (response) => {
           let getchat = response.data;
           const assistantmessage: Message = {
             type: "assistant",
             content: getchat.content.assistant,
           };
-          db.messages.add({
-            chatId: getchat.chatId,
-            userContent: getchat.content.user,
-            assistantContent: getchat.content.assistant,
-          });
+          try {
+            await db.open();
+            db.messages.add({
+              chatId: getchat.chatId,
+              userContent: getchat.content.user,
+              assistantContent: getchat.content.assistant,
+            });
+          } finally {
+            db.close();
+          }
+
           messages.value[indexnumber.value].messages.push(assistantmessage);
         });
     }
@@ -162,6 +170,7 @@ async function sendmessage() {
     textarea.value = "";
   } else {
     //缺乏apikey的dialog
+    alert("没输入apikey和选择模型，请选择");
   }
 }
 function differentUser(i: string) {
@@ -171,6 +180,9 @@ function differentUser(i: string) {
     return "assistant";
   }
 }
+
+const apikey = ref("");
+const model = ref("");
 
 const route = useRoute();
 type indexnumber = number;
@@ -205,30 +217,43 @@ const load = ref(() => {
 const messages: Ref<Chat[]> = ref([]);
 
 onMounted(async () => {
-  await db.open();
-  if ((await db.messages.toArray()).length != 0) {
-    const chatIds = await db.messages.orderBy("chatId").uniqueKeys();
-    for (const chatid of chatIds) {
-      const messagesForChat = await db.messages
-        .where("chatId")
-        .equals(chatid)
-        .toArray();
-      const messages1: Chat = {
-        chatId: chatid.toString(),
-        messages: [],
-      };
-      messagesForChat.forEach((message) => {
-        messages1.messages.push({
-          type: "user",
-          content: message.userContent,
-        });
-        messages1.messages.push({
-          type: "assistant",
-          content: message.assistantContent,
-        });
-      });
-      messages.value.push(messages1);
+  try {
+    await db.open();
+    const firtRecord = await db.Apikey.toCollection().first();
+
+    if (firtRecord) {
+      apikey.value = firtRecord.apikey as string;
+      model.value = firtRecord.model as string;
     }
+
+    console.log(firtRecord);
+
+    if ((await db.messages.toArray()).length != 0) {
+      const chatIds = await db.messages.orderBy("chatId").uniqueKeys();
+      for (const chatid of chatIds) {
+        const messagesForChat = await db.messages
+          .where("chatId")
+          .equals(chatid)
+          .toArray();
+        const messages1: Chat = {
+          chatId: chatid.toString(),
+          messages: [],
+        };
+        messagesForChat.forEach((message) => {
+          messages1.messages.push({
+            type: "user",
+            content: message.userContent,
+          });
+          messages1.messages.push({
+            type: "assistant",
+            content: message.assistantContent,
+          });
+        });
+        messages.value.push(messages1);
+      }
+    }
+  } finally {
+    db.close();
   }
 });
 // const messages = ref([

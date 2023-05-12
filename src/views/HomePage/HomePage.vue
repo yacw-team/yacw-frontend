@@ -139,6 +139,7 @@ import { ref } from "vue";
 import { Coin, User, MagicStick } from "@element-plus/icons-vue";
 import ModelSelectCard from "@/views/HomePage/components/ModelSelectCard.vue";
 import { db } from "../../database/db";
+import func from "../../../vue-temp/vue-editor-bridge";
 
 const addKeyDialogVisiable = ref(false);
 const selectModelDialogVisiable = ref(false);
@@ -170,30 +171,48 @@ const handleAddKeySubmit = async () => {
     addKeyInputError.value = true;
     return;
   }
-  if ((await db.Apikey.count()) == 1) {
-    db.Apikey.update(1, { apikey: openAIkey.value });
-  } else {
-    await db.Apikey.clear();
-    await db.Apikey.add({
-      apikey: openAIkey.value,
-      model: "",
-    });
+  console.log(openAIkey.value);
+  try {
+    await db.open();
+    const firstRecord = await db.Apikey.toCollection().first();
+
+    if (firstRecord) {
+      await db.Apikey.update(firstRecord.id as number, {
+        apikey: openAIkey.value,
+      });
+      //console.log(firstRecord);
+    } else {
+      await db.Apikey.add({
+        apikey: openAIkey.value,
+        model: "",
+      });
+      console.log(firstRecord);
+    }
+  } finally {
+    db.close();
   }
+
+
   addKeyDialogVisiable.value = false;
 };
 
 const handleSelectModelSubmit = async (modelValue: string) => {
   selectedModel.value = modelValue;
-
-  if ((await db.Apikey.count()) == 1) {
-    db.Apikey.update(1, { model: selectedModel.value });
-    
-  } else {
-    await db.Apikey.clear();
-    await db.Apikey.add({
-      apikey: "",
-      model: selectedModel.value,
-    });
+  try {
+    await db.open();
+    const firtRecord = await db.Apikey.toCollection().first();
+    if (firtRecord) {
+      await db.Apikey.update(firtRecord.id as number, { model: modelValue });
+     // console.log(firtRecord);
+    } else {
+      await db.Apikey.add({
+        apikey: "",
+        model: modelValue,
+      });
+      console.log(firtRecord);
+    }
+  } finally {
+    db.close();
   }
 
   selectModelDialogVisiable.value = false;
