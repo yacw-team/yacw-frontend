@@ -24,7 +24,8 @@
             </el-menu>
         </el-col>
         <el-col :span="22">
-            <div class="allElement">
+            <div v-if=" isDataLoaded">
+                 <div class="allElement">
                 <el-row :gutter="20" v-for="row in cardColumns" justify-content="space-between">
                     <el-col v-for="col in row" :span="8">
                         <el-card :body-style="{ padding: '0px' }" @click="sendMessage(col)">
@@ -39,13 +40,22 @@
                     </el-col>
                 </el-row>
             </div>
+            </div>
+            <div v-else>
+                <p>Loading...</p>
+            </div>
+           
 
 
         </el-col>
     </el-row>
     <teleport to=".mask">
-        <Details :jsonData="jsondata" v-if="isVisible" @close="isVisible = false" v-model="isVisible"
-            @usePrompt="(msg: string) => finishChoosePrompt(msg)" />
+
+        <Details :jsondataicon="jsondata.icon" :jsondataprompts="jsondata.prompts"  
+        :jsondatabackground="jsondata.background" :jsondataname="jsondata.name" 
+        :jsondatadescription="jsondata.description" 
+        v-if="isVisible" @close="isVisible = false" v-model="isVisible" />
+
     </teleport>
     <div class="footer">
         <el-pagination background layout="prev, pager, next" :total="PromptsList.Prompts.length" :current-page="currentPage"
@@ -56,16 +66,16 @@
 <script setup lang="ts">
 import { reactive, onMounted, computed, ref, watch } from 'vue'
 import Details from '@/components/LookDetailsPrompt.vue'
+import axios from 'axios';
 
 interface Prompt {
     id: string,
     name: string,
     description: string,
     prompts: string,
-    type: string,
     background: string,
     icon: string
-};
+}
 const PromptsList = reactive({
     Prompts: [] as Prompt[],
 })
@@ -80,7 +90,6 @@ const jsondata = reactive<Prompt>({
     name: '',
     description: '',
     prompts: '',
-    type: '',
     background: '',
     icon: ''
 });
@@ -89,9 +98,11 @@ const jsondata = reactive<Prompt>({
 const currentPage = ref(1);
 const isVisible = ref(false);
 const pageSize = 12;
+
 const promptType = ref('');
 const emit = defineEmits(['sendPrompt', 'changeShow1']);
 const promptMessage = ref();  //传递给输入框的prompt信息，来自LookDetailsPrompt
+
 
 //事件方法的集合
 
@@ -114,7 +125,6 @@ function sendMessage(col: Prompt) {
     jsondata.name = col.name;
     jsondata.description = col.description;
     jsondata.icon = col.icon;
-    jsondata.type = col.type;
     jsondata.prompts = col.prompts;
     isVisible.value = true;
 }
@@ -136,168 +146,26 @@ const getRandomBackground = () => {
     return { background, icon };
 };
 
-
+const isDataLoaded=ref(false);
 const fetchCards = async (index: string) => {
     //根据类型进行请求
-    // let url = '/v1/chat/prompts';
-    // if (index !== null) {
-    //     url += `?type=${index}`;
-    // }
+    let url = '/api/v1/chat/prompts';
+    if (index != null) {
+        url += `?type=${index}`;
+    }
 
-    //const res = await fetch(url); 
-    // const data = await res.json();
-
-
-    const data = {
-        Prompts: [
-            {
-                'id': '1',
-                "name": "111",
-                "description": "string",
-                "prompts": "string",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-
-            },
-            {
-                'id': '2',
-                "name": "222",
-                "description": "大便啊",
-                "prompts": "大便啊",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            },
-            {
-                'id': '3',
-                "name": "333",
-                "description": "我靠",
-                "prompts": "我靠",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            }, {
-                'id': '4',
-                "name": "444",
-                "description": "你没事把",
-                "prompts": "你没事把",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            },
-            {
-                'id': '5',
-                "name": "555",
-                "description": "哈哈哈哈",
-                "prompts": "哈哈哈哈",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            },
-            {
-                'id': '6',
-                "name": "666",
-                "description": "真是的",
-                "prompts": "真是的",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            }, {
-                'id': '7',
-                "name": "777",
-                "description": "芜湖",
-                "prompts": "芜湖",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            },
-            {
-                'id': '8',
-                "name": "888",
-                "description": "冲！！！",
-                "prompts": "冲！！！",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            },
-            {
-                'id': '9',
-                "name": "999",
-                "description": "嘻嘻嘻",
-                "prompts": "嘻嘻嘻",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            }, {
-                'id': '11',
-                "name": "1111",
-                "description": "string",
-                "prompts": "string",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-
-            },
-            {
-                'id': '12',
-                "name": "1222",
-                "description": "string",
-                "prompts": "string",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            },
-            {
-                'id': '13',
-                "name": "1333",
-                "description": "string",
-                "prompts": "string",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            }, {
-                'id': '14',
-                "name": "1444",
-                "description": "string",
-                "prompts": "string",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            },
-            {
-                'id': '5',
-                "name": "1555",
-                "description": "string",
-                "prompts": "string",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            },
-            {
-                'id': '16',
-                "name": "1666",
-                "description": "string",
-                "prompts": "string",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            }, {
-                'id': '17',
-                "name": "1777",
-                "description": "string",
-                "prompts": "string",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            },
-            {
-                'id': '18',
-                "name": "1888",
-                "description": "string",
-                "prompts": "string",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            },
-            {
-                'id': '19',
-                "name": "1999",
-                "description": "string",
-                "prompts": "string",
-                "type": "code",
-                "imgsrc": "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            },
-        ]
-    };
-
-    PromptsList.Prompts = data.Prompts.map((prompt) => {
+    axios.get(url)
+    .then((response)=>{
+        let data =response.data; 
+        PromptsList.Prompts = data.Prompts.map((prompt:Prompt) => {
         const { background, icon } = getRandomBackground();
+        console.log(data)
         return { ...prompt, background, icon };
+       
     });
+    })
+    
+    isDataLoaded.value = true;
 }
 
 

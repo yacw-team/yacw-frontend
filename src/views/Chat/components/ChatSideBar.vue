@@ -12,7 +12,7 @@
       <div v-for="(conversation, index) in reversedCoversations" :key="index">
         <CreateNewChat
           :title="conversation.title"
-          :chatID="conversation.chatID"
+          :chatID="conversation.chatId"
           :index="conversations.length - index - 1"
           :updateItems="updateItems"
           @deleteChat="(chatId: string) => handleDeleteChat(chatId)"
@@ -26,35 +26,47 @@
 import { computed, ref, defineProps, onMounted, watch } from "vue";
 import { Plus } from "@element-plus/icons-vue";
 import CreateNewChat from "./CreateNewChat.vue";
+import {db} from "@/database/db"
+import { useRouter } from "vue-router";
 
 interface ChatConversation {
-  chatID: string;
+  chatId: string;
   title: string;
 }
 
 const isCollapsed = ref(false);
 const searchText = ref("");
-const conversations = ref<ChatConversation[]>([
-  { chatID: "1", title: "1" },
-  { chatID: "2", title: "2" },
-  { chatID: "3", title: "3" },
-]);
 
-const reversedCoversations = computed(() => {
+const reversedConversations = computed(() => {
   return conversations.value.slice().reverse();
 });
 
+const conversations = ref<ChatConversation[]>([]);
+
+onMounted(async () => {
+  (newTitle.changeTitle as string) = "新对话";
+
+  await db.open();
+  const data = await db.messagetitles.toArray();
+  console.log(data)
+
+  if (data.length != 0) {
+    console.log(data)
+    data.forEach((msgtitle) => {
+      conversations.value.push({
+        chatId: msgtitle.chatId,
+        title: msgtitle.title,
+      });
+    });
+  }
+});
 const handleAddNewChat = () => {
   const newConversation: ChatConversation = {
-    chatID: "-1" + conversations.value.length,
+    chatId: "-1" + conversations.value.length,
     title: "新对话",
   };
   conversations.value.push(newConversation);
 };
-
-onMounted(() => {
-  (newTitle.changeTitle as string) = "新对话";
-});
 
 let newTitle = defineProps({
   changeTitleId: String,
@@ -62,6 +74,7 @@ let newTitle = defineProps({
   changeTitle: String,
 });
 
+const router = useRouter();
 watch(
   () => newTitle.changeTitle,
   (newval) => {
@@ -70,9 +83,14 @@ watch(
       newTitle.changeTitleIndex != undefined &&
       newTitle.changeTitleId != undefined
     ) {
-      conversations.value[newTitle.changeTitleIndex].chatID =
+      conversations.value[newTitle.changeTitleIndex].chatId =
         newTitle.changeTitleId;
       conversations.value[newTitle.changeTitleIndex].title = newval as string;
+      router.push({
+        name: "chat",
+        params: { id: conversations.value[newTitle.changeTitleIndex].chatId },
+      });
+      location.reload();
     }
   }
 );
