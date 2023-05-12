@@ -1,6 +1,8 @@
 <template>
-  <div class="flex">
+
+  <div class="flex flex-row">
     <ChatSideBar
+      class="pr-4"
       :changeTitleId="changeTitle.id"
       :changeTitleIndex="changeTitle.index"
       :changeTitle="changeTitle.title"
@@ -29,9 +31,7 @@
           :span="23"
         />
         <el-button :span="1" :disabled="!textarea" @click="sendmessage">
-          {{
-          send
-          }}
+          {{ send }}
         </el-button>
       </div>
     </div>
