@@ -14,10 +14,9 @@
         :changeTitle="changeTitle.title"
       />
       <div class="flex flex-col w-3/4 h-full">
-
         <div class="flex-1 bg-gray-50">
           <div class="flex flex-col">
-            <div v-if="messages && messages[indexnumber] && indexnumber>-1 ">
+            <div v-if="messages && messages[indexnumber] && indexnumber > -1">
               <div
                 id="chat-messages"
                 class="flex-1 mx-4 overflow-y-scroll no-scrollbar"
@@ -58,9 +57,13 @@
         </div>
         <div id="input-slot" class="flex flex-row mx-4 my-6">
           <el-input
+            type="textarea"
+            :autosize="{ minRows: 1, maxRows: 4 }"
+            resize="none"
             v-model="textarea"
             :disabled="isLoading"
-            placeholder="请输入"
+            placeholder="请输入对话文字，使用 Shift + Enter 发送消息"
+            @keydown.shift.enter.prevent="sendmessage"
           />
           <el-button
             class="ml-4"
@@ -258,29 +261,32 @@ watch(
   () => route.params.id,
   async (newid) => {
     const contentid = newid;
-    if (contentid == "0" ) {
-           indexnumber.value = -1;
+    if (contentid == "0") {
+      indexnumber.value = -1;
       return;
-    } 
-    else if(contentid == "1" )
-    {
-        if(messages.value[indexnumber.value].messages.length>0){
-          await db.open();
-          db.messages.where('chatId').equals(messages.value[indexnumber.value].chatId).delete();
-          db.messagetitles.where('chatId').equals(messages.value[indexnumber.value].chatId).delete();
-          db.close();
-        }
-      
-      axios.post("/api/v1/chat/deletechat",{
-          apiKey: apikey.value, 
-          chatId: messages.value[indexnumber.value].chatId  
-      })
+    } else if (contentid == "1") {
+      if (messages.value[indexnumber.value].messages.length > 0) {
+        await db.open();
+        db.messages
+          .where("chatId")
+          .equals(messages.value[indexnumber.value].chatId)
+          .delete();
+        db.messagetitles
+          .where("chatId")
+          .equals(messages.value[indexnumber.value].chatId)
+          .delete();
+        db.close();
+      }
 
-      messages.value.splice(indexnumber.value,1);
+      axios.post("/api/v1/chat/deletechat", {
+        apiKey: apikey.value,
+        chatId: messages.value[indexnumber.value].chatId,
+      });
+
+      messages.value.splice(indexnumber.value, 1);
       indexnumber.value--;
       return;
-    }
-    else {
+    } else {
       for (let i = 0; i < messages.value.length; i++) {
         if (messages.value[i].chatId == contentid) {
           indexnumber.value = i;
