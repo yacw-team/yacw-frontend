@@ -10,12 +10,11 @@
       <div class="flex flex-row bg-gray-50">
         <ChatSideBar
           class="w-1/4 px-4 py-2 bg-white border border-gray-200 rounded-md"
-          :changeTitleId="changeTitle.id"
           :changeTitleIndex="changeTitle.index"
           :changeTitle="changeTitle.title"
         />
         <div class="flex flex-col w-3/4">
-          <div v-if="messages[indexnumber]">
+          <div v-if="messages && messages[indexnumber] && indexnumber>-1 ">
             <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
               <div v-for="(message, index) in messages[indexnumber].messages" :key="index">
                 <ChatMessage class="mb-2" :role="message.type" :chatContent="message.content" />
@@ -65,11 +64,9 @@ import ChatMessage from "./components/ChatMessage.vue";
 
 const messages: Ref<Chat[]> = ref([]);
 
-
 const isLoading = ref(false);
 
 let textarea = ref("");
-
 
 const prompt = ref();
 const isVisible = ref(false); //组件切换显示
@@ -89,10 +86,9 @@ const indexnumber = ref(0); //作为具体哪个chatid
 interface Personality {
   id: string;
   name: string;
-  description	: string;
+  description: string;
   prompts: string;
 }
-
 
 interface getchat {
   chatId: string;
@@ -149,11 +145,12 @@ async function sendmessage() {
 
     if (messages.value[indexnumber.value].messages.length == 1) {
       //第一次发送时
-      console.log(model.value)
+      console.log(model.value);
       axios
         .post("/api/v1/chat/new", {
           apiKey: apikey.value,
           modelId: model.value,
+          chatId: messages.value[indexnumber.value].chatId,
           content: {
             personalityId: characterid.value, //构造system
             user: textarea.value, // user input
@@ -161,11 +158,9 @@ async function sendmessage() {
         })
         .then(async (response) => {
           let firstchat: firstchat = response.data;
-          messages.value[indexnumber.value].chatId=firstchat.chatId;
           changeTitle.value.index = indexnumber.value;
-          changeTitle.value.id = firstchat.chatId;
           changeTitle.value.title = firstchat.content.title;
-         
+
           try {
             await db.open();
             db.messagetitles.add({
@@ -228,25 +223,48 @@ async function sendmessage() {
 
 watch(
   () => route.params.id,
-  (newid) => {
+  async (newid) => {
     const contentid = newid;
-    for (let i = 0; i < messages.value.length; i++) {
-      if (messages.value[i].chatId == contentid) {
-        indexnumber.value = i;
-        return;
-      }
+    if (contentid == "0" ) {
+           indexnumber.value = -1;
+      return;
+    } 
+    else if(contentid == "1" )
+    {
+        if(messages.value[indexnumber.value].messages.length>0){
+          await db.open();
+          db.messages.where('chatId').equals(messages.value[indexnumber.value].chatId).delete();
+          db.messagetitles.where('chatId').equals(messages.value[indexnumber.value].chatId).delete();
+          db.close();
+        }
+      
+      axios.post("/api/v1/chat/deletechat",{
+          apiKey: apikey.value, 
+          chatId: messages.value[indexnumber.value].chatId  
+      })
+
+      messages.value.splice(indexnumber.value,1);
+      indexnumber.value--;
+      return;
     }
-    const newmessage = {
-      chatId: route.params.id as string,
-      messages: [],
-    };
-    messages.value.push(newmessage);
-    indexnumber.value = messages.value.length - 1;
+    else {
+      for (let i = 0; i < messages.value.length; i++) {
+        if (messages.value[i].chatId == contentid) {
+          indexnumber.value = i;
+          return;
+        }
+      }
+      const newmessage = {
+        chatId: route.params.id as string,
+        messages: [],
+      };
+      messages.value.push(newmessage);
+      indexnumber.value = messages.value.length - 1;
+    }
   }
 );
 
 const count = ref(0);
-
 
 // 在组件挂载时从 localStorage 中恢复值
 onMounted(() => {
@@ -267,7 +285,7 @@ watch(
 
 function getCharacterinfo(msg: Personality) {
   characterid.value = msg.id;
-  console.log(characterid.value)
+  console.log(characterid.value);
   console.log(msg);
   Character.value = msg;
   isShowCharacter.value = true;
@@ -282,9 +300,6 @@ onMounted(async () => {
       apikey.value = firtRecord.apikey as string;
       model.value = firtRecord.model as string;
     }
-
-    console.log(firtRecord);
-
     if ((await db.messages.toArray()).length != 0) {
       const chatIds = await db.messages.orderBy("chatId").uniqueKeys();
       for (const chatid of chatIds) {
