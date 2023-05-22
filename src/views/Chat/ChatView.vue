@@ -6,17 +6,18 @@
       @changeShow1="(msg: boolean) => isVisible = msg"
       @sendPrompt="(msg: string) => textarea = msg"
     />
+
     <div v-if="!isVisible" class="flex flex-row h-full">
       <ChatSideBar
         class="w-1/4 px-4 py-2 bg-white border border-gray-200 rounded-md"
-        :changeTitleId="changeTitle.id"
         :changeTitleIndex="changeTitle.index"
         :changeTitle="changeTitle.title"
       />
       <div class="flex flex-col w-3/4 h-full">
+
         <div class="flex-1 bg-gray-50">
           <div class="flex flex-col">
-            <div v-if="messages[indexnumber]">
+            <div v-if="messages && messages[indexnumber] && indexnumber>-1 ">
               <div
                 id="chat-messages"
                 class="flex-1 mx-4 overflow-y-scroll no-scrollbar"
@@ -182,6 +183,7 @@ async function sendmessage() {
         .post("/api/v1/chat/new", {
           apiKey: apikey.value,
           modelId: model.value,
+          chatId: messages.value[indexnumber.value].chatId,
           content: {
             personalityId: characterid.value, //构造system
             user: textarea.value, // user input
@@ -189,9 +191,7 @@ async function sendmessage() {
         })
         .then(async (response) => {
           let firstchat: firstchat = response.data;
-          messages.value[indexnumber.value].chatId = firstchat.chatId;
           changeTitle.value.index = indexnumber.value;
-          changeTitle.value.id = firstchat.chatId;
           changeTitle.value.title = firstchat.content.title;
 
           try {
@@ -256,20 +256,44 @@ async function sendmessage() {
 
 watch(
   () => route.params.id,
-  (newid) => {
+  async (newid) => {
     const contentid = newid;
-    for (let i = 0; i < messages.value.length; i++) {
-      if (messages.value[i].chatId == contentid) {
-        indexnumber.value = i;
-        return;
-      }
+    if (contentid == "0" ) {
+           indexnumber.value = -1;
+      return;
+    } 
+    else if(contentid == "1" )
+    {
+        if(messages.value[indexnumber.value].messages.length>0){
+          await db.open();
+          db.messages.where('chatId').equals(messages.value[indexnumber.value].chatId).delete();
+          db.messagetitles.where('chatId').equals(messages.value[indexnumber.value].chatId).delete();
+          db.close();
+        }
+      
+      axios.post("/api/v1/chat/deletechat",{
+          apiKey: apikey.value, 
+          chatId: messages.value[indexnumber.value].chatId  
+      })
+
+      messages.value.splice(indexnumber.value,1);
+      indexnumber.value--;
+      return;
     }
-    const newmessage = {
-      chatId: route.params.id as string,
-      messages: [],
-    };
-    messages.value.push(newmessage);
-    indexnumber.value = messages.value.length - 1;
+    else {
+      for (let i = 0; i < messages.value.length; i++) {
+        if (messages.value[i].chatId == contentid) {
+          indexnumber.value = i;
+          return;
+        }
+      }
+      const newmessage = {
+        chatId: route.params.id as string,
+        messages: [],
+      };
+      messages.value.push(newmessage);
+      indexnumber.value = messages.value.length - 1;
+    }
   }
 );
 
@@ -309,9 +333,6 @@ onMounted(async () => {
       apikey.value = firtRecord.apikey as string;
       model.value = firtRecord.model as string;
     }
-
-    console.log(firtRecord);
-
     if ((await db.messages.toArray()).length != 0) {
       const chatIds = await db.messages.orderBy("chatId").uniqueKeys();
       for (const chatid of chatIds) {
