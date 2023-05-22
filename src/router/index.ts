@@ -28,7 +28,8 @@ const router = createRouter({
       path: "/chatinput",
       name: "chatinput",
       component: () => import("@/components/chatInput.vue"),
-    }
+    },
+   
   ],
 });
 
