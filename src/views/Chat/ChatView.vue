@@ -238,7 +238,7 @@ watch(
           db.close();
         }
       
-      axios.post("/v1/chat/chat",{
+      axios.post("/api/v1/chat/deletechat",{
           apiKey: apikey.value, 
           chatId: messages.value[indexnumber.value].chatId  
       })
