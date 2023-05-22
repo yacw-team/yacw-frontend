@@ -237,6 +237,11 @@ watch(
           db.messagetitles.where('chatId').equals(messages.value[indexnumber.value].chatId).delete();
           db.close();
         }
+      
+      axios.post("/v1/chat/chat",{
+          apiKey: apikey.value, 
+          chatId: messages.value[indexnumber.value].chatId  
+      })
 
       messages.value.splice(indexnumber.value,1);
       indexnumber.value--;
