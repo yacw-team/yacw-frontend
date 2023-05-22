@@ -6,44 +6,75 @@
       @changeShow1="(msg: boolean) => isVisible = msg"
       @sendPrompt="(msg: string) => textarea = msg"
     />
-    <div v-if="!isVisible">
-      <div class="flex flex-row bg-gray-50">
-        <ChatSideBar
-          class="w-1/4 px-4 py-2 bg-white border border-gray-200 rounded-md"
-          :changeTitleId="changeTitle.id"
-          :changeTitleIndex="changeTitle.index"
-          :changeTitle="changeTitle.title"
-        />
-        <div class="flex flex-col w-3/4">
-          <div v-if="messages[indexnumber]">
-            <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
-              <div v-for="(message, index) in messages[indexnumber].messages" :key="index">
-                <ChatMessage class="mb-2" :role="message.type" :chatContent="message.content" />
+    <div v-if="!isVisible" class="flex flex-row h-full">
+      <ChatSideBar
+        class="w-1/4 px-4 py-2 bg-white border border-gray-200 rounded-md"
+        :changeTitleId="changeTitle.id"
+        :changeTitleIndex="changeTitle.index"
+        :changeTitle="changeTitle.title"
+      />
+      <div class="flex flex-col w-3/4 h-full">
+        <div class="flex-1 bg-gray-50">
+          <div class="flex flex-col">
+            <div v-if="messages[indexnumber]">
+              <div
+                id="chat-messages"
+                class="flex-1 mx-4 overflow-y-scroll no-scrollbar"
+              >
+                <div
+                  v-for="(message, index) in messages[indexnumber].messages"
+                  :key="index"
+                >
+                  <ChatMessage
+                    class="mb-2"
+                    :role="message.type"
+                    :chatContent="message.content"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          <div v-else>
-            <HomePage />
+            <div v-else>
+              <HomePage />
+            </div>
           </div>
         </div>
-      </div>
-      <div style="display: flex; flex-direction: row;">
-        <PromptLibrary
-          @response="(msg: string) => textarea += msg"
-          @changeShow="(msg: boolean) => isVisible = msg"
-        />
-        <Alcharacter @getCharacter="(msg: Personality) => getCharacterinfo(msg)" />
-      </div>
-      <div id="input-slot" class="flex flex-row mx-4 my-6">
-        <el-input v-model="textarea" :disabled="isLoading" placeholder="请输入" />
-        <el-button class="ml-4" type="primary" :disabled="!textarea" @click="sendmessage">
-          <div class="flex flex-row items-center">
-            <span>发送</span>
-            <el-icon class="ml-1">
-              <ArrowRightBold />
-            </el-icon>
+        <div class="flex justify-center pt-4">
+          <div class="flex flex-row items-center justify-center w-1/2">
+            <div class="flex flex-1">
+              <PromptLibrary
+                @response="(msg: string) => textarea += msg"
+                @changeShow="(msg: boolean) => isVisible = msg"
+                style="margin: auto"
+              />
+            </div>
+            <div class="flex flex-1">
+              <AICharacter
+                @getCharacter="(msg: Personality) => getCharacterinfo(msg)"
+                style="margin: auto"
+              />
+            </div>
           </div>
-        </el-button>
+        </div>
+        <div id="input-slot" class="flex flex-row mx-4 my-6">
+          <el-input
+            v-model="textarea"
+            :disabled="isLoading"
+            placeholder="请输入"
+          />
+          <el-button
+            class="ml-4"
+            type="primary"
+            :disabled="!textarea"
+            @click="sendmessage"
+          >
+            <div class="flex flex-row items-center">
+              <span>发送</span>
+              <el-icon class="ml-1">
+                <ArrowRightBold />
+              </el-icon>
+            </div>
+          </el-button>
+        </div>
       </div>
     </div>
   </div>
@@ -57,19 +88,17 @@ import { useRoute } from "vue-router";
 import axios from "axios";
 
 import { db } from "../../database/db";
-import PromptLibrary from "@/components/PromptLibrary.vue";
+import PromptLibrary from "./components/PromptLibrary.vue";
 import promptShop from "@/components/PromptShop.vue";
-import Alcharacter from "@/components/AIcharacter.vue";
+import AICharacter from "./components/AIcharacter.vue";
 import HomePage from "@/views/Chat/ChatHomePage.vue";
 import ChatMessage from "./components/ChatMessage.vue";
 
 const messages: Ref<Chat[]> = ref([]);
 
-
 const isLoading = ref(false);
 
 let textarea = ref("");
-
 
 const prompt = ref();
 const isVisible = ref(false); //组件切换显示
@@ -89,10 +118,9 @@ const indexnumber = ref(0); //作为具体哪个chatid
 interface Personality {
   id: string;
   name: string;
-  description	: string;
+  description: string;
   prompts: string;
 }
-
 
 interface getchat {
   chatId: string;
@@ -149,7 +177,7 @@ async function sendmessage() {
 
     if (messages.value[indexnumber.value].messages.length == 1) {
       //第一次发送时
-      console.log(model.value)
+      console.log(model.value);
       axios
         .post("/api/v1/chat/new", {
           apiKey: apikey.value,
@@ -161,11 +189,11 @@ async function sendmessage() {
         })
         .then(async (response) => {
           let firstchat: firstchat = response.data;
-          messages.value[indexnumber.value].chatId=firstchat.chatId;
+          messages.value[indexnumber.value].chatId = firstchat.chatId;
           changeTitle.value.index = indexnumber.value;
           changeTitle.value.id = firstchat.chatId;
           changeTitle.value.title = firstchat.content.title;
-         
+
           try {
             await db.open();
             db.messagetitles.add({
@@ -247,7 +275,6 @@ watch(
 
 const count = ref(0);
 
-
 // 在组件挂载时从 localStorage 中恢复值
 onMounted(() => {
   const savedInput = localStorage.getItem("input");
@@ -267,7 +294,7 @@ watch(
 
 function getCharacterinfo(msg: Personality) {
   characterid.value = msg.id;
-  console.log(characterid.value)
+  console.log(characterid.value);
   console.log(msg);
   Character.value = msg;
   isShowCharacter.value = true;
