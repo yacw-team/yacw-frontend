@@ -1,19 +1,11 @@
 <template>
   <div>
-    <promptShop
-      @changeShow="(msg: boolean) => isVisible = msg"
-      v-if="isVisible"
-      @changeShow1="(msg: boolean) => isVisible = msg"
-      @sendPrompt="(msg: string) => textarea = msg"
-    />
+    <promptShop @changeShow="(msg: boolean) => isVisible = msg" v-if="isVisible"
+      @changeShow1="(msg: boolean) => isVisible = msg" @sendPrompt="(msg: string) => textarea = msg" />
     <div v-if="!isVisible">
       <div class="flex flex-row bg-gray-50">
-        <ChatSideBar
-          class="w-1/4 px-4 py-2 bg-white border border-gray-200 rounded-md"
-          :changeTitleId="changeTitle.id"
-          :changeTitleIndex="changeTitle.index"
-          :changeTitle="changeTitle.title"
-        />
+        <ChatSideBar class="w-1/4 px-4 py-2 bg-white border border-gray-200 rounded-md" :changeTitleId="changeTitle.id"
+          :changeTitleIndex="changeTitle.index" :changeTitle="changeTitle.title" />
         <div class="flex flex-col w-3/4">
           <div v-if="messages[indexnumber]">
             <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
@@ -28,12 +20,13 @@
         </div>
       </div>
       <div style="display: flex; flex-direction: row;">
-        <PromptLibrary
-          @response="(msg: string) => textarea += msg"
-          @changeShow="(msg: boolean) => isVisible = msg"
-        />
-        <Alcharacter @getCharacter="(msg: Personality) => getCharacterinfo(msg)" />
+        <PromptLibrary @response="(msg: string) => textarea += msg" @changeShow="(msg: boolean) => isVisible = msg" />
+        <Alcharacter @getCharacter="(msg: Personality) => getCharacterinfo(msg)" /> <span v-if="isShowCharacter"
+          style="background-color: aquamarine; width: fit-content; padding-left: 0.5em; padding-right:0.5em; border-radius: 10px;">You
+          are select
+          <strong>{{ Character.name }}</strong></span>
       </div>
+
       <div id="input-slot" class="flex flex-row mx-4 my-6">
         <el-input v-model="textarea" :disabled="isLoading" placeholder="请输入" />
         <el-button class="ml-4" type="primary" :disabled="!textarea" @click="sendmessage">
@@ -89,8 +82,8 @@ const indexnumber = ref(0); //作为具体哪个chatid
 interface Personality {
   id: string;
   name: string;
-  description	: string;
-  prompts: string;
+  description: string;
+
 }
 
 
@@ -161,11 +154,11 @@ async function sendmessage() {
         })
         .then(async (response) => {
           let firstchat: firstchat = response.data;
-          messages.value[indexnumber.value].chatId=firstchat.chatId;
+          messages.value[indexnumber.value].chatId = firstchat.chatId;
           changeTitle.value.index = indexnumber.value;
           changeTitle.value.id = firstchat.chatId;
           changeTitle.value.title = firstchat.content.title;
-         
+
           try {
             await db.open();
             db.messagetitles.add({
@@ -323,7 +316,9 @@ onMounted(async () => {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 </style>
