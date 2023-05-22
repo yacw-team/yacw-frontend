@@ -3,19 +3,23 @@
     <el-button
       @click="open"
       round
-      style="background-color: rgb(186, 100, 205); color: white; font-weight: bold;"
-    >Select AIcharacter</el-button>
-    <div style="width:1200px;
-         padding-left:100px;">
-      <el-dialog style="width:1200px;" v-model="dialogVisible">
-        <div style="width:500px;
-    padding:10px 100px;">
+      size="large"
+      style="
+        background-color: rgb(186, 100, 205);
+        color: white;
+        font-weight: bold;
+      "
+      >AI 角色选择</el-button
+    >
+    <div>
+      <el-dialog style="width: 1200px" v-model="dialogVisible">
+        <div style="width: 500px; padding: 10px 100px">
           <el-form label-position="top">
             <el-form-item>
               <el-input
                 v-model="searchText"
                 @input="handleSearch"
-                class="w-50 m-2"
+                class="m-2 w-50"
                 placeholder="搜索角色"
                 size="large"
                 clearable
@@ -23,25 +27,24 @@
             </el-form-item>
           </el-form>
         </div>
-        <div style="padding-left:100px;">
+        <div style="padding-left: 100px">
           <el-button @click="createCharacter">Add Character</el-button>
         </div>
         <el-row :gutter="35">
           <el-col
-            style="padding:20px 80px  ;"
+            style="padding: 20px 80px"
             :span="12"
             v-for="(personalities, index) in filteredPersonalities"
             :key="index"
           >
             <el-card
               shadow="hover"
-              style="width:350px; padding: 20px;
-          border-radius:25px; "
+              style="width: 350px; padding: 20px; border-radius: 25px"
               @click="selectCard(personalities)"
             >
               <UserFilled style="width: 1em; height: 1em; margin-right: 8px" />
-              <div style="height: 150px; ;overflow-y: auto;">
-                <h3>{{ personalities.name}}</h3>
+              <div style="height: 150px; overflow-y: auto">
+                <h3>{{ personalities.name }}</h3>
                 <p>{{ personalities.description }}</p>
               </div>
             </el-card>
@@ -52,15 +55,14 @@
     </div>
   </div>
 </template>
- <script setup lang="ts">
+<script setup lang="ts">
 import { defineProps, onMounted, ref } from "vue";
 import axios from "axios";
-
 
 interface Personality {
   id: string;
   name: string;
-  description	: string;
+  description: string;
   prompts: string;
 }
 const searchText = ref("");
@@ -133,16 +135,14 @@ onMounted(() => {
   axios
     .get("/api/v1/chat/personality")
     .then((response) => {
-      console.log('send success')
+      console.log("send success");
       filteredPersonalities.value = response.data;
-      console.log("获取的后端personality"+filteredPersonalities.value)
+      console.log("获取的后端personality" + filteredPersonalities.value);
     })
     .catch((error) => {
       console.log(error);
     });
 });
-
-
 
 async function handleSearch() {
   const response = await axios.get("");
@@ -162,8 +162,8 @@ function selectCard(personalities: Personality) {
   dialogVisible.value = false;
 }
 </script>
- 
- <style scoped>
+
+<style scoped>
 .close-btn {
   position: absolute;
   top: 10px;
@@ -177,6 +177,3 @@ p {
   color: grey;
 }
 </style>
- 
- 
- 
