@@ -59,7 +59,7 @@
         </div>
         <div id="input-slot" class="flex flex-row mx-4 my-6">
           <el-input v-model="textarea" :disabled="isLoading" placeholder="请输入" />
-          <el-button class="ml-4" type="primary" :disabled="!textarea" @click="sendmessage">
+          <el-button class="ml-4" type="primary" :disabled="!textarea && !isLoading" @click="sendmessage">
             <div class="flex flex-row items-center">
               <span>发送</span>
               <el-icon class="ml-1">
@@ -86,6 +86,7 @@ import promptShop from "@/components/PromptShop.vue";
 import AICharacter from "./components/AIcharacter.vue";
 import HomePage from "@/views/Chat/ChatHomePage.vue";
 import ChatMessage from "./components/ChatMessage.vue";
+import { ElMessage } from "element-plus";
 
 const messages: Ref<Chat[]> = ref([]);
 
@@ -165,6 +166,7 @@ async function sendmessage() {
       type: "user",
       content: textarea.value,
     };
+    textarea.value = "";
     messages.value[indexnumber.value].messages.push(userMessage);
 
     isLoading.value = true;
@@ -241,10 +243,13 @@ async function sendmessage() {
 
     //下面是模拟发送直接改index为2的chat的标题
     isLoading.value = false;
-    textarea.value = "";
+    
   } else {
     //缺乏apikey的dialog
-    alert("没输入apikey和选择模型，请选择");
+    ElMessage({
+          message: "ApiKey没有输入或未选择AI模型",
+          type: "error",
+        });
   }
 }
 
