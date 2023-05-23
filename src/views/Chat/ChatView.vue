@@ -31,6 +31,9 @@
                     :chatContent="message.content"
                   />
                 </div>
+                <el-skeleton :rows="5" animated :loading="!isLoading &&firstclick">
+                  <template #default></template>
+                </el-skeleton>
               </div>
             </div>
             <div v-else>
@@ -38,6 +41,7 @@
             </div>
           </div>
         </div>
+
         <div class="flex justify-center pt-4">
           <div class="flex flex-row items-center justify-center w-1/2">
             <div class="flex flex-1">
@@ -54,6 +58,14 @@
               />
             </div>
           </div>
+          <span
+            v-if="isShowCharacter"
+            style="background-color: aquamarine; width: fit-content; padding-left: 0.5em; padding-right:0.5em; border-radius: 10px;"
+          >
+            You
+            are select
+            <strong>{{ Character.name }}</strong>
+          </span>
         </div>
         <div id="input-slot" class="flex flex-row mx-4 my-6">
           <el-input
@@ -97,10 +109,12 @@ import promptShop from "@/components/PromptShop.vue";
 import AICharacter from "./components/AIcharacter.vue";
 import HomePage from "@/views/Chat/ChatHomePage.vue";
 import ChatMessage from "./components/ChatMessage.vue";
+import { ElMessage } from "element-plus";
 
 const messages: Ref<Chat[]> = ref([]);
 
 const isLoading = ref(false);
+const firstclick = ref(false);
 
 let textarea = ref("");
 
@@ -175,10 +189,11 @@ async function sendmessage() {
       type: "user",
       content: textarea.value,
     };
+    textarea.value = "";
     messages.value[indexnumber.value].messages.push(userMessage);
 
     isLoading.value = true;
-
+    firstclick.value = true;
     if (messages.value[indexnumber.value].messages.length == 1) {
       //第一次发送时
       console.log(model.value);
@@ -194,6 +209,7 @@ async function sendmessage() {
         })
         .then(async (response) => {
           let firstchat: firstchat = response.data;
+
           changeTitle.value.index = indexnumber.value;
           changeTitle.value.title = firstchat.content.title;
 
@@ -250,10 +266,13 @@ async function sendmessage() {
 
     //下面是模拟发送直接改index为2的chat的标题
     isLoading.value = false;
-    textarea.value = "";
+    
   } else {
     //缺乏apikey的dialog
-    alert("没输入apikey和选择模型，请选择");
+    ElMessage({
+          message: "ApiKey没有输入或未选择AI模型",
+          type: "error",
+        });
   }
 }
 
@@ -377,7 +396,9 @@ onMounted(async () => {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 </style>
