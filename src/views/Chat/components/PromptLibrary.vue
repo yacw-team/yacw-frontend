@@ -144,7 +144,7 @@ const p: Array<Prompt> = [
   {
     id: "1",
     name: "音乐家",
-    description: "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊,
+    description: "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊",
     prompts: "音乐家;",
   },
 ];
