@@ -1,19 +1,28 @@
 <template>
   <div>
     <div class="pt-16 text-center">
-      <h1 class="text-4xl font-bold">Get started with ChatGPT API</h1>
+      <span class="text-4xl font-bold" ref="typing"></span>
       <div class="flex flex-row items-center justify-center p-16">
-        <el-button class="mx-2" type="warning" round @click="addKeyDialogVisiable = true">输入 API Key</el-button>
+        <el-button
+          class="mx-2"
+          type="warning"
+          round
+          @click="addKeyDialogVisiable = true"
+          >输入 API Key</el-button
+        >
         <el-button
           class="mx-2"
           type="primary"
           round
           @click="selectModelDialogVisiable = true"
-        >选择 ChatGPT 模型</el-button>
+          >选择 ChatGPT 模型</el-button
+        >
       </div>
     </div>
     <el-main>
-      <div class="flex flex-row flex-wrap items-center justify-center mx-2 h-max">
+      <div
+        class="flex flex-row flex-wrap items-center justify-center mx-2 h-max"
+      >
         <el-card class="w-1/3 mx-4 md:w-1/5 md:mx-10 md:p-4">
           <template #header>
             <div class="flex flex-row justify-center">
@@ -41,7 +50,9 @@
             </div>
           </template>
           <div>
-            <p>我们非常注重用户隐私和数据保护，我们不会收集任何敏感信息，并采取了多种措施确保所有数据的安全性。</p>
+            <p>
+              我们非常注重用户隐私和数据保护，我们不会收集任何敏感信息，并采取了多种措施确保所有数据的安全性。
+            </p>
           </div>
         </el-card>
 
@@ -78,10 +89,13 @@
           <a
             class="text-blue-500"
             href="https://platform.openai.com/account/api-keys"
-          >OpenAI Key Management</a>
+            >OpenAI Key Management</a
+          >
           页面获取 OpenAI API Key.
         </div>
-        <div class="my-1">您的 Key 将会被保存在本地浏览器中，我们不会收集您的 Key.</div>
+        <div class="my-1">
+          您的 Key 将会被保存在本地浏览器中，我们不会收集您的 Key.
+        </div>
       </div>
       <div id="add-key-input" class="my-6">
         <el-input
@@ -103,8 +117,11 @@
             openAIkey = '';
             addKeyInputError = false;
           "
-        >取消</el-button>
-        <el-button class="ml-2" type="primary" @click="handleAddKeySubmit">保存</el-button>
+          >取消</el-button
+        >
+        <el-button class="ml-2" type="primary" @click="handleAddKeySubmit"
+          >保存</el-button
+        >
       </div>
     </div>
   </el-dialog>
@@ -135,10 +152,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { Coin, User, MagicStick } from "@element-plus/icons-vue";
 import ModelSelectCard from "@/views/HomePage/components/ModelSelectCard.vue";
 import { db } from "../../database/db";
+import Typed from "typed.js";
 
 const addKeyDialogVisiable = ref(false);
 const selectModelDialogVisiable = ref(false);
@@ -146,6 +164,19 @@ const addKeyInputError = ref(false);
 
 const openAIkey = ref("");
 const selectedModel = ref("");
+
+const typing = ref(null);
+
+onMounted(() => {
+  const typed = new Typed(typing.value, {
+    strings: ["YACW", "Yet Another ChatGPT WebAPP"],
+    typeSpeed: 60,
+    backSpeed: 40,
+    startDelay: 500,
+    backDelay: 1500,
+    loop: true,
+  });
+});
 
 const models = [
   {
@@ -191,7 +222,6 @@ const handleAddKeySubmit = async () => {
     db.close();
   }
 
-
   addKeyDialogVisiable.value = false;
 };
 
@@ -202,7 +232,7 @@ const handleSelectModelSubmit = async (modelValue: string) => {
     const firtRecord = await db.Apikey.toCollection().first();
     if (firtRecord) {
       await db.Apikey.update(firtRecord.id as number, { model: modelValue });
-     // console.log(firtRecord);
+      // console.log(firtRecord);
     } else {
       await db.Apikey.add({
         apikey: "",
@@ -227,5 +257,9 @@ const handleSelectModelSubmit = async (modelValue: string) => {
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+
+.typed-cursor {
+  font-size: 40px;
 }
 </style>
