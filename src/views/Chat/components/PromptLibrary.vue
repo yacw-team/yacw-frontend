@@ -1,6 +1,6 @@
 <template>
   <el-button @click="centerDialogVisible = true" round
-    style="font-weight: bold; color: white; background-color: coral;">Click to open the Dialog</el-button>
+    style="font-weight: bold; color: white; background-color: coral;">Prompt 商店</el-button>
   <el-dialog v-model="centerDialogVisible" title="Prompt Library" align-center center width="auto" height="auto">
     <el-tabs v-model="activeName" class="demo-tabs" style="height: fit-content;">
       <el-tab-pane label="Your prompt" name="first">
