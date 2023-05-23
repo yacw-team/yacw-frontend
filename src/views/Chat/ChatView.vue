@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <promptShop
       @changeShow="(msg: boolean) => isVisible = msg"
       v-if="isVisible"
@@ -15,25 +14,16 @@
         :changeTitle="changeTitle.title"
       />
       <div class="flex flex-col w-3/4 h-full">
-
         <div class="flex-1 bg-gray-50">
           <div class="flex flex-col">
             <div v-if="messages && messages[indexnumber] && indexnumber>-1 ">
-              <div
-                id="chat-messages"
-                class="flex-1 mx-4 overflow-y-scroll no-scrollbar"
-              >
-                <div
-                  v-for="(message, index) in messages[indexnumber].messages"
-                  :key="index"
-                >
-                  <ChatMessage
-                    class="mb-2"
-                    :role="message.type"
-                    :chatContent="message.content"
-                  />
+              <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
+                <div v-for="(message, index) in messages[indexnumber].messages" :key="index">
+                  <ChatMessage class="mb-2" :role="message.type" :chatContent="message.content" />
                 </div>
-
+                <el-skeleton :rows="5" animated :loading="!isLoading &&firstclick">
+                  <template #default></template>
+                </el-skeleton>
               </div>
             </div>
             <div v-else>
@@ -58,23 +48,18 @@
               />
             </div>
           </div>
-          <span v-if="isShowCharacter"
-          style="background-color: aquamarine; width: fit-content; padding-left: 0.5em; padding-right:0.5em; border-radius: 10px;">You
-          are select
-          <strong>{{ Character.name }}</strong></span>
+          <span
+            v-if="isShowCharacter"
+            style="background-color: aquamarine; width: fit-content; padding-left: 0.5em; padding-right:0.5em; border-radius: 10px;"
+          >
+            You
+            are select
+            <strong>{{ Character.name }}</strong>
+          </span>
         </div>
         <div id="input-slot" class="flex flex-row mx-4 my-6">
-          <el-input
-            v-model="textarea"
-            :disabled="isLoading"
-            placeholder="请输入"
-          />
-          <el-button
-            class="ml-4"
-            type="primary"
-            :disabled="!textarea"
-            @click="sendmessage"
-          >
+          <el-input v-model="textarea" :disabled="isLoading" placeholder="请输入" />
+          <el-button class="ml-4" type="primary" :disabled="!textarea" @click="sendmessage">
             <div class="flex flex-row items-center">
               <span>发送</span>
               <el-icon class="ml-1">
@@ -105,6 +90,7 @@ import ChatMessage from "./components/ChatMessage.vue";
 const messages: Ref<Chat[]> = ref([]);
 
 const isLoading = ref(false);
+const firstclick = ref(false);
 
 let textarea = ref("");
 
@@ -128,7 +114,6 @@ interface Personality {
   name: string;
   description: string;
   prompts: string;
-
 }
 
 interface getchat {
@@ -183,7 +168,7 @@ async function sendmessage() {
     messages.value[indexnumber.value].messages.push(userMessage);
 
     isLoading.value = true;
-
+    firstclick.value = true;
     if (messages.value[indexnumber.value].messages.length == 1) {
       //第一次发送时
       console.log(model.value);
@@ -267,29 +252,32 @@ watch(
   () => route.params.id,
   async (newid) => {
     const contentid = newid;
-    if (contentid == "0" ) {
-           indexnumber.value = -1;
+    if (contentid == "0") {
+      indexnumber.value = -1;
       return;
-    } 
-    else if(contentid == "1" )
-    {
-        if(messages.value[indexnumber.value].messages.length>0){
-          await db.open();
-          db.messages.where('chatId').equals(messages.value[indexnumber.value].chatId).delete();
-          db.messagetitles.where('chatId').equals(messages.value[indexnumber.value].chatId).delete();
-          db.close();
-        }
-      
-      axios.post("/api/v1/chat/deletechat",{
-          apiKey: apikey.value, 
-          chatId: messages.value[indexnumber.value].chatId  
-      })
+    } else if (contentid == "1") {
+      if (messages.value[indexnumber.value].messages.length > 0) {
+        await db.open();
+        db.messages
+          .where("chatId")
+          .equals(messages.value[indexnumber.value].chatId)
+          .delete();
+        db.messagetitles
+          .where("chatId")
+          .equals(messages.value[indexnumber.value].chatId)
+          .delete();
+        db.close();
+      }
 
-      messages.value.splice(indexnumber.value,1);
+      axios.post("/api/v1/chat/deletechat", {
+        apiKey: apikey.value,
+        chatId: messages.value[indexnumber.value].chatId,
+      });
+
+      messages.value.splice(indexnumber.value, 1);
       indexnumber.value--;
       return;
-    }
-    else {
+    } else {
       for (let i = 0; i < messages.value.length; i++) {
         if (messages.value[i].chatId == contentid) {
           indexnumber.value = i;
