@@ -1,5 +1,6 @@
 <template>
   <div>
+
     <promptShop
       @changeShow="(msg: boolean) => isVisible = msg"
       v-if="isVisible"
@@ -32,6 +33,7 @@
                     :chatContent="message.content"
                   />
                 </div>
+
               </div>
             </div>
             <div v-else>
@@ -39,6 +41,7 @@
             </div>
           </div>
         </div>
+
         <div class="flex justify-center pt-4">
           <div class="flex flex-row items-center justify-center w-1/2">
             <div class="flex flex-1">
@@ -55,6 +58,10 @@
               />
             </div>
           </div>
+          <span v-if="isShowCharacter"
+          style="background-color: aquamarine; width: fit-content; padding-left: 0.5em; padding-right:0.5em; border-radius: 10px;">You
+          are select
+          <strong>{{ Character.name }}</strong></span>
         </div>
         <div id="input-slot" class="flex flex-row mx-4 my-6">
           <el-input
@@ -121,6 +128,7 @@ interface Personality {
   name: string;
   description: string;
   prompts: string;
+
 }
 
 interface getchat {
@@ -191,6 +199,7 @@ async function sendmessage() {
         })
         .then(async (response) => {
           let firstchat: firstchat = response.data;
+
           changeTitle.value.index = indexnumber.value;
           changeTitle.value.title = firstchat.content.title;
 
@@ -371,7 +380,9 @@ onMounted(async () => {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 </style>
