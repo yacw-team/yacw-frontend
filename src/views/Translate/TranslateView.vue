@@ -6,8 +6,8 @@
           placeholder="请输入待翻译的文本" :readonly="fromTextReadOnly" @blur.stop="handleSubmit" />
       </el-card>
       <div class="flex my-2">
-        <el-icon size="20" class="flex-1 py-4 hover:cursor-pointer" @click="handleSwitchText">
-          <Sort />
+        <el-icon size="20" class="flex-1 py-4 hover:cursor-pointer" >
+          <Sort @click="handleSwitchText"/>
         </el-icon>
       </div>
       <el-skeleton class="" :loading="toTextLoading" animated>
