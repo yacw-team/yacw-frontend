@@ -2,7 +2,7 @@
   <div>
     <div>
       <div class="pt-16 text-center">
-        <h1 class="text-4xl font-bold">Get started with ChatGPT API</h1>
+        <span class="text-4xl font-bold" ref="typing"></span>
         <div class="flex flex-row items-center justify-center p-16">
           <el-button
             class="mx-2"
@@ -142,10 +142,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { Coin, User, MagicStick } from "@element-plus/icons-vue";
 import ModelSelectCard from "@/views/HomePage/components/ModelSelectCard.vue";
 import { db } from "../../database/db";
+import Typed from "typed.js";
 import axios from "axios";
 import { ElMessage } from "element-plus";
 
@@ -155,6 +156,19 @@ const addKeyInputError = ref(false);
 
 const openAIkey = ref("");
 const selectedModel = ref("");
+
+const typing = ref(null);
+
+onMounted(() => {
+  const typed = new Typed(typing.value, {
+    strings: ["YACW", "Yet Another ChatGPT WebAPP"],
+    typeSpeed: 60,
+    backSpeed: 40,
+    startDelay: 500,
+    backDelay: 1500,
+    loop: true,
+  });
+});
 
 const models = [
   {
@@ -190,7 +204,6 @@ const handleAddKeySubmit = async () => {
         try {
           await db.open();
           const firstRecord = await db.Apikey.toCollection().first();
-
           if (firstRecord) {
             await db.Apikey.update(firstRecord.id as number, {
               apikey: openAIkey.value,
@@ -251,5 +264,9 @@ const handleSelectModelSubmit = async (modelValue: string) => {
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+
+.typed-cursor {
+  font-size: 40px;
 }
 </style>
