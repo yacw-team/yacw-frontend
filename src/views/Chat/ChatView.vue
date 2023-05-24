@@ -16,10 +16,20 @@
       <div class="flex flex-col w-3/4 h-full">
         <div class="flex-1 bg-gray-50">
           <div class="flex flex-col">
-            <div v-if="messages && messages[indexnumber] && indexnumber>-1 ">
-              <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
-                <div v-for="(message, index) in messages[indexnumber].messages" :key="index">
-                  <ChatMessage class="mb-2" :role="message.type" :chatContent="message.content" />
+            <div v-if="messages && messages[indexnumber] && indexnumber > -1">
+              <div
+                id="chat-messages"
+                class="flex-1 mx-4 overflow-y-scroll no-scrollbar"
+              >
+                <div
+                  v-for="(message, index) in messages[indexnumber].messages"
+                  :key="index"
+                >
+                  <ChatMessage
+                    class="mb-2"
+                    :role="message.type"
+                    :chatContent="message.content"
+                  />
                 </div>
                 <el-skeleton :rows="5" animated :loading="!isLoading &&firstclick">
                   <template #default></template>
@@ -58,8 +68,21 @@
           </span>
         </div>
         <div id="input-slot" class="flex flex-row mx-4 my-6">
-          <el-input v-model="textarea" :disabled="isLoading" placeholder="请输入" />
-          <el-button class="ml-4" type="primary" :disabled="!textarea && !isLoading" @click="sendmessage">
+          <el-input
+            type="textarea"
+            :autosize="{ minRows: 1, maxRows: 4 }"
+            resize="none"
+            v-model="textarea"
+            :disabled="isLoading"
+            placeholder="请输入对话文字，使用 Shift + Enter 发送消息"
+            @keydown.shift.enter.prevent="sendmessage"
+          />
+          <el-button
+            class="ml-4"
+            type="primary"
+            :disabled="!textarea"
+            @click="sendmessage"
+          >
             <div class="flex flex-row items-center">
               <span>发送</span>
               <el-icon class="ml-1">
