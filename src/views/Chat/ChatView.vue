@@ -68,7 +68,7 @@
             placeholder="请输入对话文字，使用 Shift + Enter 发送消息"
             @keydown.shift.enter.prevent="sendmessage"
           />
-          <el-button class="ml-4" type="primary" :disabled="!textarea" @click="sendmessage">
+          <el-button class="ml-4" type="primary" :disabled="!textarea && isLoading" @click="sendmessage">
             <div class="flex flex-row items-center">
               <span>发送</span>
               <el-icon class="ml-1">
