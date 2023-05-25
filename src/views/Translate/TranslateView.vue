@@ -3,7 +3,7 @@
     <div class="w-full p-2 md:w-4/5">
       <el-card>
         <el-input class="no-border larger-font" v-model="fromText" :rows="6" type="textarea" resize="none"
-          placeholder="请输入待翻译的文本" :readonly="fromTextReadOnly" @blur.stop="handleSubmit" />
+          placeholder="请输入待翻译的文本，输入完毕后请等待2-3秒，我们将给出结果" :readonly="fromTextReadOnly" @blur.stop="handleSubmit" />
       </el-card>
       <div class="flex my-2">
         <el-icon size="20" class="flex-1 py-4 hover:cursor-pointer" >
@@ -123,7 +123,7 @@ const handleSubmit = async () => {
   // allow user input
   fromTextReadOnly.value = false;
   // stop ToText loading
-  toTextLoading.value = false;
+  toTextLoading.value = false
 
   toTextReadOnly.value = false;
 };
@@ -144,6 +144,8 @@ const handleResetBtn = () => {
 
   toTextReadOnly.value = true;
 };
+
+
 </script>
 
 <style>
