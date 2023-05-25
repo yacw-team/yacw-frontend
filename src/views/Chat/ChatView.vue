@@ -6,44 +6,77 @@
       @changeShow1="(msg: boolean) => isVisible = msg"
       @sendPrompt="(msg: string) => textarea = msg"
     />
-    <div v-if="!isVisible">
-      <div class="flex flex-row bg-gray-50">
-        <ChatSideBar
-          class="w-1/4 px-4 py-2 bg-white border border-gray-200 rounded-md"
-          :changeTitleId="changeTitle.id"
-          :changeTitleIndex="changeTitle.index"
-          :changeTitle="changeTitle.title"
-        />
-        <div class="flex flex-col w-3/4">
-          <div v-if="messages[indexnumber]">
-            <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
-              <div v-for="(message, index) in messages[indexnumber].messages" :key="index">
-                <ChatMessage class="mb-2" :role="message.type" :chatContent="message.content" />
+
+    <div v-if="!isVisible" class="flex flex-row h-full">
+      <ChatSideBar
+        class="w-1/4 px-4 py-2 bg-white border border-gray-200 rounded-md"
+        :changeTitleIndex="changeTitle.index"
+        :changeTitle="changeTitle.title"
+        :newId="getNewid"
+      />
+      <div class="flex flex-col w-3/4 h-full">
+        <div class="flex-1 bg-gray-50">
+          <div class="flex flex-col">
+            <div v-if="messages && messages[indexnumber] && indexnumber > -1">
+              <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
+                <div v-for="(message, index) in messages[indexnumber].messages" :key="index">
+                  <ChatMessage class="mb-2" :role="message.type" :chatContent="message.content" />
+                </div>
+                <el-skeleton :rows="5" animated :loading="!isLoading &&firstclick">
+                  <template #default></template>
+                </el-skeleton>
               </div>
             </div>
-          </div>
-          <div v-else>
-            <HomePage />
+            <div v-else>
+              <HomePage />
+            </div>
           </div>
         </div>
-      </div>
-      <div style="display: flex; flex-direction: row;">
-        <PromptLibrary
-          @response="(msg: string) => textarea += msg"
-          @changeShow="(msg: boolean) => isVisible = msg"
-        />
-        <Alcharacter @getCharacter="(msg: Personality) => getCharacterinfo(msg)" />
-      </div>
-      <div id="input-slot" class="flex flex-row mx-4 my-6">
-        <el-input v-model="textarea" :disabled="isLoading" placeholder="请输入" />
-        <el-button class="ml-4" type="primary" :disabled="!textarea" @click="sendmessage">
-          <div class="flex flex-row items-center">
-            <span>发送</span>
-            <el-icon class="ml-1">
-              <ArrowRightBold />
-            </el-icon>
+
+        <div class="flex justify-center pt-4">
+          <div class="flex flex-row items-center justify-center w-1/2">
+            <div class="flex flex-1">
+              <PromptLibrary
+                @response="(msg: string) => textarea += msg"
+                @changeShow="(msg: boolean) => isVisible = msg"
+                style="margin: auto"
+              />
+            </div>
+            <div class="flex flex-1">
+              <AICharacter
+                @getCharacter="(msg: Personality) => getCharacterinfo(msg)"
+                style="margin: auto"
+              />
+            </div>
           </div>
-        </el-button>
+          <span
+            v-if="isShowCharacter"
+            style="background-color: aquamarine; width: fit-content; padding-left: 0.5em; padding-right:0.5em; border-radius: 10px;"
+          >
+            You
+            are select
+            <strong>{{ Character.name }}</strong>
+          </span>
+        </div>
+        <div id="input-slot" class="flex flex-row mx-4 my-6">
+          <el-input
+            type="textarea"
+            :autosize="{ minRows: 1, maxRows: 4 }"
+            resize="none"
+            v-model="textarea"
+            :disabled="isLoading"
+            placeholder="请输入对话文字，使用 Shift + Enter 发送消息"
+            @keydown.shift.enter.prevent="sendmessage"
+          />
+          <el-button class="ml-4" type="primary" :disabled="!textarea" @click="sendmessage">
+            <div class="flex flex-row items-center">
+              <span>发送</span>
+              <el-icon class="ml-1">
+                <ArrowRightBold />
+              </el-icon>
+            </div>
+          </el-button>
+        </div>
       </div>
     </div>
   </div>
@@ -55,23 +88,22 @@ import type { Ref } from "vue";
 import { ArrowRightBold } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
-
+import { v4 as uuidv4 } from "uuid";
 import { db } from "../../database/db";
-import PromptLibrary from "@/components/PromptLibrary.vue";
+import PromptLibrary from "./components/PromptLibrary.vue";
 import promptShop from "@/components/PromptShop.vue";
-import Alcharacter from "@/components/AIcharacter.vue";
+import AICharacter from "./components/AIcharacter.vue";
 import HomePage from "@/views/Chat/ChatHomePage.vue";
 import ChatMessage from "./components/ChatMessage.vue";
+import { ElMessage } from "element-plus";
 
 const messages: Ref<Chat[]> = ref([]);
 
-
 const isLoading = ref(false);
+const firstclick = ref(false);
 
 let textarea = ref("");
 
-
-const prompt = ref();
 const isVisible = ref(false); //组件切换显示
 const Character = ref();
 const characterid = ref("");
@@ -86,13 +118,15 @@ type indexnumber = number;
 // eslint-disable-next-line no-redeclare
 const indexnumber = ref(0); //作为具体哪个chatid
 
+const queryId = ref(""); //判断是不是0或1
+const getNewid = ref("");
+
 interface Personality {
   id: string;
   name: string;
-  description	: string;
+  description: string;
   prompts: string;
 }
-
 
 interface getchat {
   chatId: string;
@@ -137,23 +171,38 @@ interface Chat {
 }
 
 async function sendmessage() {
-  console.log(characterid.value);
+
   if (apikey.value != "" && model.value != "") {
+    console.log(queryId.value)
+    if (queryId.value == "0" || queryId.value == "1" || queryId.value == "") {
+      //如果是在初始页面时候聊天 或 如果是在删除后聊天
+      const newmessage = {
+        chatId: uuidv4(),
+        messages: [],
+      };
+      getNewid.value=newmessage.chatId;
+      messages.value.push(newmessage);
+      indexnumber.value = messages.value.length - 1;
+      changeTitle.value.index = indexnumber.value;
+    }
+    //之后聊天在某一对话中发送对话
     const userMessage: Message = {
       type: "user",
       content: textarea.value,
     };
+    textarea.value = "";
     messages.value[indexnumber.value].messages.push(userMessage);
 
     isLoading.value = true;
-
+    firstclick.value = true;
     if (messages.value[indexnumber.value].messages.length == 1) {
       //第一次发送时
-      console.log(model.value)
+      console.log(model.value);
       axios
         .post("/api/v1/chat/new", {
           apiKey: apikey.value,
           modelId: model.value,
+          chatId: messages.value[indexnumber.value].chatId,
           content: {
             personalityId: characterid.value, //构造system
             user: textarea.value, // user input
@@ -161,11 +210,10 @@ async function sendmessage() {
         })
         .then(async (response) => {
           let firstchat: firstchat = response.data;
-          messages.value[indexnumber.value].chatId=firstchat.chatId;
+
           changeTitle.value.index = indexnumber.value;
-          changeTitle.value.id = firstchat.chatId;
           changeTitle.value.title = firstchat.content.title;
-         
+
           try {
             await db.open();
             db.messagetitles.add({
@@ -219,34 +267,61 @@ async function sendmessage() {
 
     //下面是模拟发送直接改index为2的chat的标题
     isLoading.value = false;
-    textarea.value = "";
   } else {
     //缺乏apikey的dialog
-    alert("没输入apikey和选择模型，请选择");
+    ElMessage({
+      message: "ApiKey没有输入或未选择AI模型",
+      type: "error",
+    });
   }
 }
 
 watch(
   () => route.params.id,
-  (newid) => {
+  async (newid) => {
     const contentid = newid;
-    for (let i = 0; i < messages.value.length; i++) {
-      if (messages.value[i].chatId == contentid) {
-        indexnumber.value = i;
-        return;
+    queryId.value = newid as string;
+    if (contentid == "0") {
+      indexnumber.value = -1;
+      return;
+    } else if (contentid == "1") {
+      if (messages.value[indexnumber.value].messages.length > 0) {
+        await db.open();
+        db.messages
+          .where("chatId")
+          .equals(messages.value[indexnumber.value].chatId)
+          .delete();
+        db.messagetitles
+          .where("chatId")
+          .equals(messages.value[indexnumber.value].chatId)
+          .delete();
+        db.close();
       }
+
+      axios.post("/api/v1/chat/deletechat", {
+        apiKey: apikey.value,
+        chatId: messages.value[indexnumber.value].chatId,
+      });
+
+      messages.value.splice(indexnumber.value, 1);
+      indexnumber.value--;
+      return;
+    } else {
+      for (let i = 0; i < messages.value.length; i++) {
+        if (messages.value[i].chatId == contentid) {
+          indexnumber.value = i;
+          return;
+        }
+      }
+      const newmessage = {
+        chatId: route.params.id as string,
+        messages: [],
+      };
+      messages.value.push(newmessage);
+      indexnumber.value = messages.value.length - 1;
     }
-    const newmessage = {
-      chatId: route.params.id as string,
-      messages: [],
-    };
-    messages.value.push(newmessage);
-    indexnumber.value = messages.value.length - 1;
   }
 );
-
-const count = ref(0);
-
 
 // 在组件挂载时从 localStorage 中恢复值
 onMounted(() => {
@@ -267,7 +342,7 @@ watch(
 
 function getCharacterinfo(msg: Personality) {
   characterid.value = msg.id;
-  console.log(characterid.value)
+  console.log(characterid.value);
   console.log(msg);
   Character.value = msg;
   isShowCharacter.value = true;
@@ -282,9 +357,6 @@ onMounted(async () => {
       apikey.value = firtRecord.apikey as string;
       model.value = firtRecord.model as string;
     }
-
-    console.log(firtRecord);
-
     if ((await db.messages.toArray()).length != 0) {
       const chatIds = await db.messages.orderBy("chatId").uniqueKeys();
       for (const chatid of chatIds) {
@@ -323,7 +395,9 @@ onMounted(async () => {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 </style>

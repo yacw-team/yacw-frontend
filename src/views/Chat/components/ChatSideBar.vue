@@ -26,8 +26,11 @@
 import { computed, ref, defineProps, onMounted, watch } from "vue";
 import { Plus } from "@element-plus/icons-vue";
 import CreateNewChat from "./CreateNewChat.vue";
-import {db} from "@/database/db"
+import { db } from "@/database/db";
 import { useRouter } from "vue-router";
+
+import { v4 as uuidv4 } from "uuid";
+import { ElMessage } from "element-plus";
 
 interface ChatConversation {
   chatId: string;
@@ -36,6 +39,7 @@ interface ChatConversation {
 
 const isCollapsed = ref(false);
 const searchText = ref("");
+const hasNewChat = ref(false);
 
 const reversedConversations = computed(() => {
   return conversations.value.slice().reverse();
@@ -45,13 +49,14 @@ const conversations = ref<ChatConversation[]>([]);
 
 onMounted(async () => {
   (newTitle.changeTitle as string) = "新对话";
+  (newTitle.newId as string)='';
 
   await db.open();
   const data = await db.messagetitles.toArray();
-  console.log(data)
+  console.log(data);
 
   if (data.length != 0) {
-    console.log(data)
+    console.log(data);
     data.forEach((msgtitle) => {
       conversations.value.push({
         chatId: msgtitle.chatId,
@@ -61,17 +66,43 @@ onMounted(async () => {
   }
 });
 const handleAddNewChat = () => {
-  const newConversation: ChatConversation = {
-    chatId: "-1" + conversations.value.length,
-    title: "新对话",
-  };
-  conversations.value.push(newConversation);
+  if (!hasNewChat.value) {
+    const newConversation: ChatConversation = {
+      chatId: uuidv4(),
+      title: "新对话",
+    };
+    conversations.value.push(newConversation);
+    router.push({ name: "chat", params: { id:newConversation.chatId  } });
+    hasNewChat.value = true;
+  } else {
+    ElMessage({
+      message: "一次只能新建一次新对话",
+      type: "warning",
+    });
+  }
+
+  
 };
 
+watch(
+  ()=>newTitle.newId,
+  (newval)=>{
+    console.log(newTitle.newId);
+    const newConversation: ChatConversation = {
+      chatId: newTitle.newId as string,
+      title: "新对话",
+    };
+    conversations.value.push(newConversation);
+    router.push({ name: "chat", params: { id:newConversation.chatId  } });
+    hasNewChat.value = true;
+  }
+)
+
+
 let newTitle = defineProps({
-  changeTitleId: String,
   changeTitleIndex: Number,
   changeTitle: String,
+  newId:String,
 });
 
 const router = useRouter();
@@ -79,13 +110,9 @@ watch(
   () => newTitle.changeTitle,
   (newval) => {
     console.log(newTitle);
-    if (
-      newTitle.changeTitleIndex != undefined &&
-      newTitle.changeTitleId != undefined
-    ) {
-      conversations.value[newTitle.changeTitleIndex].chatId =
-        newTitle.changeTitleId;
+    if (newTitle.changeTitleIndex != undefined) {
       conversations.value[newTitle.changeTitleIndex].title = newval as string;
+      hasNewChat.value = false;
       // router.push({
       //   name: "chat",
       //   params: { id: conversations.value[newTitle.changeTitleIndex].chatId },
@@ -103,8 +130,16 @@ const handleDeleteChat = (chatId: string) => {
   const indexToDelete = conversations.value.findIndex(
     (conversation) => conversation.chatId === chatId
   );
-  if (indexToDelete !== -1) {
+  console.log(indexToDelete);
+  if (indexToDelete == conversations.value.length-1) {
+    hasNewChat.value = false;
+    conversations.value.splice(indexToDelete, 1);
+     
+  } else if (indexToDelete !== -1) {
     conversations.value.splice(indexToDelete, 1);
   }
+ // router.push({ name: "chat", params: { id: "1" } });
+
+
 };
 </script>

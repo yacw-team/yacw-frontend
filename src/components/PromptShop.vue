@@ -1,60 +1,60 @@
 <template>
     <div class="mask" v-show="isVisible" @click="isVisible = false"></div>
     <div style="width: 100%;">
-    <el-row class="all">
-        <el-col :span="2" class="MyMenu">
-            <el-menu default-active="2" class="el-menu-vertical-demo">
-                <el-menu-item index="All" @click="changeType('All')">
-                    <span>全部</span>
-                </el-menu-item>
-                <el-menu-item index="IT/编程" @click="changeType('IT/编程')">
-                    <span>IT/编程</span>
-                </el-menu-item>
-                <el-menu-item index="生活质量" @click="changeType('生活质量')">
-                    <span>生活质量</span>
-                </el-menu-item>
-                <el-menu-item index="趣味知识" @click="changeType('趣味知识')">
-                    <span>趣味知识</span>
-                </el-menu-item>
-                <el-menu-item index="自然百科" @click="changeType('自然百科')">
-                    <span>自然百科</span>
-                </el-menu-item>
-                <el-menu-item index="医生" @click="changeType('医生')">
-                    <span>医生</span>
-                </el-menu-item>
-            </el-menu>
-        </el-col>
-        <el-col :span="22">
-            <div class="allElement">
-                <el-row :gutter="20" v-for="row in cardColumns" justify-content="space-between">
-                    <el-col v-for="col in row" :span="8">
-                        <el-card :body-style="{ padding: '0px' }" @click="sendMessage(col)">
-                            <div class="background" :style="{ background: col.background }">
-                                <span class="emoji">{{ col.icon }}</span>
-                                <span class="name">{{ col.name }}</span>
-                            </div>
-                            <div class="bottom" style="padding: 14px">
-                                <span>{{ col.name }}</span>
-                            </div>
-                        </el-card>
-                    </el-col>
-                </el-row>
-            </div>
+        <el-row class="all">
+            <el-col :span="2" class="MyMenu">
+                <el-menu default-active="2" class="el-menu-vertical-demo">
+                    <el-menu-item index="All" @click="changeType('All')">
+                        <span>全部</span>
+                    </el-menu-item>
+                    <el-menu-item index="IT/编程" @click="changeType('IT/编程')">
+                        <span>IT/编程</span>
+                    </el-menu-item>
+                    <el-menu-item index="生活质量" @click="changeType('生活质量')">
+                        <span>生活质量</span>
+                    </el-menu-item>
+                    <el-menu-item index="趣味知识" @click="changeType('趣味知识')">
+                        <span>趣味知识</span>
+                    </el-menu-item>
+                    <el-menu-item index="自然百科" @click="changeType('自然百科')">
+                        <span>自然百科</span>
+                    </el-menu-item>
+                    <el-menu-item index="医生" @click="changeType('医生')">
+                        <span>医生</span>
+                    </el-menu-item>
+                </el-menu>
+            </el-col>
+            <el-col :span="22">
+                <div class="allElement">
+                    <el-row :gutter="20" v-for="(row, index) in cardColumns" :key="index">
+                        <el-col v-for="(col, index1) in row" :key="index1" :span="8">
+                            <el-card :body-style="{ padding: '0px' }" @click="sendMessage(col)">
+                                <div class="background" :style="{ background: col.background }">
+                                    <span class="emoji">{{ col.icon }}</span>
+                                    <span class="name">{{ col.name }}</span>
+                                </div>
+                                <div class="bottom" style="padding: 14px">
+                                    <span>{{ col.name }}</span>
+                                </div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
+                </div>
 
 
-        </el-col>
-    </el-row>
-    <teleport to=".mask">
-        <Details :jsondataicon="jsondata.icon" :jsondataprompts="jsondata.prompts"  
-        :jsondatabackground="jsondata.background" :jsondataname="jsondata.name" 
-        :jsondatadescription="jsondata.description" 
-        v-if="isVisible" @close="isVisible = false" v-model="isVisible"
-            @usePrompt="(msg: string) => finishChoosePrompt(msg)" />
-    </teleport>
-    <div class="footer">
-        <el-pagination background layout="prev, pager, next" :total="PromptsList.Prompts.length" :current-page="currentPage"
-            :page-size="12" @current-change="updatePage" />
-    </div></div>
+            </el-col>
+        </el-row>
+        <teleport to=".mask">
+            <Details :jsondataicon="jsondata.icon" :jsondataprompts="jsondata.prompts"
+                :jsondatabackground="jsondata.background" :jsondataname="jsondata.name"
+                :jsondatadescription="jsondata.description" v-if="isVisible" @close="isVisible = false" v-model="isVisible"
+                @usePrompt="(msg: string) => finishChoosePrompt(msg)" />
+        </teleport>
+        <div class="footer">
+            <el-pagination background layout="prev, pager, next" :total="PromptsList.Prompts.length"
+                :current-page="currentPage" :page-size="12" @current-change="updatePage" />
+        </div>
+    </div>
 </template>
   
 <script setup lang="ts">
@@ -71,7 +71,7 @@ interface Prompt {
     prompts: string,
     background: string,
     icon: string
-};
+}
 const PromptsList = reactive({
     Prompts: [] as Prompt[],
 })
@@ -101,9 +101,9 @@ const promptMessage = ref();  //传递给输入框的prompt信息，来自LookDe
 //事件方法的集合
 
 function changeType(index: string) {
-    if(index!='All')
-    promptType.value = index;
-    else  promptType.value = null;
+    if (index != 'All')
+        promptType.value = index;
+    else promptType.value = null;
     fetchCards(promptType.value);
     console.log(index);
 }
@@ -142,61 +142,22 @@ const getRandomBackground = () => {
     return { background, icon };
 };
 
-const data = ref({ Prompts: [] as Prompt[] });
+let data = ref({ Prompts: [] as Prompt[] });
 const fetchCards = async (index: string) => {
     //根据类型进行请求
     let url = '/api/v1/chat/prompts';
     if (index != null) {
         url += `?type=${index}`;
     }
-
-    // try {
-    //     console.log("发出请求，来获得shop资源");
-    //     const res = await fetch(url);
-    //     data.value = await axios.get(url);
-
-
-    // } catch (error) {
-    //     console.log("获取失败,使用默认值")
-    //     data.value = {
-    //         Prompts: [
-    //             {
-    //                 'id': '1',
-    //                 "name": "111",
-    //                 "description": "string",
-    //                 "prompts": "string",
-    //                 "icon": '',
-    //                 "background": ''
-    //             },
-    //             {
-    //                 'id': '2',
-    //                 "name": "222",
-    //                 "description": "大便啊",
-    //                 "prompts": "大便啊",
-    //                 "icon": '',
-    //                 "background": ''
-    //             },
-    //             {
-    //                 'id': '3',
-    //                 "name": "333",
-    //                 "description": "我靠",
-    //                 "prompts": "我靠",
-    //                 "icon": '',
-    //                 "background": ''
-    //             },
-    //         ]
-    //     };
-
-    // }
     axios.get(url).then(response => {
         console.log("发出请求,来获得shop资源");
-         data.value = response.data;
+        data.value = response.data;
         PromptsList.Prompts = data.value.Prompts.map((prompt: Prompt) => {
             const { background, icon } = getRandomBackground();
             console.log(data)
             return { ...prompt, background, icon };
         })
-    },error=>{
+    }, error => {
         console.log("获取失败,使用默认值")
         data.value = {
             Prompts: [
@@ -223,7 +184,21 @@ const fetchCards = async (index: string) => {
                     "prompts": "我靠",
                     "icon": '',
                     "background": ''
-                },
+                }, {
+                    'id': '4',
+                    "name": "333",
+                    "description": "hhhh",
+                    "prompts": "哇哈哈哈",
+                    "icon": '',
+                    "background": ''
+                }, {
+                    'id': '3',
+                    "name": "333",
+                    "description": "纳尼",
+                    "prompts": "纳尼",
+                    "icon": '',
+                    "background": ''
+                }
             ]
         };
     })
@@ -280,7 +255,7 @@ watch(() => data, (newVal) => {
     margin-bottom: 20px;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: left;
 }
 
 
@@ -342,7 +317,7 @@ watch(() => data, (newVal) => {
 .MyMenu {
     height: 100vh;
     padding-right: 5%;
-   
+
 }
 
 .mask {
