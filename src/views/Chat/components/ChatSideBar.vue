@@ -49,6 +49,7 @@ const conversations = ref<ChatConversation[]>([]);
 
 onMounted(async () => {
   (newTitle.changeTitle as string) = "新对话";
+  (newTitle.newId as string)='';
 
   await db.open();
   const data = await db.messagetitles.toArray();
@@ -71,6 +72,7 @@ const handleAddNewChat = () => {
       title: "新对话",
     };
     conversations.value.push(newConversation);
+    router.push({ name: "chat", params: { id:newConversation.chatId  } });
     hasNewChat.value = true;
   } else {
     ElMessage({
@@ -78,11 +80,29 @@ const handleAddNewChat = () => {
       type: "warning",
     });
   }
+
+  
 };
+
+watch(
+  ()=>newTitle.newId,
+  (newval)=>{
+    console.log(newTitle.newId);
+    const newConversation: ChatConversation = {
+      chatId: newTitle.newId as string,
+      title: "新对话",
+    };
+    conversations.value.push(newConversation);
+    router.push({ name: "chat", params: { id:newConversation.chatId  } });
+    hasNewChat.value = true;
+  }
+)
+
 
 let newTitle = defineProps({
   changeTitleIndex: Number,
   changeTitle: String,
+  newId:String,
 });
 
 const router = useRouter();

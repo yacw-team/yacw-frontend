@@ -190,8 +190,6 @@ function confirmSuccess(msg: boolean) {
   } else if (msg == false) {
     ElMessage.info('create prompt falure')
   }
-
-
 }
 
 

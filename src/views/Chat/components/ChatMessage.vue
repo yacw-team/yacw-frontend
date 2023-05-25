@@ -8,6 +8,9 @@
     <div id="message-content" class="mx-4">
       <div v-html="chatContentRandered"></div>
     </div>
+    <div class="ml-auto absolute top-1 right-1 copy">
+    <i class="el-icon-copy" @click="copyText"><el-icon><CopyDocument /></el-icon></i>
+  </div>
   </div>
 </template>
 
@@ -16,8 +19,11 @@ import { marked } from "marked";
 import DOMPurify from "dompurify";
 import highlight from "highlight.js";
 import "highlight.js/styles/idea.css";
+import { ElMessage } from "element-plus";
+import { CopyDocument } from "@element-plus/icons-vue";
 
 const props = defineProps({
+
   role: {
     type: String,
     required: true,
@@ -52,6 +58,11 @@ if (props.role === "user") {
   avatar = assistant_avatar;
 }
 
+const copyText = () => {
+  navigator.clipboard.writeText(props.chatContent);
+  ElMessage.success('Copied to clipboard!');
+};
+
 const chatContentRandered = DOMPurify.sanitize(marked.parse(props.chatContent));
 </script>
 
@@ -62,4 +73,9 @@ pre {
     border-radius: 0.375rem;
     background-color: #f8fafc;
 }
+
+#message-content{
+  overflow:auto;
+}
+
 </style>
