@@ -52,7 +52,7 @@
           </el-col>
         </el-row>
         <br />
-        <el-row v-for="index in p" :key="index" class="item">
+        <el-row v-for="index in p.Prompts" :key="index" class="item">
           <el-col :span="24">
             <el-card shadow="always">
               <span>prompt名字: {{ index.name }}</span>
@@ -135,35 +135,52 @@ onMounted(async () => {
   }
 })
 
-const p: Array<Prompt> = [
-  {
-    id: "1",
-    name: "软件工程师",
-    description: "水水水水水水水水水水水水水水水水水水水",
-    prompts: "软件工程师;",
+const p = ref({ Prompts: [] as Prompt[] })
+onMounted(async () => {
+  axios.get('/api/v1/chat/prompts').then(response => {
+    p.value = response.data.Prompts;
+  }).catch((error => {
+    p.value = {
+      Prompts: [
+        {
+          id: "1",
+          name: "软件工程师",
+          description: "水水水水水水水水水水水水水水水水水水水",
+          prompts: "软件工程师;",
 
-  },
-  {
-    id: "1",
-    name: "音乐家",
-    description: "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊,不是把不是把。水水水水水水水水水水水水水水水水水水",
-    prompts: "音乐家;",
+        },
+        {
+          id: "1",
+          name: "音乐家",
+          description: "哇哇哇哇哇哇哇",
+          prompts: "音乐家;",
 
-  }, {
-    id: "1",
-    name: "软件工程师",
-    description: "水水水水水水水水水水水水水水水水水水水",
-    prompts: "软件工程师;",
+        }, {
+          id: "1",
+          name: "软件工程师",
+          description: "啦啦啦啦啦啦啦啦啦啦啦",
+          prompts: "软件工程师;",
 
-  },
-  {
-    id: "1",
-    name: "音乐家",
-    description: "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊",
-    prompts: "音乐家;",
+        },
+        {
+          id: "1",
+          name: "音乐家",
+          description: "噼噼啪啪噼噼啪啪噼噼啪啪",
+          prompts: "音乐家;",
 
-  },
-];
+        },
+      ]
+    }
+  })).finally(()=>{
+    const s = ref({ Prompts: [] as Prompt[] });
+    let length=4;     //固定显示的，从后端获取的prompt的数量
+    for(let i=0;i<length&&i<p.value.Prompts.length;i++){
+      s.value.Prompts[i]=p.value.Prompts[i];
+    }
+    p.value.Prompts=s.value.Prompts;
+  })
+})
+
 
 
 function confirmSuccess(msg: boolean) {
@@ -173,8 +190,6 @@ function confirmSuccess(msg: boolean) {
   } else if (msg == false) {
     ElMessage.info('create prompt falure')
   }
-
-
 }
 
 
