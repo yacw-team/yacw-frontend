@@ -15,7 +15,7 @@
         <br />
         <el-col :span="12">
           <el-button @click="toggle">新建prompt</el-button>
-          <Cp v-if="createdialog" />
+          <Cp v-if="createdialog" @createPrompt="(msg: boolean) => confirmSuccess(msg)" />
         </el-col>
         <br />
         <el-row v-for="index in temp" :key="index" class="item">
@@ -72,15 +72,17 @@
 </template>
 
 <script lang="ts" setup>
-import {  onMounted, ref } from "vue";
+import { onMounted, ref, defineEmits } from "vue";
 import Cp from "./CreatePersonality.vue";
 import axios from "axios";
 import { db } from "@/database/db";
+import { ElMessage } from "element-plus";
+
 
 const centerDialogVisible = ref(false);
 const createdialog = ref(false);
 const activeName = ref('first')
-
+const emit = defineEmits(['response', 'changeShow', 'sucessCreate']);
 const temp = ref();
 
 function toggle() {
@@ -109,13 +111,13 @@ const fetchUserprompts = async () => {
         temp.value = response.data
       }).catch((error) => {
         console.log("请求用户prompt错误");
-        console.log(error);
       })
   } else {
     console.log("没有apiKey，给默认的数据")
     temp.value = p
   }
 }
+
 
 
 onMounted(fetchUserprompts);
@@ -144,13 +146,36 @@ const p: Array<Prompt> = [
   {
     id: "1",
     name: "音乐家",
-    description: "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊",
+    description: "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊,不是把不是把。水水水水水水水水水水水水水水水水水水",
     prompts: "音乐家;",
+
+  }, {
+    id: "1",
+    name: "软件工程师",
+    description: "水水水水水水水水水水水水水水水水水水水",
+    prompts: "软件工程师;",
+
+  },
+  {
+    id: "1",
+    name: "音乐家",
+    description: "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊",
+    prompts: "音乐家;",
+
   },
 ];
 
 
-const emit = defineEmits(['response', 'changeShow']);
+function confirmSuccess(msg: boolean) {
+  if (msg == true) {
+    fetchUserprompts;
+    ElMessage.info('create prompt success')
+  } else if (msg == false) {
+    ElMessage.info('create prompt falure')
+  }
+
+
+}
 
 
 function getdetails(detail: string) {
@@ -163,8 +188,6 @@ function getdetails(detail: string) {
 function changeComponent() {
   centerDialogVisible.value = false;
   emit('changeShow', true);
-
-  console.log("成功发出事件")
 }
 
 
