@@ -12,24 +12,15 @@
         class="w-1/4 px-4 py-2 bg-white border border-gray-200 rounded-md"
         :changeTitleIndex="changeTitle.index"
         :changeTitle="changeTitle.title"
+        :newId="getNewid"
       />
       <div class="flex flex-col w-3/4 h-full">
         <div class="flex-1 bg-gray-50">
           <div class="flex flex-col">
             <div v-if="messages && messages[indexnumber] && indexnumber > -1">
-              <div
-                id="chat-messages"
-                class="flex-1 mx-4 overflow-y-scroll no-scrollbar"
-              >
-                <div
-                  v-for="(message, index) in messages[indexnumber].messages"
-                  :key="index"
-                >
-                  <ChatMessage
-                    class="mb-2"
-                    :role="message.type"
-                    :chatContent="message.content"
-                  />
+              <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
+                <div v-for="(message, index) in messages[indexnumber].messages" :key="index">
+                  <ChatMessage class="mb-2" :role="message.type" :chatContent="message.content" />
                 </div>
                 <el-skeleton :rows="5" animated :loading="!isLoading &&firstclick">
                   <template #default></template>
@@ -77,12 +68,7 @@
             placeholder="请输入对话文字，使用 Shift + Enter 发送消息"
             @keydown.shift.enter.prevent="sendmessage"
           />
-          <el-button
-            class="ml-4"
-            type="primary"
-            :disabled="!textarea"
-            @click="sendmessage"
-          >
+          <el-button class="ml-4" type="primary" :disabled="!textarea" @click="sendmessage">
             <div class="flex flex-row items-center">
               <span>发送</span>
               <el-icon class="ml-1">
@@ -102,7 +88,7 @@ import type { Ref } from "vue";
 import { ArrowRightBold } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
-
+import { v4 as uuidv4 } from "uuid";
 import { db } from "../../database/db";
 import PromptLibrary from "./components/PromptLibrary.vue";
 import promptShop from "@/components/PromptShop.vue";
@@ -118,7 +104,6 @@ const firstclick = ref(false);
 
 let textarea = ref("");
 
-const prompt = ref();
 const isVisible = ref(false); //组件切换显示
 const Character = ref();
 const characterid = ref("");
@@ -132,6 +117,9 @@ const route = useRoute();
 type indexnumber = number;
 // eslint-disable-next-line no-redeclare
 const indexnumber = ref(0); //作为具体哪个chatid
+
+const queryId = ref(""); //判断是不是0或1
+const getNewid = ref("");
 
 interface Personality {
   id: string;
@@ -183,8 +171,21 @@ interface Chat {
 }
 
 async function sendmessage() {
-  console.log(characterid.value);
+
   if (apikey.value != "" && model.value != "") {
+    console.log(queryId.value)
+    if (queryId.value == "0" || queryId.value == "1" || queryId.value == "") {
+      //如果是在初始页面时候聊天 或 如果是在删除后聊天
+      const newmessage = {
+        chatId: uuidv4(),
+        messages: [],
+      };
+      getNewid.value=newmessage.chatId;
+      messages.value.push(newmessage);
+      indexnumber.value = messages.value.length - 1;
+      changeTitle.value.index = indexnumber.value;
+    }
+    //之后聊天在某一对话中发送对话
     const userMessage: Message = {
       type: "user",
       content: textarea.value,
@@ -266,13 +267,12 @@ async function sendmessage() {
 
     //下面是模拟发送直接改index为2的chat的标题
     isLoading.value = false;
-    
   } else {
     //缺乏apikey的dialog
     ElMessage({
-          message: "ApiKey没有输入或未选择AI模型",
-          type: "error",
-        });
+      message: "ApiKey没有输入或未选择AI模型",
+      type: "error",
+    });
   }
 }
 
@@ -280,6 +280,7 @@ watch(
   () => route.params.id,
   async (newid) => {
     const contentid = newid;
+    queryId.value = newid as string;
     if (contentid == "0") {
       indexnumber.value = -1;
       return;
@@ -321,8 +322,6 @@ watch(
     }
   }
 );
-
-const count = ref(0);
 
 // 在组件挂载时从 localStorage 中恢复值
 onMounted(() => {
