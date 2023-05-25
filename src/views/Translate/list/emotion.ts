@@ -1,42 +1,42 @@
 export const emotionList = [
     {
         value: 'happiness and pleasure',
-        label: 'Joyful'
+        label: '高兴的'
     },
     {
         value: 'frustration or irritation',
-        label: 'Angry'
+        label: '愤怒的'
     },
     {
         value: 'apprehension or anxiety',
-        label: 'Fearful'
+        label: '担心的'
     },
     {
         value: 'sorrow or melancholy',
-        label: 'Sad'
+        label: '忧伤的'
     },
     {
         value: 'excitement or eagerness',
-        label: 'Enthusiastic'
+        label: '充满热情的'
     },
     {
         value: 'self-assurance or conviction',
-        label: 'Confident'
+        label: '自信的'
     },
     {
         value: 'amazement or astonishment',
-        label: 'Surprised'
+        label: '感到惊讶的'
     },
     {
         value: 'revulsion or distaste',
-        label: 'Disgusted'
+        label: '厌烦的'
     },
     {
         value: 'optimism or positive expectations',
-        label: 'Hopeful'
+        label: '乐观的'
     },
     {
         value: 'deep thoughtfulness or contemplation',
-        label: 'Pensive'
+        label: '沉思的'
     },
 ];

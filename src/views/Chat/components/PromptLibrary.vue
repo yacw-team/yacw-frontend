@@ -15,7 +15,7 @@
         <br />
         <el-col :span="12">
           <el-button @click="toggle">新建prompt</el-button>
-          <Cp v-if="createdialog" />
+          <Cp v-if="createdialog" @createPrompt="(msg: boolean) => confirmSuccess(msg)" />
         </el-col>
         <br />
         <el-row v-for="index in temp" :key="index" class="item">
@@ -52,7 +52,7 @@
           </el-col>
         </el-row>
         <br />
-        <el-row v-for="index in p" :key="index" class="item">
+        <el-row v-for="index in p.Prompts" :key="index" class="item">
           <el-col :span="24">
             <el-card shadow="always">
               <span>prompt名字: {{ index.name }}</span>
@@ -72,15 +72,17 @@
 </template>
 
 <script lang="ts" setup>
-import {  onMounted, ref } from "vue";
+import { onMounted, ref, defineEmits } from "vue";
 import Cp from "./CreatePersonality.vue";
 import axios from "axios";
 import { db } from "@/database/db";
+import { ElMessage } from "element-plus";
+
 
 const centerDialogVisible = ref(false);
 const createdialog = ref(false);
 const activeName = ref('first')
-
+const emit = defineEmits(['response', 'changeShow', 'sucessCreate']);
 const temp = ref();
 
 function toggle() {
@@ -109,13 +111,13 @@ const fetchUserprompts = async () => {
         temp.value = response.data
       }).catch((error) => {
         console.log("请求用户prompt错误");
-        console.log(error);
       })
   } else {
     console.log("没有apiKey，给默认的数据")
     temp.value = p
   }
 }
+
 
 
 onMounted(fetchUserprompts);
@@ -133,24 +135,62 @@ onMounted(async () => {
   }
 })
 
-const p: Array<Prompt> = [
-  {
-    id: "1",
-    name: "软件工程师",
-    description: "水水水水水水水水水水水水水水水水水水水",
-    prompts: "软件工程师;",
+const p = ref({ Prompts: [] as Prompt[] })
+onMounted(async () => {
+  axios.get('/api/v1/chat/prompts').then(response => {
+    p.value = response.data.Prompts;
+  }).catch((error => {
+    p.value = {
+      Prompts: [
+        {
+          id: "1",
+          name: "软件工程师",
+          description: "水水水水水水水水水水水水水水水水水水水",
+          prompts: "软件工程师;",
 
-  },
-  {
-    id: "1",
-    name: "音乐家",
-    description: "啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊",
-    prompts: "音乐家;",
-  },
-];
+        },
+        {
+          id: "1",
+          name: "音乐家",
+          description: "哇哇哇哇哇哇哇",
+          prompts: "音乐家;",
+
+        }, {
+          id: "1",
+          name: "软件工程师",
+          description: "啦啦啦啦啦啦啦啦啦啦啦",
+          prompts: "软件工程师;",
+
+        },
+        {
+          id: "1",
+          name: "音乐家",
+          description: "噼噼啪啪噼噼啪啪噼噼啪啪",
+          prompts: "音乐家;",
+
+        },
+      ]
+    }
+  })).finally(()=>{
+    const s = ref({ Prompts: [] as Prompt[] });
+    let length=4;     //固定显示的，从后端获取的prompt的数量
+    for(let i=0;i<length&&i<p.value.Prompts.length;i++){
+      s.value.Prompts[i]=p.value.Prompts[i];
+    }
+    p.value.Prompts=s.value.Prompts;
+  })
+})
 
 
-const emit = defineEmits(['response', 'changeShow']);
+
+function confirmSuccess(msg: boolean) {
+  if (msg == true) {
+    fetchUserprompts;
+    ElMessage.info('create prompt success')
+  } else if (msg == false) {
+    ElMessage.info('create prompt falure')
+  }
+}
 
 
 function getdetails(detail: string) {
@@ -163,8 +203,6 @@ function getdetails(detail: string) {
 function changeComponent() {
   centerDialogVisible.value = false;
   emit('changeShow', true);
-
-  console.log("成功发出事件")
 }
 
 
