@@ -7,7 +7,8 @@
           <el-button class="mx-2" type="warning" :plain="isAPIKeyInputed" round @click="addKeyDialogVisiable = true">
             {{ APIKeyInputBtnText }}
           </el-button>
-          <el-button class="mx-2" type="primary" round @click="selectModelDialogVisiable = true">选择 ChatGPT 模型</el-button>
+          <el-button class="mx-2" type="primary" round :plain="isModelSelected" @click="selectModelDialogVisiable = true">
+            {{ modelSelectBtnText }} </el-button>
         </div>
       </div>
       <el-main>
@@ -89,8 +90,7 @@
           <el-button class="mr-2" @click="
             addKeyDialogVisiable = false;
           openAIkey = '';
-          addKeyInputError = false;
-                        ">取消</el-button>
+          addKeyInputError = false;">取消</el-button>
           <el-button class="ml-2" type="primary" @click="handleAddKeySubmit">保存</el-button>
         </div>
       </div>
@@ -102,7 +102,8 @@
             <ModelSelectCard v-for="model in models"
               @submit-model="(modelValue: string) => handleSelectModelSubmit(modelValue)" v-bind:key="model.id"
               class="w-1/2 m-2" :model-image="model.modelImage" :model-name="model.modelName"
-              :model-value="model.modelValue" :model-description="model.modelDescription" />
+              :model-value="model.modelValue" :model-description="model.modelDescription"
+              :is-selected="model.isSelected" />
           </div>
         </div>
       </div>
@@ -118,6 +119,7 @@ import { db } from "../../database/db";
 import Typed from "typed.js";
 import axios from "axios";
 import { ElMessage } from "element-plus";
+import { modelIdToName } from "@/utils/modelIdToName";
 
 const addKeyDialogVisiable = ref(false);
 const selectModelDialogVisiable = ref(false);
@@ -132,9 +134,12 @@ const typing = ref(null);
 // 按钮样式控制
 const isAPIKeyInputed = ref(false);
 const APIKeyInputBtnText = ref("输入 API Key");
+const isModelSelected = ref(false);
+const modelSelectBtnText = ref("选择模型");
 
 onBeforeMount(() => {
   checkAPIKeyExistance();
+  checkSelectedModelExistance();
 })
 
 onMounted(() => {
@@ -155,6 +160,7 @@ const models = [
     modelName: "GPT-3.5",
     modelValue: "0",
     modelDescription: "快速，准确度令人满意",
+    isSelected: false,
   },
   {
     id: "1",
@@ -162,6 +168,7 @@ const models = [
     modelName: "GPT-4",
     modelValue: "1",
     modelDescription: "超乎想象的准确，但缓慢",
+    isSelected: false,
   },
 ];
 
@@ -172,7 +179,7 @@ const handleAddKeySubmit = async () => {
     return;
   }
   axios
-    .post("/api/v1/chat/apikey", {
+    .post("/api/v1/chat/apiKey", {
       apiKey: openAIkey.value,
     })
     .then(async (response) => {
@@ -216,7 +223,6 @@ const handleSelectModelSubmit = async (modelValue: string) => {
     const firtRecord = await db.Apikey.toCollection().first();
     if (firtRecord) {
       await db.Apikey.update(firtRecord.id as number, { model: modelValue });
-      // console.log(firtRecord);
     } else {
       await db.Apikey.add({
         apikey: "",
@@ -227,6 +233,25 @@ const handleSelectModelSubmit = async (modelValue: string) => {
   } finally {
     db.close();
   }
+
+  try {
+    await db.open();
+    const firtRecord = await db.Apikey.toCollection().first();
+    if (firtRecord) {
+      isModelSelected.value = true;
+      modelSelectBtnText.value = "当前模型: " + modelIdToName(firtRecord.model);
+      for (let i = 0; i < models.length; i++) {
+        if (models[i].modelValue === firtRecord.model) {
+          models[i].isSelected = true;
+        } else {
+          models[i].isSelected = false;
+        }
+      }
+    }
+  } finally {
+    db.close();
+  }
+
 
   selectModelDialogVisiable.value = false;
 };
@@ -259,6 +284,28 @@ const changeInputAPIKeyBtnStyle = async () => {
 
 const maskAPIKey = (apiKey: string) => {
   return apiKey.slice(0, 3) + "********************************************" + apiKey.slice(-4);
+};
+
+const checkSelectedModelExistance = async () => {
+  try {
+    await db.open();
+    const firtRecord = await db.Apikey.toCollection().first();
+    if (firtRecord) {
+      if (firtRecord.model) {
+        isModelSelected.value = true;
+        modelSelectBtnText.value = "当前模型: " + modelIdToName(firtRecord.model);
+        for (let i = 0; i < models.length; i++) {
+          if (models[i].modelValue === firtRecord.model) {
+            models[i].isSelected = true;
+          } else {
+            models[i].isSelected = false;
+          }
+        }
+      }
+    }
+  } finally {
+    db.close();
+  }
 };
 </script>
 

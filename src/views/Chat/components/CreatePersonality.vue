@@ -60,19 +60,18 @@ const rules = {
 
 const submitForm = async () => {
   try {
-    const response = await axios.post("/api/v1/chat/personality", {
+    const response = await axios.post("/api/v1/chat/prompts", {
       apiKey: apiKey,
       name: form.value.name,
       description: form.value.description,
       prompt: form.value.prompts,
     });
      data = response.data;
-    emit("createPrompt", true);
-    dialogVisible.value = false;
+    emit("createPrompt", data);
   }catch(error){
-      emit("createPrompt", false);
-      dialogVisible.value = false;
-    
+      emit("createPrompt", data); 
+  }finally{
+     dialogVisible.value = false;
   }
 };
 
