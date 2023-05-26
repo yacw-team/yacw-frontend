@@ -16,7 +16,7 @@ export interface sendMessage{
     },
 }
 
-export interface deletechat{
+export interface deleteChat{
     apiKey:string,
     chatId:string,
 }
