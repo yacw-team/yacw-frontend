@@ -22,7 +22,7 @@
                 <div v-for="(message, index) in messages[indexnumber].messages" :key="index">
                   <ChatMessage class="mb-2" :role="message.type" :chatContent="message.content" />
                 </div>
-                <el-skeleton :rows="5" animated :loading="!isLoading &&firstclick">
+                <el-skeleton :rows="5" animated :loading="isLoading &&firstclick">
                   <template #default></template>
                 </el-skeleton>
               </div>
@@ -68,7 +68,12 @@
             placeholder="请输入对话文字，使用 Shift + Enter 发送消息"
             @keydown.shift.enter.prevent="sendmessage"
           />
-          <el-button class="ml-4" type="primary" :disabled="!textarea" @click="sendmessage">
+          <el-button
+            class="ml-4"
+            type="primary"
+            :disabled="!textarea || (!isLoading && firstclick) "
+            @click="sendmessage"
+          >
             <div class="flex flex-row items-center">
               <span>发送</span>
               <el-icon class="ml-1">
@@ -96,6 +101,9 @@ import AICharacter from "./components/AIcharacter.vue";
 import HomePage from "@/views/Chat/ChatHomePage.vue";
 import ChatMessage from "./components/ChatMessage.vue";
 import { ElMessage } from "element-plus";
+import type { getFirstMessage, getMessage } from "@/api/chat/res";
+import type { sendMessage, firstSendMessage, deleteChat } from "@/api/chat/req";
+import { getFirst, getmessage, deletemessage } from "@/api/chat/chat";
 
 const messages: Ref<Chat[]> = ref([]);
 
@@ -128,26 +136,26 @@ interface Personality {
   prompts: string;
 }
 
-interface getchat {
-  chatId: string;
+// interface getchat {
+//   chatId: string;
 
-  content: {
-    user: string;
-    assistant: string;
-  };
-}
+//   content: {
+//     user: string;
+//     assistant: string;
+//   };
+// }
 
-interface firstchat {
-  chatId: string;
-  modelId: string;
-  content: {
-    personalityId: string;
-    promptsId: string;
-    user: string; // user input
-    assistant: string;
-    title: string;
-  };
-}
+// interface firstchat {
+//   chatId: string;
+//   modelId: string;
+//   content: {
+//     personalityId: string;
+//     promptsId: string;
+//     user: string; // user input
+//     assistant: string;
+//     title: string;
+//   };
+// }
 
 interface ChangeTitle {
   index: number;
@@ -171,16 +179,15 @@ interface Chat {
 }
 
 async function sendmessage() {
-
   if (apikey.value != "" && model.value != "") {
-    console.log(queryId.value)
+    console.log(queryId.value);
     if (queryId.value == "0" || queryId.value == "1" || queryId.value == "") {
       //如果是在初始页面时候聊天 或 如果是在删除后聊天
       const newmessage = {
         chatId: uuidv4(),
         messages: [],
       };
-      getNewid.value=newmessage.chatId;
+      getNewid.value = newmessage.chatId;
       messages.value.push(newmessage);
       indexnumber.value = messages.value.length - 1;
       changeTitle.value.index = indexnumber.value;
@@ -190,79 +197,140 @@ async function sendmessage() {
       type: "user",
       content: textarea.value,
     };
-    textarea.value = "";
+
     messages.value[indexnumber.value].messages.push(userMessage);
 
     isLoading.value = true;
     firstclick.value = true;
+
     if (messages.value[indexnumber.value].messages.length == 1) {
+      const firstsendmessage: firstSendMessage = {
+        apiKey: apikey.value,
+        modelId: model.value,
+        chatId: messages.value[indexnumber.value].chatId,
+        content: {
+          personalityId: characterid.value, //构造system
+          user: textarea.value, // user input
+        },
+      };
       //第一次发送时
       console.log(model.value);
-      axios
-        .post("/api/v1/chat/new", {
-          apiKey: apikey.value,
-          modelId: model.value,
-          chatId: messages.value[indexnumber.value].chatId,
-          content: {
-            personalityId: characterid.value, //构造system
-            user: textarea.value, // user input
-          },
-        })
-        .then(async (response) => {
-          let firstchat: firstchat = response.data;
+      textarea.value = "";
+      const firstchat: getFirstMessage = await getFirst(firstsendmessage);
 
-          changeTitle.value.index = indexnumber.value;
-          changeTitle.value.title = firstchat.content.title;
+      changeTitle.value.index = indexnumber.value;
+      changeTitle.value.title = firstchat.content.title;
 
-          try {
-            await db.open();
-            db.messagetitles.add({
-              chatId: firstchat.chatId,
-              title: firstchat.content.title,
-            });
-            db.messages.add({
-              chatId: firstchat.chatId,
-              userContent: firstchat.content.user,
-              assistantContent: firstchat.content.assistant,
-            });
-          } finally {
-            db.close();
-          }
-          messages.value[indexnumber.value].chatId = firstchat.chatId;
-          messages.value[indexnumber.value].messages.push({
-            type: "assistant",
-            content: firstchat.content.assistant,
-          });
+      try {
+        await db.open();
+        db.messagetitles.add({
+          chatId: firstchat.chatId,
+          title: firstchat.content.title,
         });
+        db.messages.add({
+          chatId: firstchat.chatId,
+          userContent: firstchat.content.user,
+          assistantContent: firstchat.content.assistant,
+        });
+      } finally {
+        db.close();
+      }
+      messages.value[indexnumber.value].chatId = firstchat.chatId;
+      messages.value[indexnumber.value].messages.push({
+        type: "assistant",
+        content: firstchat.content.assistant,
+      });
+      // axios
+      //   .post("/api/v1/chat/new", {
+      //     apiKey: apikey.value,
+      //     modelId: model.value,
+      //     chatId: messages.value[indexnumber.value].chatId,
+      //     content: {
+      //       personalityId: characterid.value, //构造system
+      //       user: textarea.value, // user input
+      //     },
+      //   })
+      //   .then(async (response) => {
+      //     let firstchat: firstchat = response.data;
+
+      //     changeTitle.value.index = indexnumber.value;
+      //     changeTitle.value.title = firstchat.content.title;
+
+      //     try {
+      //       await db.open();
+      //       db.messagetitles.add({
+      //         chatId: firstchat.chatId,
+      //         title: firstchat.content.title,
+      //       });
+      //       db.messages.add({
+      //         chatId: firstchat.chatId,
+      //         userContent: firstchat.content.user,
+      //         assistantContent: firstchat.content.assistant,
+      //       });
+      //     } finally {
+      //       db.close();
+      //     }
+      //     messages.value[indexnumber.value].chatId = firstchat.chatId;
+      //     messages.value[indexnumber.value].messages.push({
+      //       type: "assistant",
+      //       content: firstchat.content.assistant,
+      //     });
+      //   });
     } else {
       //多次发送时
-      axios
-        .post("/api/v1/chat/chat", {
-          apiKey: apikey.value,
-          chatId: messages.value[indexnumber.value].chatId,
-          content: {
-            user: textarea.value,
-          },
-        })
-        .then(async (response) => {
-          let getchat = response.data;
-          const assistantmessage: Message = {
-            type: "assistant",
-            content: getchat.content.assistant,
-          };
-          try {
-            await db.open();
-            db.messages.add({
-              chatId: getchat.chatId,
-              userContent: getchat.content.user,
-              assistantContent: getchat.content.assistant,
-            });
-          } finally {
-            db.close();
-          }
-
-          messages.value[indexnumber.value].messages.push(assistantmessage);
+      const sendmessage: sendMessage = {
+        apiKey: apikey.value,
+        chatId: messages.value[indexnumber.value].chatId,
+        content: {
+          user: textarea.value,
+        },
+      };
+      textarea.value = "";
+      const getchat: getMessage = await getmessage(sendmessage);
+      const assistantmessage: Message = {
+        type: "assistant",
+        content: getchat.content.assistant,
+      };
+      try {
+        await db.open();
+        db.messages.add({
+          chatId: getchat.chatId,
+          userContent: getchat.content.user,
+          assistantContent: getchat.content.assistant,
         });
+      } finally {
+        db.close();
+      }
+
+      messages.value[indexnumber.value].messages.push(assistantmessage);
+
+      // axios
+      //   .post("/api/v1/chat/chat", {
+      //     apiKey: apikey.value,
+      //     chatId: messages.value[indexnumber.value].chatId,
+      //     content: {
+      //       user: textarea.value,
+      //     },
+      //   })
+      //   .then(async (response) => {
+      //     let getchat = response.data;
+      //     const assistantmessage: Message = {
+      //       type: "assistant",
+      //       content: getchat.content.assistant,
+      //     };
+      //     try {
+      //       await db.open();
+      //       db.messages.add({
+      //         chatId: getchat.chatId,
+      //         userContent: getchat.content.user,
+      //         assistantContent: getchat.content.assistant,
+      //       });
+      //     } finally {
+      //       db.close();
+      //     }
+
+      //     messages.value[indexnumber.value].messages.push(assistantmessage);
+      //   });
     }
 
     //下面是模拟发送直接改index为2的chat的标题
@@ -297,11 +365,16 @@ watch(
           .delete();
         db.close();
       }
-
-      axios.post("/api/v1/chat/deletechat", {
+      const deletechat: deleteChat = {
         apiKey: apikey.value,
         chatId: messages.value[indexnumber.value].chatId,
-      });
+      };
+      // axios.post("/api/v1/chat/deletechat", {
+      //   apiKey: apikey.value,
+      //   chatId: messages.value[indexnumber.value].chatId,
+      // });
+
+      await deletemessage(deletechat);
 
       messages.value.splice(indexnumber.value, 1);
       indexnumber.value--;
