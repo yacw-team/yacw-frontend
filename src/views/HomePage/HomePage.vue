@@ -78,7 +78,7 @@
           </div>
         </div>
         <div id="add-key-input" class="my-6">
-          <el-input v-model="openAIkey" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+          <el-input v-model="openAIkey" :placeholder="keyInputPlaceHolder" />
           <Transition>
             <div class="mt-4 text-red-500" v-if="addKeyInputError">
               您输入的 Key 格式有误。OpenAI API Key 应为 "sk-" 打头，长度为 51
@@ -126,6 +126,7 @@ const selectModelDialogVisiable = ref(false);
 const addKeyInputError = ref(false);
 
 const openAIkey = ref("");
+const keyInputPlaceHolder = ref("sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 const selectedModel = ref("");
 
 const typing = ref(null);
@@ -199,6 +200,7 @@ const handleAddKeySubmit = async () => {
           }
           addKeyDialogVisiable.value = false;
           changeInputAPIKeyBtnStyle();
+          openAIkey.value = "";
         } finally {
           db.close();
         }
@@ -273,7 +275,7 @@ const changeInputAPIKeyBtnStyle = async () => {
     db.open();
     const firtRecord = await db.Apikey.toCollection().first();
     if (firtRecord) {
-      openAIkey.value = maskAPIKey(firtRecord.apikey);
+      keyInputPlaceHolder.value = maskAPIKey(firtRecord.apikey);
     }
   } finally {
     db.close();
