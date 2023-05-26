@@ -216,7 +216,7 @@ const handleAddKeySubmit = async () => {
     return;
   }
   axios
-    .post("/api/v1/chat/apikey", {
+    .post("/api/v1/chat/apiKey", {
       apiKey: openAIkey.value,
     })
     .then(async (response) => {
