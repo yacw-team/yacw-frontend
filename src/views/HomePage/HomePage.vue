@@ -4,28 +4,15 @@
       <div class="pt-16 text-center">
         <span class="text-4xl font-bold" ref="typing"></span>
         <div class="flex flex-row items-center justify-center p-16">
-          <el-button
-            class="mx-2"
-            type="warning"
-            :plain="isAPIKeyInputed"
-            round
-            @click="addKeyDialogVisiable = true"
-          >
+          <el-button class="mx-2" type="warning" :plain="isAPIKeyInputed" round @click="addKeyDialogVisiable = true">
             {{ APIKeyInputBtnText }}
           </el-button>
-          <el-button
-            class="mx-2"
-            type="primary"
-            round
-            @click="selectModelDialogVisiable = true"
-            >选择 ChatGPT 模型</el-button
-          >
+          <el-button class="mx-2" type="primary" round :plain="isModelSelected" @click="selectModelDialogVisiable = true">
+            {{ modelSelectBtnText }} </el-button>
         </div>
       </div>
       <el-main>
-        <div
-          class="flex flex-row flex-wrap items-center justify-center mx-2 h-max"
-        >
+        <div class="flex flex-row flex-wrap items-center justify-center mx-2 h-max">
           <el-card class="w-1/3 mx-4 md:w-1/5 md:mx-10 md:p-4">
             <template #header>
               <div class="flex flex-row justify-center">
@@ -78,22 +65,12 @@
         </div>
       </el-main>
     </div>
-    <el-dialog
-      v-model="addKeyDialogVisiable"
-      :show-close="false"
-      width="40%"
-      title="🔑 输入你的 OpenAI API Key"
-      center
-    >
+    <el-dialog v-model="addKeyDialogVisiable" :show-close="false" width="40%" title="🔑 输入你的 OpenAI API Key" center>
       <div class="px-4">
         <div id="add-key-hint">
           <div>
             您需要在
-            <a
-              class="text-blue-500"
-              href="https://platform.openai.com/account/api-keys"
-              >OpenAI Key Management</a
-            >
+            <a class="text-blue-500" href="https://platform.openai.com/account/api-keys">OpenAI Key Management</a>
             页面获取 OpenAI API Key.
           </div>
           <div class="my-1">
@@ -101,10 +78,7 @@
           </div>
         </div>
         <div id="add-key-input" class="my-6">
-          <el-input
-            v-model="openAIkey"
-            placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-          />
+          <el-input v-model="openAIkey" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
           <Transition>
             <div class="mt-4 text-red-500" v-if="addKeyInputError">
               您输入的 Key 格式有误。OpenAI API Key 应为 "sk-" 打头，长度为 51
@@ -113,41 +87,23 @@
           </Transition>
         </div>
         <div id="add-key-btns" class="flex flex-row justify-center">
-          <el-button
-            class="mr-2"
-            @click="
-              addKeyDialogVisiable = false;
-              openAIkey = '';
-              addKeyInputError = false;
-            "
-            >取消</el-button
-          >
-          <el-button class="ml-2" type="primary" @click="handleAddKeySubmit"
-            >保存</el-button
-          >
+          <el-button class="mr-2" @click="
+            addKeyDialogVisiable = false;
+          openAIkey = '';
+          addKeyInputError = false;">取消</el-button>
+          <el-button class="ml-2" type="primary" @click="handleAddKeySubmit">保存</el-button>
         </div>
       </div>
     </el-dialog>
-    <el-dialog
-      v-model="selectModelDialogVisiable"
-      :show-close="false"
-      width="40%"
-      title="🤖 选择您想使用的模型"
-      center
-    >
+    <el-dialog v-model="selectModelDialogVisiable" :show-close="false" width="40%" title="🤖 选择您想使用的模型" center>
       <div class="px-4">
         <div>
           <div class="flex flex-row items-center justify-center">
-            <ModelSelectCard
-              v-for="model in models"
-              @submit-model="(modelValue: string) => handleSelectModelSubmit(modelValue)"
-              v-bind:key="model.id"
-              class="w-1/2 m-2"
-              :model-image="model.modelImage"
-              :model-name="model.modelName"
-              :model-value="model.modelValue"
-              :model-description="model.modelDescription"
-            />
+            <ModelSelectCard v-for="model in models"
+              @submit-model="(modelValue: string) => handleSelectModelSubmit(modelValue)" v-bind:key="model.id"
+              class="w-1/2 m-2" :model-image="model.modelImage" :model-name="model.modelName"
+              :model-value="model.modelValue" :model-description="model.modelDescription"
+              :is-selected="model.isSelected" />
           </div>
         </div>
       </div>
@@ -163,6 +119,7 @@ import { db } from "../../database/db";
 import Typed from "typed.js";
 import axios from "axios";
 import { ElMessage } from "element-plus";
+import { modelIdToName } from "@/utils/modelIdToName";
 
 const addKeyDialogVisiable = ref(false);
 const selectModelDialogVisiable = ref(false);
@@ -176,9 +133,12 @@ const typing = ref(null);
 // 按钮样式控制
 const isAPIKeyInputed = ref(false);
 const APIKeyInputBtnText = ref("输入 API Key");
+const isModelSelected = ref(false);
+const modelSelectBtnText = ref("选择模型");
 
 onBeforeMount(() => {
   checkAPIKeyExistance();
+  checkSelectedModelExistance();
 })
 
 onMounted(() => {
@@ -199,6 +159,7 @@ const models = [
     modelName: "GPT-3.5",
     modelValue: "0",
     modelDescription: "快速，准确度令人满意",
+    isSelected: false,
   },
   {
     id: "1",
@@ -206,6 +167,7 @@ const models = [
     modelName: "GPT-4",
     modelValue: "1",
     modelDescription: "超乎想象的准确，但缓慢",
+    isSelected: false,
   },
 ];
 
@@ -259,7 +221,6 @@ const handleSelectModelSubmit = async (modelValue: string) => {
     const firtRecord = await db.Apikey.toCollection().first();
     if (firtRecord) {
       await db.Apikey.update(firtRecord.id as number, { model: modelValue });
-      // console.log(firtRecord);
     } else {
       await db.Apikey.add({
         apikey: "",
@@ -270,6 +231,25 @@ const handleSelectModelSubmit = async (modelValue: string) => {
   } finally {
     db.close();
   }
+
+  try {
+    await db.open();
+    const firtRecord = await db.Apikey.toCollection().first();
+    if (firtRecord) {
+      isModelSelected.value = true;
+      modelSelectBtnText.value = "当前模型: " + modelIdToName(firtRecord.model);
+      for (let i = 0; i < models.length; i++) {
+        if (models[i].modelValue === firtRecord.model) {
+          models[i].isSelected = true;
+        } else {
+          models[i].isSelected = false;
+        }
+      }
+    }
+  } finally {
+    db.close();
+  }
+
 
   selectModelDialogVisiable.value = false;
 };
@@ -302,6 +282,28 @@ const changeInputAPIKeyBtnStyle = async () => {
 
 const maskAPIKey = (apiKey: string) => {
   return apiKey.slice(0, 3) + "********************************************" + apiKey.slice(-4);
+};
+
+const checkSelectedModelExistance = async () => {
+  try {
+    await db.open();
+    const firtRecord = await db.Apikey.toCollection().first();
+    if (firtRecord) {
+      if (firtRecord.model) {
+        isModelSelected.value = true;
+        modelSelectBtnText.value = "当前模型: " + modelIdToName(firtRecord.model);
+        for (let i = 0; i < models.length; i++) {
+          if (models[i].modelValue === firtRecord.model) {
+            models[i].isSelected = true;
+          } else {
+            models[i].isSelected = false;
+          }
+        }
+      }
+    }
+  } finally {
+    db.close();
+  }
 };
 </script>
 
