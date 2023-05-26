@@ -20,11 +20,13 @@
             <div v-if="messages && messages[indexnumber] && indexnumber > -1">
               <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
                 <div v-for="(message, index) in messages[indexnumber].messages" :key="index">
-                  <ChatMessage class="mb-2" :role="message.type" :chatContent="message.content" />
+                  <ChatMessage
+                    class="mb-2"
+                    :role="message.type"
+                    :chatContent="message.content"
+                    :isloading="isLoading && firstclick"
+                  />
                 </div>
-                <el-skeleton :rows="5" animated :loading="isLoading &&firstclick">
-                  <template #default></template>
-                </el-skeleton>
               </div>
             </div>
             <div v-else>
@@ -203,6 +205,12 @@ async function sendmessage() {
     isLoading.value = true;
     firstclick.value = true;
 
+    //messages.value[indexnumber.value].chatId = firstchat.chatId;
+    messages.value[indexnumber.value].messages.push({
+      type: "assistant",
+      content: "",
+    });
+
     if (messages.value[indexnumber.value].messages.length == 1) {
       const firstsendmessage: firstSendMessage = {
         apiKey: apikey.value,
@@ -213,10 +221,16 @@ async function sendmessage() {
           user: textarea.value, // user input
         },
       };
+
       //第一次发送时
       console.log(model.value);
+
       textarea.value = "";
       const firstchat: getFirstMessage = await getFirst(firstsendmessage);
+
+      messages.value[indexnumber.value].messages[
+        messages.value[indexnumber.value].messages.length - 1
+      ].content = firstchat.content.assistant;
 
       changeTitle.value.index = indexnumber.value;
       changeTitle.value.title = firstchat.content.title;
@@ -235,11 +249,12 @@ async function sendmessage() {
       } finally {
         db.close();
       }
-      messages.value[indexnumber.value].chatId = firstchat.chatId;
-      messages.value[indexnumber.value].messages.push({
-        type: "assistant",
-        content: firstchat.content.assistant,
-      });
+      // messages.value[indexnumber.value].chatId = firstchat.chatId;
+      // messages.value[indexnumber.value].messages.push({
+      //   type: "assistant",
+      //   content: firstchat.content.assistant,
+      // });
+
       // axios
       //   .post("/api/v1/chat/new", {
       //     apiKey: apikey.value,
@@ -287,10 +302,14 @@ async function sendmessage() {
       };
       textarea.value = "";
       const getchat: getMessage = await getmessage(sendmessage);
-      const assistantmessage: Message = {
-        type: "assistant",
-        content: getchat.content.assistant,
-      };
+      // const assistantmessage: Message = {
+      //   type: "assistant",
+      //   content: getchat.content.assistant,
+      // };
+      
+      messages.value[indexnumber.value].messages[
+        messages.value[indexnumber.value].messages.length - 1
+      ].content = getchat.content.assistant;
       try {
         await db.open();
         db.messages.add({
@@ -302,7 +321,7 @@ async function sendmessage() {
         db.close();
       }
 
-      messages.value[indexnumber.value].messages.push(assistantmessage);
+  //    messages.value[indexnumber.value].messages.push(assistantmessage);
 
       // axios
       //   .post("/api/v1/chat/chat", {
