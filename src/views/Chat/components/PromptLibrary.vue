@@ -15,10 +15,10 @@
         <br />
         <el-col :span="12">
           <el-button @click="toggle">新建prompt</el-button>
-          <Cp v-if="createdialog" @createPrompt="(msg: boolean) => confirmSuccess(msg)" />
+          <Cp v-if="createdialog" @createPrompt="(msg: Prompt) => confirmSuccess(msg)" />
         </el-col>
         <br />
-        <el-row v-for="index in temp" :key="index" class="item">
+        <el-row v-for="index in userPrompt.Prompts" :key="index" class="item">
           <el-col :span="24">
             <el-card shadow="always">
               <span>prompt名字: {{ index.name }}</span>
@@ -83,7 +83,7 @@ const centerDialogVisible = ref(false);
 const createdialog = ref(false);
 const activeName = ref('first')
 const emit = defineEmits(['response', 'changeShow', 'sucessCreate']);
-const temp = ref();
+const userPrompt = ref({ Prompts: [] as Prompt[] })
 
 function toggle() {
   createdialog.value = !createdialog.value;
@@ -101,21 +101,16 @@ const apikey = ref("");
 
 //获取后端的用户的prompt
 const fetchUserprompts = async () => {
-
+  
   if (apikey.value != '' || apikey.value != null) {
     axios
       .post("/api/v1/chat/myprompts", {
         apiKey: apikey.value,
       })
       .then(async (response) => {
-        temp.value = response.data
-      }).catch((error) => {
-        console.log("请求用户prompt错误");
+        userPrompt.value.Prompts = response.data.Prompts
       })
-  } else {
-    console.log("没有apiKey，给默认的数据")
-    temp.value = p
-  }
+  } 
 }
 
 
@@ -138,7 +133,7 @@ onMounted(async () => {
 const p = ref({ Prompts: [] as Prompt[] })
 onMounted(async () => {
   axios.get('/api/v1/chat/prompts').then(response => {
-    p.value = response.data.Prompts;
+    p.value = response.data;
   }).catch((error => {
     p.value = {
       Prompts: [
@@ -155,20 +150,7 @@ onMounted(async () => {
           description: "哇哇哇哇哇哇哇",
           prompts: "音乐家;",
 
-        }, {
-          id: "1",
-          name: "软件工程师",
-          description: "啦啦啦啦啦啦啦啦啦啦啦",
-          prompts: "软件工程师;",
-
-        },
-        {
-          id: "1",
-          name: "音乐家",
-          description: "噼噼啪啪噼噼啪啪噼噼啪啪",
-          prompts: "音乐家;",
-
-        },
+        }, 
       ]
     }
   })).finally(()=>{
@@ -183,11 +165,11 @@ onMounted(async () => {
 
 
 
-function confirmSuccess(msg: boolean) {
-  if (msg == true) {
-    fetchUserprompts;
+function confirmSuccess(msg :  Prompt) {
+  if (msg.id !="" ) {
+    userPrompt.value.Prompts.push(msg);
     ElMessage.info('create prompt success')
-  } else if (msg == false) {
+  } else  {
     ElMessage.info('create prompt falure')
   }
 }
