@@ -7,19 +7,25 @@
           <el-button
             class="mx-2"
             type="warning"
+            :plain="isAPIKeyInputed"
             round
             @click="addKeyDialogVisiable = true"
-          >输入 API Key</el-button>
+          >
+            {{ APIKeyInputBtnText }}
+          </el-button>
           <el-button
             class="mx-2"
             type="primary"
             round
             @click="selectModelDialogVisiable = true"
-          >选择 ChatGPT 模型</el-button>
+            >选择 ChatGPT 模型</el-button
+          >
         </div>
       </div>
       <el-main>
-        <div class="flex flex-row flex-wrap items-center justify-center mx-2 h-max">
+        <div
+          class="flex flex-row flex-wrap items-center justify-center mx-2 h-max"
+        >
           <el-card class="w-1/3 mx-4 md:w-1/5 md:mx-10 md:p-4">
             <template #header>
               <div class="flex flex-row justify-center">
@@ -47,7 +53,9 @@
               </div>
             </template>
             <div>
-              <p>我们非常注重用户隐私和数据保护，我们不会收集任何敏感信息，并采取了多种措施确保所有数据的安全性。</p>
+              <p>
+                我们非常注重用户隐私和数据保护，我们不会收集任何敏感信息，并采取了多种措施确保所有数据的安全性。
+              </p>
             </div>
           </el-card>
 
@@ -84,10 +92,13 @@
             <a
               class="text-blue-500"
               href="https://platform.openai.com/account/api-keys"
-            >OpenAI Key Management</a>
+              >OpenAI Key Management</a
+            >
             页面获取 OpenAI API Key.
           </div>
-          <div class="my-1">您的 Key 将会被保存在本地浏览器中，我们不会收集您的 Key.</div>
+          <div class="my-1">
+            您的 Key 将会被保存在本地浏览器中，我们不会收集您的 Key.
+          </div>
         </div>
         <div id="add-key-input" class="my-6">
           <el-input
@@ -105,12 +116,15 @@
           <el-button
             class="mr-2"
             @click="
-            addKeyDialogVisiable = false;
-            openAIkey = '';
-            addKeyInputError = false;
-          "
-          >取消</el-button>
-          <el-button class="ml-2" type="primary" @click="handleAddKeySubmit">保存</el-button>
+              addKeyDialogVisiable = false;
+              openAIkey = '';
+              addKeyInputError = false;
+            "
+            >取消</el-button
+          >
+          <el-button class="ml-2" type="primary" @click="handleAddKeySubmit"
+            >保存</el-button
+          >
         </div>
       </div>
     </el-dialog>
@@ -142,7 +156,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onBeforeMount, onMounted, ref } from "vue";
 import { Coin, User, MagicStick } from "@element-plus/icons-vue";
 import ModelSelectCard from "@/views/HomePage/components/ModelSelectCard.vue";
 import { db } from "../../database/db";
@@ -159,8 +173,16 @@ const selectedModel = ref("");
 
 const typing = ref(null);
 
+// 按钮样式控制
+const isAPIKeyInputed = ref(false);
+const APIKeyInputBtnText = ref("输入 API Key");
+
+onBeforeMount(() => {
+  checkAPIKeyExistance();
+})
+
 onMounted(() => {
-  const typed = new Typed(typing.value, {
+  new Typed(typing.value, {
     strings: ["YACW", "Yet Another ChatGPT WebAPP"],
     typeSpeed: 60,
     backSpeed: 40,
@@ -194,13 +216,12 @@ const handleAddKeySubmit = async () => {
     return;
   }
   axios
-    .post("/api/v1/chat/apikey", {
+    .post("/api/v1/chat/apiKey", {
       apiKey: openAIkey.value,
     })
     .then(async (response) => {
       if (response.status === 200) {
         // 处理认证通过的逻辑
-        //console.log("Authentication successful");
         try {
           await db.open();
           const firstRecord = await db.Apikey.toCollection().first();
@@ -208,15 +229,14 @@ const handleAddKeySubmit = async () => {
             await db.Apikey.update(firstRecord.id as number, {
               apikey: openAIkey.value,
             });
-            //console.log(firstRecord);
           } else {
             await db.Apikey.add({
               apikey: openAIkey.value,
               model: "",
             });
-            console.log(firstRecord);
-            addKeyDialogVisiable.value = false;
           }
+          addKeyDialogVisiable.value = false;
+          changeInputAPIKeyBtnStyle();
         } finally {
           db.close();
         }
@@ -252,6 +272,36 @@ const handleSelectModelSubmit = async (modelValue: string) => {
   }
 
   selectModelDialogVisiable.value = false;
+};
+
+const checkAPIKeyExistance = async () => {
+  try {
+    await db.open();
+    const firtRecord = await db.Apikey.toCollection().first();
+    if (firtRecord) {
+      changeInputAPIKeyBtnStyle();
+    }
+  } finally {
+    db.close();
+  }
+};
+
+const changeInputAPIKeyBtnStyle = async () => {
+  isAPIKeyInputed.value = true;
+  APIKeyInputBtnText.value = "更改 API Key";
+  try {
+    db.open();
+    const firtRecord = await db.Apikey.toCollection().first();
+    if (firtRecord) {
+      openAIkey.value = maskAPIKey(firtRecord.apikey);
+    }
+  } finally {
+    db.close();
+  }
+};
+
+const maskAPIKey = (apiKey: string) => {
+  return apiKey.slice(0, 3) + "********************************************" + apiKey.slice(-4);
 };
 </script>
 

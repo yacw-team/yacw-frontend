@@ -103,7 +103,7 @@ const handleSubmit = async () => {
   fromTextReadOnly.value = true;
   // start ToText loading
   toTextLoading.value = true;
- 
+
   const req: GetTranslateResultReq = {
     apiKey: apikey.value, // TODO: 从数据库中获取
     modelId: modelid.value,
@@ -128,7 +128,7 @@ const handleSubmit = async () => {
 
   setTimeout(() => {
     toTextLoading.value = false
-  }, 1000)
+  }, 2000)
 
   toTextReadOnly.value = false;
 };
