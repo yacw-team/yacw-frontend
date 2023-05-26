@@ -10,6 +10,7 @@
           <Sort @click="handleSwitchText"/>
         </el-icon>
       </div>
+      
       <el-skeleton class="" :loading="toTextLoading" animated>
         <template #template>
           <el-card>
@@ -23,6 +24,7 @@
           </el-card>
         </template>
       </el-skeleton>
+      
     </div>
     <div class="flex flex-row items-center justify-center w-full p-2 md:w-1/5 md:flex-col">
       <div class="flex flex-col justify-center flex-1 w-1/2 md:w-full">
@@ -101,7 +103,7 @@ const handleSubmit = async () => {
   fromTextReadOnly.value = true;
   // start ToText loading
   toTextLoading.value = true;
-
+ 
   const req: GetTranslateResultReq = {
     apiKey: apikey.value, // TODO: 从数据库中获取
     modelId: modelid.value,
@@ -123,7 +125,10 @@ const handleSubmit = async () => {
   // allow user input
   fromTextReadOnly.value = false;
   // stop ToText loading
-  toTextLoading.value = false
+
+  setTimeout(() => {
+    toTextLoading.value = false
+  }, 1000)
 
   toTextReadOnly.value = false;
 };
