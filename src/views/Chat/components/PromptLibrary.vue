@@ -115,8 +115,6 @@ const fetchUserprompts = async () => {
 
 
 
-onMounted(fetchUserprompts);
-
 onMounted(async () => {
   try {
     await db.open();
@@ -127,6 +125,7 @@ onMounted(async () => {
     }
   } finally {
     db.close();
+    fetchUserprompts
   }
 })
 
