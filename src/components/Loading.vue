@@ -10,7 +10,7 @@
     ></div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 const nums = computed(() => {
   return Math.floor(window.innerWidth / 10);
@@ -18,7 +18,7 @@ const nums = computed(() => {
 });
 </script>
 
-<style lang="css">
+<style scoped>
 .star {
   width: 100%;
   height: 100vh;
@@ -51,5 +51,7 @@ const nums = computed(() => {
     transform: translateY(-100vh);
   }
 }
+
 </style>
+
 
