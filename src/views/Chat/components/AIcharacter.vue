@@ -17,13 +17,13 @@
         </div>
 
         <el-row :gutter="35">
-          <el-col style="padding: 20px 80px" :span="12" v-for="(personalities, index) in filteredPersonalities"
+          <el-col  :span="12" v-for="(personalities, index) in filteredPersonalities"
             :key="index">
             <el-card shadow="hover" :style="{ background: getRandomBackground() }" @click="selectCard(personalities)">
               <UserFilled style="width: 1em; height: 1em; margin-right: 8px" />
               <div style="height: 150px; overflow-y: auto">
                 <h3>{{ personalities.name }}</h3>
-                <p>{{ personalities.description }}</p>
+                <p>{{ personalities.prompts }}</p>
               </div>
             </el-card>
           </el-col>
@@ -42,7 +42,7 @@ interface Personality {
   id: string;
   name: string;
   description: string;
-
+  prompts: string
 }
 const searchText = ref("");
 const filteredPersonalities = ref<Personality[]>();
@@ -56,49 +56,57 @@ const props: Personality[] = [
     id: "1",
     name: "Career Counselor",
     description:
-      "A career counselor who can help you with anything related to your career from job searching to career planning.",
+      "A career counselor",
+    prompots: 'A career counselor who can help you with anything related to your career from job searching to career planning.'
   },
   {
     id: "2",
     name: "Financial Advisor",
-    description:
+    prompots:
       "A financial advisor who can provide advice on budgeting, saving, investing, retirement planning, and other financial issues.",
+    description: 'A financial advisor'
   },
   {
     id: "3",
     name: "Personal Trainer",
-    description:
+    prompots:
       "A personal trainer who can help you stay fit and improve your health by creating personalized fitness plans and providing workout routines.",
+    description: 'A financial advisor'
   },
   {
     id: "4",
     name: "Software Developer",
-    description:
+    prompots:
       "A software developer who can help you develop software programs and applications using programming languages such as Java, Python, and JavaScript.",
+    description: 'A financial advisor'
   },
   {
     id: "5",
     name: "Life Hacker",
-    description:
+    prompots:
       "A life hacker who can provide useful tips and tricks to help you optimize your daily routines, save time, and increase productivity.",
+    description: 'A life hacker'
   },
   {
     id: "6",
     name: "DIY Expert",
-    description:
+    prompots:
       "A DIY expert who can provide advice and guidance on do-it-yourself projects, such as woodworking, painting, and crafting.",
+    description: 'A financial advisor'
   },
   {
     id: "7",
     name: "Mindfulness Coach",
-    description:
+    prompots:
       "A mindfulness coach who can guide you through meditation and relaxation techniques to help you focus on the present moment and reduce stress and anxiety.",
+    description: 'A mindfulness coach'
   },
   {
     id: "8",
     name: "Journalist",
-    description:
+    prompots:
       "A journalist who can research and report on newsworthy events, conduct interviews, and write news articles and stories.",
+    description: 'A journalist'
   },
 ];
 
