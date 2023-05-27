@@ -78,7 +78,7 @@
           </div>
         </div>
         <div id="add-key-input" class="my-6">
-          <el-input v-model="openAIkey" :placeholder="keyInputPlaceHolder" />
+          <el-input v-model="openAIkey" placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
           <Transition>
             <div class="mt-4 text-red-500" v-if="addKeyInputError">
               您输入的 Key 格式有误。OpenAI API Key 应为 "sk-" 打头，长度为 51
@@ -91,7 +91,8 @@
             addKeyDialogVisiable = false;
           openAIkey = '';
           addKeyInputError = false;">取消</el-button>
-          <el-button class="ml-2" type="primary" @click="handleAddKeySubmit">保存</el-button>
+          <el-button class="ml-2" type="primary" @click="handleAddKeySubmit"
+            :loading="inputKeyWindowLoading">保存</el-button>
         </div>
       </div>
     </el-dialog>
@@ -126,7 +127,6 @@ const selectModelDialogVisiable = ref(false);
 const addKeyInputError = ref(false);
 
 const openAIkey = ref("");
-const keyInputPlaceHolder = ref("sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 const selectedModel = ref("");
 
 const typing = ref(null);
@@ -136,6 +136,9 @@ const isAPIKeyInputed = ref(false);
 const APIKeyInputBtnText = ref("输入 API Key");
 const isModelSelected = ref(false);
 const modelSelectBtnText = ref("选择模型");
+
+// 控制弹窗样式
+const inputKeyWindowLoading = ref(false);
 
 onBeforeMount(() => {
   checkAPIKeyExistance();
@@ -178,6 +181,7 @@ const handleAddKeySubmit = async () => {
     addKeyInputError.value = true;
     return;
   }
+  inputKeyWindowLoading.value = true;
   axios
     .post("/api/v1/chat/apiKey", {
       apiKey: openAIkey.value,
@@ -200,7 +204,6 @@ const handleAddKeySubmit = async () => {
           }
           addKeyDialogVisiable.value = false;
           changeInputAPIKeyBtnStyle();
-          openAIkey.value = "";
         } finally {
           db.close();
         }
@@ -212,8 +215,10 @@ const handleAddKeySubmit = async () => {
           type: "error",
         });
       }
+    })
+    .finally(() => {
+      inputKeyWindowLoading.value = false;
     });
-  console.log(openAIkey.value);
 };
 
 const handleSelectModelSubmit = async (modelValue: string) => {
@@ -275,7 +280,7 @@ const changeInputAPIKeyBtnStyle = async () => {
     db.open();
     const firtRecord = await db.Apikey.toCollection().first();
     if (firtRecord) {
-      keyInputPlaceHolder.value = maskAPIKey(firtRecord.apikey);
+      openAIkey.value = maskAPIKey(firtRecord.apikey);
     }
   } finally {
     db.close();
