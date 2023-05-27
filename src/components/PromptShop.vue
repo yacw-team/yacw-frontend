@@ -150,15 +150,12 @@ const fetchCards = async (index: string) => {
         url += `?type=${index}`;
     }
     axios.get(url).then(response => {
-        console.log("发出请求,来获得shop资源");
         data.value = response.data;
         PromptsList.Prompts = data.value.Prompts.map((prompt: Prompt) => {
             const { background, icon } = getRandomBackground();
-            console.log(data)
             return { ...prompt, background, icon };
         })
     }, error => {
-        console.log("获取失败,使用默认值")
         data.value = {
             Prompts: [
                 {
@@ -206,26 +203,16 @@ const fetchCards = async (index: string) => {
 
 
 onMounted(() => {
-    console.log("shop的Mount时刻");
     fetchCards(promptType.value);
-    console.log("此时已经获取资源")
 });
 
 const cardColumns = computed(() => {
 
-
-    //这部分负责把json数据塞入二维数组[][]
     const columns = [];
     let column = [];
-
-    //这部分负责计算页数来更新数据
-
     const start = (currentPage.value - 1) * pageSize;
     const end = start + pageSize;
-    PromptsList.Prompts = data.value.Prompts.map((prompt: Prompt) => {
-        const { background, icon } = getRandomBackground();
-        return { ...prompt, background, icon };
-    });
+
 
     for (let i = start; i < PromptsList.Prompts.length && i < end; i++) {
         column.push(PromptsList.Prompts[i]);
@@ -235,17 +222,9 @@ const cardColumns = computed(() => {
             column = [];
         }
     }
-
-
     return columns;
 });
 
-watch(() => data, (newVal) => {
-    PromptsList.Prompts = data.value.Prompts.map((prompt: Prompt) => {
-        const { background, icon } = getRandomBackground();
-        return { ...prompt, background, icon };
-    });
-})
 
 
 </script>
