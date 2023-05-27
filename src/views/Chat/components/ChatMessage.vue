@@ -7,7 +7,7 @@
       <template #template></template>
       <template #default>
         <div id="message-content" class="mx-4">
-          <div :hidden="chatContent == ''" v-html="chatContentRandered"></div>
+          <div v-html="chatContentRandered"></div>
         </div>
       </template>
     </el-skeleton>
