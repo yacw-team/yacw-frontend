@@ -211,7 +211,7 @@ async function sendmessage() {
       content: "",
     });
 
-    if (messages.value[indexnumber.value].messages.length == 1) {
+    if (messages.value[indexnumber.value].messages.length == 2) {
       const firstsendmessage: firstSendMessage = {
         apiKey: apikey.value,
         modelId: model.value,
