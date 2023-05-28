@@ -118,9 +118,9 @@ import { Coin, User, MagicStick } from "@element-plus/icons-vue";
 import ModelSelectCard from "@/views/HomePage/components/ModelSelectCard.vue";
 import { db } from "../../database/db";
 import Typed from "typed.js";
-import axios from "axios";
 import { ElMessage } from "element-plus";
 import { modelIdToName } from "@/utils/modelIdToName";
+import { checkAPIKey } from "@/api/home/home";
 
 const addKeyDialogVisiable = ref(false);
 const selectModelDialogVisiable = ref(false);
@@ -182,43 +182,42 @@ const handleAddKeySubmit = async () => {
     return;
   }
   inputKeyWindowLoading.value = true;
-  axios
-    .post("/api/v1/chat/apiKey", {
-      apiKey: openAIkey.value,
-    })
-    .then(async (response) => {
-      if (response.status === 200) {
-        // 处理认证通过的逻辑
-        try {
-          await db.open();
-          const firstRecord = await db.Apikey.toCollection().first();
-          if (firstRecord) {
-            await db.Apikey.update(firstRecord.id as number, {
-              apikey: openAIkey.value,
-            });
-          } else {
-            await db.Apikey.add({
-              apikey: openAIkey.value,
-              model: "",
-            });
-          }
-          addKeyDialogVisiable.value = false;
-          changeInputAPIKeyBtnStyle();
-        } finally {
-          db.close();
-        }
-        return;
-      } else if (response.status === 401) {
-        // 处理认证失败的逻辑
-        ElMessage({
-          message: "Apikey无法认证",
-          type: "error",
+  const checkStatus = await checkAPIKey(openAIkey.value);
+  if (checkStatus == "") {
+    ElMessage({
+      message: "API Key 验证失败，请稍后重试。",
+      type: "error",
+    });
+  }
+  if (checkStatus === "200") {
+    // 处理认证通过的逻辑
+    try {
+      await db.open();
+      const firstRecord = await db.Apikey.toCollection().first();
+      if (firstRecord) {
+        await db.Apikey.update(firstRecord.id as number, {
+          apikey: openAIkey.value,
+        });
+      } else {
+        await db.Apikey.add({
+          apikey: openAIkey.value,
+          model: "",
         });
       }
-    })
-    .finally(() => {
-      inputKeyWindowLoading.value = false;
+      addKeyDialogVisiable.value = false;
+      changeInputAPIKeyBtnStyle();
+    } finally {
+      db.close();
+    }
+    return;
+  } else if (checkStatus === "401") {
+    // 处理认证失败的逻辑
+    ElMessage({
+      message: "API Key 验证失败，请检查您的 API Key 是否正确。",
+      type: "error",
     });
+  }
+  inputKeyWindowLoading.value = false;
 };
 
 const handleSelectModelSubmit = async (modelValue: string) => {
