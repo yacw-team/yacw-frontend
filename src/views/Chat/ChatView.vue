@@ -210,8 +210,9 @@ async function sendmessage() {
       type: "assistant",
       content: "",
     });
+    
 
-    if (messages.value[indexnumber.value].messages.length == 1) {
+    if (messages.value[indexnumber.value].messages.length == 2) {
       const firstsendmessage: firstSendMessage = {
         apiKey: apikey.value,
         modelId: model.value,
@@ -228,9 +229,14 @@ async function sendmessage() {
       textarea.value = "";
       const firstchat: getFirstMessage = await getFirst(firstsendmessage);
 
-      messages.value[indexnumber.value].messages[
-        messages.value[indexnumber.value].messages.length - 1
-      ].content = firstchat.content.assistant;
+      // messages.value[indexnumber.value].messages[length - 1].content =
+      //   firstchat.content.assistant;
+
+      messages.value[indexnumber.value].messages.pop();
+      messages.value[indexnumber.value].messages.push({
+        type: "assistant",
+      content: firstchat.content.assistant,
+      })
 
       changeTitle.value.index = indexnumber.value;
       changeTitle.value.title = firstchat.content.title;
@@ -306,10 +312,12 @@ async function sendmessage() {
       //   type: "assistant",
       //   content: getchat.content.assistant,
       // };
-      
-      messages.value[indexnumber.value].messages[
-        messages.value[indexnumber.value].messages.length - 1
-      ].content = getchat.content.assistant;
+
+      messages.value[indexnumber.value].messages.pop();
+      messages.value[indexnumber.value].messages.push({
+        type: "assistant",
+      content: getchat.content.assistant,
+      })
       try {
         await db.open();
         db.messages.add({
@@ -321,7 +329,7 @@ async function sendmessage() {
         db.close();
       }
 
-  //    messages.value[indexnumber.value].messages.push(assistantmessage);
+      //    messages.value[indexnumber.value].messages.push(assistantmessage);
 
       // axios
       //   .post("/api/v1/chat/chat", {
