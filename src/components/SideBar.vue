@@ -28,14 +28,6 @@
         </el-menu-item>
       </router-link>
       <div @click="handleUnderConstruction">
-        <el-menu-item index="4">
-          <i :class="isCollapsed ? 'el-icon-s-flag' : 'el-icon-s-platform'">
-            <Help />
-          </i>
-          <span>{{ isCollapsed ? "" : "心理咨询" }}</span>
-        </el-menu-item>
-      </div>
-      <div @click="handleUnderConstruction">
         <el-menu-item index="5">
           <i
             :class="isCollapsed ? 'el-icon-s-custom' : 'el-icon-data-analysis'"
