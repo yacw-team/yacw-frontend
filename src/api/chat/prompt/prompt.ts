@@ -1,7 +1,6 @@
 import type { sendNewPrompt } from "@/api/chat/prompt/req";
 import type {Prompt} from "@/api/chat/prompt/res"
 import axios  from "axios"
-import { ref } from "vue";
 
 const URL ={
     Getmyprompts:"/api/v1/chat/myprompts",
