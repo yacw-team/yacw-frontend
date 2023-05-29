@@ -2,7 +2,7 @@
 import type { getFirstMessage, getMessage } from "./res"
 import type { sendMessage, firstSendMessage, deleteChat } from "./req"
 import axios from "axios";
-import { randomUUID } from "crypto";
+
 
 const URL = {
     FIRSTCHAT: "/api/v1/chat/new",
