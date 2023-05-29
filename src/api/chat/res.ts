@@ -17,8 +17,5 @@ export interface getMessage{
         user: string,
         assistant: string,
     },
-    id:{
-        usermsgid:string,
-        assmsgid:string,
-    }
+
 }

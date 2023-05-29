@@ -73,7 +73,7 @@
           <el-button
             class="ml-4"
             type="primary"
-            :disabled="!textarea || (!isLoading && firstclick) "
+            :disabled="textarea.length==0  "
             @click="sendmessage"
           >
             <div class="flex flex-row items-center">
@@ -96,12 +96,13 @@ import { ArrowRightBold } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
-import { db } from "../../database/db";
+import { db, getAllChatId } from "../../database/db";
 import PromptLibrary from "./components/PromptLibrary.vue";
 import promptShop from "@/components/PromptShop.vue";
 import AICharacter from "./components/AIcharacter.vue";
 import HomePage from "@/views/Chat/ChatHomePage.vue";
 import ChatMessage from "./components/ChatMessage.vue";
+
 import { ElMessage } from "element-plus";
 import type { getFirstMessage, getMessage } from "@/api/chat/res";
 import type { sendMessage, firstSendMessage, deleteChat } from "@/api/chat/req";
@@ -110,6 +111,7 @@ import { getFirst, getmessage, deletemessage } from "@/api/chat/chat";
 const messages: Ref<Chat[]> = ref([]);
 
 const isLoading = ref(false);
+
 const firstclick = ref(false);
 
 let textarea = ref("");
@@ -138,27 +140,6 @@ interface Personality {
   prompts: string;
 }
 
-// interface getchat {
-//   chatId: string;
-
-//   content: {
-//     user: string;
-//     assistant: string;
-//   };
-// }
-
-// interface firstchat {
-//   chatId: string;
-//   modelId: string;
-//   content: {
-//     personalityId: string;
-//     promptsId: string;
-//     user: string; // user input
-//     assistant: string;
-//     title: string;
-//   };
-// }
-
 interface ChangeTitle {
   index: number;
   id: string;
@@ -182,7 +163,6 @@ interface Chat {
 
 async function sendmessage() {
   if (apikey.value != "" && model.value != "") {
-    console.log(queryId.value);
     if (queryId.value == "0" || queryId.value == "1" || queryId.value == "") {
       //如果是在初始页面时候聊天 或 如果是在删除后聊天
       const newmessage = {
@@ -202,15 +182,15 @@ async function sendmessage() {
 
     messages.value[indexnumber.value].messages.push(userMessage);
 
-    isLoading.value = true;
-    firstclick.value = true;
-
     //messages.value[indexnumber.value].chatId = firstchat.chatId;
     messages.value[indexnumber.value].messages.push({
       type: "assistant",
       content: "",
     });
-    
+    isLoading.value = true;
+    firstclick.value = true;
+    console.log(isLoading.value && firstclick.value);
+    console.log(model.value);
 
     if (messages.value[indexnumber.value].messages.length == 2) {
       const firstsendmessage: firstSendMessage = {
@@ -224,7 +204,7 @@ async function sendmessage() {
       };
 
       //第一次发送时
-      console.log(model.value);
+      //console.log(model.value);
 
       textarea.value = "";
       const firstchat: getFirstMessage = await getFirst(firstsendmessage);
@@ -233,10 +213,9 @@ async function sendmessage() {
       //   firstchat.content.assistant;
 
       messages.value[indexnumber.value].messages.pop();
-      messages.value[indexnumber.value].messages.push({
-        type: "assistant",
-      content: firstchat.content.assistant,
-      })
+
+      // messages.value[indexnumber.value].messages[1].content =
+      //   firstchat.content.assistant;
 
       changeTitle.value.index = indexnumber.value;
       changeTitle.value.title = firstchat.content.title;
@@ -255,48 +234,10 @@ async function sendmessage() {
       } finally {
         db.close();
       }
-      // messages.value[indexnumber.value].chatId = firstchat.chatId;
-      // messages.value[indexnumber.value].messages.push({
-      //   type: "assistant",
-      //   content: firstchat.content.assistant,
-      // });
-
-      // axios
-      //   .post("/api/v1/chat/new", {
-      //     apiKey: apikey.value,
-      //     modelId: model.value,
-      //     chatId: messages.value[indexnumber.value].chatId,
-      //     content: {
-      //       personalityId: characterid.value, //构造system
-      //       user: textarea.value, // user input
-      //     },
-      //   })
-      //   .then(async (response) => {
-      //     let firstchat: firstchat = response.data;
-
-      //     changeTitle.value.index = indexnumber.value;
-      //     changeTitle.value.title = firstchat.content.title;
-
-      //     try {
-      //       await db.open();
-      //       db.messagetitles.add({
-      //         chatId: firstchat.chatId,
-      //         title: firstchat.content.title,
-      //       });
-      //       db.messages.add({
-      //         chatId: firstchat.chatId,
-      //         userContent: firstchat.content.user,
-      //         assistantContent: firstchat.content.assistant,
-      //       });
-      //     } finally {
-      //       db.close();
-      //     }
-      //     messages.value[indexnumber.value].chatId = firstchat.chatId;
-      //     messages.value[indexnumber.value].messages.push({
-      //       type: "assistant",
-      //       content: firstchat.content.assistant,
-      //     });
-      //   });
+      messages.value[indexnumber.value].messages.push({
+        type: "assistant",
+        content: firstchat.content.assistant,
+      });
     } else {
       //多次发送时
       const sendmessage: sendMessage = {
@@ -308,16 +249,10 @@ async function sendmessage() {
       };
       textarea.value = "";
       const getchat: getMessage = await getmessage(sendmessage);
-      // const assistantmessage: Message = {
-      //   type: "assistant",
-      //   content: getchat.content.assistant,
-      // };
 
       messages.value[indexnumber.value].messages.pop();
-      messages.value[indexnumber.value].messages.push({
-        type: "assistant",
-      content: getchat.content.assistant,
-      })
+
+      console.log(messages.value[indexnumber.value].messages);
       try {
         await db.open();
         db.messages.add({
@@ -328,40 +263,14 @@ async function sendmessage() {
       } finally {
         db.close();
       }
-
-      //    messages.value[indexnumber.value].messages.push(assistantmessage);
-
-      // axios
-      //   .post("/api/v1/chat/chat", {
-      //     apiKey: apikey.value,
-      //     chatId: messages.value[indexnumber.value].chatId,
-      //     content: {
-      //       user: textarea.value,
-      //     },
-      //   })
-      //   .then(async (response) => {
-      //     let getchat = response.data;
-      //     const assistantmessage: Message = {
-      //       type: "assistant",
-      //       content: getchat.content.assistant,
-      //     };
-      //     try {
-      //       await db.open();
-      //       db.messages.add({
-      //         chatId: getchat.chatId,
-      //         userContent: getchat.content.user,
-      //         assistantContent: getchat.content.assistant,
-      //       });
-      //     } finally {
-      //       db.close();
-      //     }
-
-      //     messages.value[indexnumber.value].messages.push(assistantmessage);
-      //   });
+      messages.value[indexnumber.value].messages.push({
+        type: "assistant",
+        content: getchat.content.assistant,
+      });
     }
 
-    //下面是模拟发送直接改index为2的chat的标题
     isLoading.value = false;
+    console.log(isLoading.value && firstclick.value);
   } else {
     //缺乏apikey的dialog
     ElMessage({
@@ -375,7 +284,10 @@ watch(
   () => route.params.id,
   async (newid) => {
     const contentid = newid;
+    firstclick.value = false;
     queryId.value = newid as string;
+    console.log(contentid);
+    console.log(indexnumber.value);
     if (contentid == "0") {
       indexnumber.value = -1;
       return;
@@ -407,6 +319,7 @@ watch(
       indexnumber.value--;
       return;
     } else {
+      // console.log(messages.value.length);
       for (let i = 0; i < messages.value.length; i++) {
         if (messages.value[i].chatId == contentid) {
           indexnumber.value = i;
@@ -457,8 +370,8 @@ onMounted(async () => {
       apikey.value = firtRecord.apikey as string;
       model.value = firtRecord.model as string;
     }
-    if ((await db.messages.toArray()).length != 0) {
-      const chatIds = await db.messages.orderBy("chatId").uniqueKeys();
+    if ((await db.messagetitles.toArray()).length != 0) {
+      const chatIds = await getAllChatId();
       for (const chatid of chatIds) {
         const messagesForChat = await db.messages
           .where("chatId")

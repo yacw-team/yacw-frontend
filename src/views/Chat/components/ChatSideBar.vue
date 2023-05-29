@@ -49,7 +49,7 @@ const conversations = ref<ChatConversation[]>([]);
 
 onMounted(async () => {
   (newTitle.changeTitle as string) = "新对话";
-  (newTitle.newId as string)='';
+  (newTitle.newId as string) = "";
 
   await db.open();
   const data = await db.messagetitles.toArray();
@@ -72,7 +72,7 @@ const handleAddNewChat = () => {
       title: "新对话",
     };
     conversations.value.push(newConversation);
-    router.push({ name: "chat", params: { id:newConversation.chatId  } });
+    router.push({ name: "chat", params: { id: newConversation.chatId } });
     hasNewChat.value = true;
   } else {
     ElMessage({
@@ -80,29 +80,26 @@ const handleAddNewChat = () => {
       type: "warning",
     });
   }
-
-  
 };
 
 watch(
-  ()=>newTitle.newId,
-  (newval)=>{
+  () => newTitle.newId,
+  (newval) => {
     console.log(newTitle.newId);
     const newConversation: ChatConversation = {
       chatId: newTitle.newId as string,
       title: "新对话",
     };
     conversations.value.push(newConversation);
-    router.push({ name: "chat", params: { id:newConversation.chatId  } });
+    router.push({ name: "chat", params: { id: newConversation.chatId } });
     hasNewChat.value = true;
   }
-)
-
+);
 
 let newTitle = defineProps({
   changeTitleIndex: Number,
   changeTitle: String,
-  newId:String,
+  newId: String,
 });
 
 const router = useRouter();
@@ -111,7 +108,9 @@ watch(
   (newval) => {
     console.log(newTitle);
     if (newTitle.changeTitleIndex != undefined) {
-      conversations.value[newTitle.changeTitleIndex].title = newval as string;
+      conversations.value[
+        conversations.value.length - newTitle.changeTitleIndex - 1
+      ].title = newTitle.changeTitle as string;
       hasNewChat.value = false;
       // router.push({
       //   name: "chat",
@@ -131,15 +130,12 @@ const handleDeleteChat = (chatId: string) => {
     (conversation) => conversation.chatId === chatId
   );
   console.log(indexToDelete);
-  if (indexToDelete == conversations.value.length-1) {
+  if (indexToDelete == conversations.value.length - 1) {
     hasNewChat.value = false;
     conversations.value.splice(indexToDelete, 1);
-     
   } else if (indexToDelete !== -1) {
     conversations.value.splice(indexToDelete, 1);
   }
- // router.push({ name: "chat", params: { id: "1" } });
-
-
+  // router.push({ name: "chat", params: { id: "1" } });
 };
 </script>
