@@ -9,13 +9,13 @@
 
     <div v-if="!isVisible" class="flex flex-row h-full">
       <ChatSideBar
-        class="w-1/4 px-4 py-2 bg-white border border-gray-200 rounded-md"
+        class="w-1/4 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-md"
         :changeTitleIndex="changeTitle.index"
         :changeTitle="changeTitle.title"
         :newId="getNewid"
       />
       <div class="flex flex-col w-3/4 h-full">
-        <div class="flex-1 bg-gray-50">
+        <div class="flex-1 bg-gray-50 dark:bg-black">
           <div class="flex flex-col">
             <div v-if="messages && messages[indexnumber] && indexnumber > -1">
               <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
@@ -94,7 +94,6 @@ import { ref, watch, onMounted } from "vue";
 import type { Ref } from "vue";
 import { ArrowRightBold } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
-import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "../../database/db";
 import PromptLibrary from "./components/PromptLibrary.vue";

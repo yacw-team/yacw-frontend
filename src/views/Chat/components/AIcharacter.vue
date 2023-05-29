@@ -1,7 +1,6 @@
 <template>
   <div>
-    <el-button @click="open" round size="large" style="
-        background-color: rgb(186, 100, 205);
+    <el-button @click="open" class="bg-purple-400 dark:bg-purple-800" round size="large" style="
         color: white;
         font-weight: bold;
       ">AI 角色选择</el-button>
