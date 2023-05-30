@@ -24,7 +24,8 @@
                     class="mb-2"
                     :role="message.type"
                     :chatContent="message.content"
-                    :isloading="isLoading && firstclick"
+                    :isloading="isLoading && firstclick && 
+                    index==messages[indexnumber].messages.length-1 &&message.content==''"
                   />
                 </div>
               </div>
@@ -101,7 +102,7 @@ import promptShop from "@/components/PromptShop.vue";
 import AICharacter from "./components/AIcharacter.vue";
 import HomePage from "@/views/Chat/ChatHomePage.vue";
 import ChatMessage from "./components/ChatMessage.vue";
-
+import { delay } from "lodash";
 import { ElMessage } from "element-plus";
 import type { getFirstMessage, getMessage } from "@/api/chat/res";
 import type { sendMessage, firstSendMessage, deleteChat } from "@/api/chat/req";
@@ -172,24 +173,24 @@ async function sendmessage() {
       messages.value.push(newmessage);
       indexnumber.value = messages.value.length - 1;
       changeTitle.value.index = indexnumber.value;
+      console.log(indexnumber.value)
     }
     //之后聊天在某一对话中发送对话
     const userMessage: Message = {
       type: "user",
       content: textarea.value,
     };
-
+    isLoading.value = true;
+    firstclick.value = true;
     messages.value[indexnumber.value].messages.push(userMessage);
 
-    //messages.value[indexnumber.value].chatId = firstchat.chatId;
     messages.value[indexnumber.value].messages.push({
       type: "assistant",
       content: "",
     });
-    isLoading.value = true;
-    firstclick.value = true;
     console.log(isLoading.value && firstclick.value);
-    console.log(model.value);
+    //messages.value[indexnumber.value].chatId = firstchat.chatId;
+    
 
     if (messages.value[indexnumber.value].messages.length == 2) {
       const firstsendmessage: firstSendMessage = {
@@ -208,13 +209,7 @@ async function sendmessage() {
       textarea.value = "";
       const firstchat: getFirstMessage = await getFirst(firstsendmessage);
 
-      // messages.value[indexnumber.value].messages[length - 1].content =
-      //   firstchat.content.assistant;
-
       messages.value[indexnumber.value].messages.pop();
-
-      // messages.value[indexnumber.value].messages[1].content =
-      //   firstchat.content.assistant;
 
       changeTitle.value.index = indexnumber.value;
       changeTitle.value.title = firstchat.content.title;
@@ -250,8 +245,6 @@ async function sendmessage() {
       const getchat: getMessage = await getmessage(sendmessage);
 
       messages.value[indexnumber.value].messages.pop();
-
-      console.log(messages.value[indexnumber.value].messages);
       try {
         await db.open();
         db.messages.add({
@@ -285,8 +278,6 @@ watch(
     const contentid = newid;
     firstclick.value = false;
     queryId.value = newid as string;
-    console.log(contentid);
-    console.log(indexnumber.value);
     if (contentid == "0") {
       indexnumber.value = -1;
       return;
@@ -322,6 +313,7 @@ watch(
       for (let i = 0; i < messages.value.length; i++) {
         if (messages.value[i].chatId == contentid) {
           indexnumber.value = i;
+          console.log(indexnumber.value)
           return;
         }
       }

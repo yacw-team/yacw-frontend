@@ -5,7 +5,7 @@
     </div>
     <el-skeleton
       style="width:100% ;padding:10px "
-      :loading="isloading && role=='assistant'"
+      :loading="isloading"
       animated
       :rows="5"
     >
