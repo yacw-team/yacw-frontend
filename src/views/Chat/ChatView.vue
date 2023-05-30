@@ -19,13 +19,13 @@
           <div class="flex flex-col">
             <div v-if="messages && messages[indexnumber] && indexnumber > -1">
               <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
-                <div v-for="(message, index) in messages[indexnumber].messages" :key="index">
+                <div v-for="(message, index) in  displayedMessages" :key="index">
                   <ChatMessage
                     class="mb-2"
                     :role="message.type"
                     :chatContent="message.content"
                     :isloading="isLoading && firstclick && 
-                    index==messages[indexnumber].messages.length-1 &&message.content==''"
+                    index== displayedMessages.length-1 &&message.content==''"
                   />
                 </div>
               </div>
@@ -91,7 +91,7 @@
 </template>
 <script setup lang="ts">
 import ChatSideBar from "./components/ChatSideBar.vue";
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 import type { Ref } from "vue";
 import { ArrowRightBold } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
@@ -126,7 +126,7 @@ const apikey = ref("");
 const model = ref("");
 
 const route = useRoute();
-type indexnumber = number;
+
 // eslint-disable-next-line no-redeclare
 const indexnumber = ref(0); //作为具体哪个chatid
 
@@ -143,6 +143,11 @@ interface Personality {
 interface ChangeTitle {
   index: number;
   id: string;
+  title: string;
+}
+interface MessageTitle {
+  id?: number;
+  chatId: string;
   title: string;
 }
 let changeTitle = ref<ChangeTitle>({
@@ -173,7 +178,7 @@ async function sendmessage() {
       messages.value.push(newmessage);
       indexnumber.value = messages.value.length - 1;
       changeTitle.value.index = indexnumber.value;
-      console.log(indexnumber.value)
+      console.log(indexnumber.value);
     }
     //之后聊天在某一对话中发送对话
     const userMessage: Message = {
@@ -190,7 +195,6 @@ async function sendmessage() {
     });
     console.log(isLoading.value && firstclick.value);
     //messages.value[indexnumber.value].chatId = firstchat.chatId;
-    
 
     if (messages.value[indexnumber.value].messages.length == 2) {
       const firstsendmessage: firstSendMessage = {
@@ -274,16 +278,17 @@ async function sendmessage() {
 
 watch(
   () => route.params.id,
-  async (newid) => {
+  (newid) => {
     const contentid = newid;
     firstclick.value = false;
+    console.log(newid);
     queryId.value = newid as string;
     if (contentid == "0") {
       indexnumber.value = -1;
       return;
     } else if (contentid == "1") {
       if (messages.value[indexnumber.value].messages.length > 0) {
-        await db.open();
+        db.open();
         db.messages
           .where("chatId")
           .equals(messages.value[indexnumber.value].chatId)
@@ -303,7 +308,7 @@ watch(
       //   chatId: messages.value[indexnumber.value].chatId,
       // });
 
-      await deletemessage(deletechat);
+      deletemessage(deletechat);
 
       messages.value.splice(indexnumber.value, 1);
       indexnumber.value--;
@@ -313,7 +318,9 @@ watch(
       for (let i = 0; i < messages.value.length; i++) {
         if (messages.value[i].chatId == contentid) {
           indexnumber.value = i;
-          console.log(indexnumber.value)
+          displayedMessages.value = currentMessages.value; 
+          console.log(indexnumber.value);
+          console.log(messages.value);
           return;
         }
       }
@@ -323,10 +330,16 @@ watch(
       };
       messages.value.push(newmessage);
       indexnumber.value = messages.value.length - 1;
+      console.log(indexnumber.value);
     }
   }
 );
 
+const currentMessages = computed(() => {
+  console.log(messages.value[indexnumber.value]?.messages);
+  return messages.value[indexnumber.value]?.messages || [];
+});
+const displayedMessages = ref(currentMessages.value);
 // 在组件挂载时从 localStorage 中恢复值
 onMounted(() => {
   const savedInput = localStorage.getItem("input");
@@ -361,15 +374,21 @@ onMounted(async () => {
       apikey.value = firtRecord.apikey as string;
       model.value = firtRecord.model as string;
     }
+    if (!db.isOpen()) db.open();
     if ((await db.messagetitles.toArray()).length != 0) {
-      const chatIds = await getAllChatId();
+      const allMessageTitles = await db.messagetitles.toArray();
+      console.log(allMessageTitles);
+      const chatIds = allMessageTitles.map(
+        (messageTitle) => messageTitle.chatId
+      );
+
       for (const chatid of chatIds) {
         const messagesForChat = await db.messages
           .where("chatId")
           .equals(chatid)
           .toArray();
         const messages1: Chat = {
-          chatId: chatid.toString(),
+          chatId: chatid,
           messages: [],
         };
         messagesForChat.forEach((message) => {
@@ -383,6 +402,7 @@ onMounted(async () => {
           });
         });
         messages.value.push(messages1);
+        console.log(messages.value);
       }
     }
   } finally {

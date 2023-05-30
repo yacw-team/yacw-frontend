@@ -54,19 +54,7 @@ export function check(): boolean {
   return true;
 }
 
-export async function getAllChatId():Promise<string[]>{
-  await db.open();
-  const uniqueChatIds: Ref<string[]> =ref([]);
- await db.transaction("r", db.messagetitles, async () => {
-    const messageTitles = await db.messagetitles.toArray();
-    messageTitles.forEach((messageTitle: MessageTitle) => {
-      console.log(messageTitle.chatId)
-      uniqueChatIds.value.push(messageTitle.chatId);
-    });
-  });
-  db.close();
-  return uniqueChatIds.value;
-}
+
 
 // db.Apikey.clear().then(() => {
 //   console.log('清理嗲了');
