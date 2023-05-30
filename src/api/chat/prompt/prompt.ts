@@ -11,7 +11,7 @@ export async function getmyprompts(req:string): Promise<Prompt[]> {
     let resData: Prompt[] =[];
     try {
         const response = await axios.post(URL.Getmyprompts, req)
-        resData = response.data;        
+        resData = response.data.Prompts;           
     } catch (error) {
         console.error(error);
         throw new Error('Failed to get message');
@@ -23,7 +23,7 @@ export async function getprompts(): Promise<Prompt[] > {
     let resData: Prompt[] =[];
     try {
         const response = await axios.get(URL.Getprompts)
-        resData = response.data;        
+        resData = response.data.Prompts;           
     } catch (error) {
         console.error(error);
         throw new Error('Failed to get message');
