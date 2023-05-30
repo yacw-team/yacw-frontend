@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-button class="ml-4 mt-2" :icon="isCollapse ? Expand : Fold" circle @click="isCollapse = !isCollapse" />
-    <el-menu default-active="2" class="el-menu-vertical-demo min-w-40" :collapse="isCollapse">
+    <el-menu class="el-menu-vertical-demo min-w-40" :collapse="isCollapse">
       <el-menu-item id="firstItem" index="0"></el-menu-item>
       <el-menu-item index="1" @click="$router.push('/')">
         <el-icon>
@@ -27,16 +27,37 @@
         </el-icon>
         <template #title>游戏</template>
       </el-menu-item>
-      <el-menu-item @click="toggleDark()">
-        <el-icon v-if="isDark">
-          <Sunny />
+      <el-menu-item @click="dialogVisuable = true">
+        <el-icon>
+          <Tools />
         </el-icon>
-        <el-icon v-else>
-          <Moon />
-        </el-icon>
-        <template #title> {{ isDark ? "开灯" : "关灯" }} </template>
+        <template #title>设置</template>
       </el-menu-item>
     </el-menu>
+    <el-dialog v-model="dialogVisuable" title="设置" width="30%" :before-close="handleClose">
+      <!-- 设置白天/黑暗模式 -->
+      <el-card class="-mt-4" shadow="never">
+        <div>
+          <span class="mr-2"> {{ isDark ? "黑暗模式" : "白天模式" }} </span>
+          <el-switch v-model="isDark" inline-prompt :active-icon="Moon" :inactive-icon="Sunny" />
+        </div>
+      </el-card>
+      <!-- 设置后端地址 -->
+      <el-card class="my-4" shadow="never">
+        <div>
+          <span class="mr-2">后端地址</span>
+          <el-input class="my-4" placeholder="请输入后端地址" disabled="" />
+          <el-button class="bg-blue-400 dark:bg-blue-600" type="primary">设置</el-button>
+        </div>
+      </el-card>
+      <!-- 清除浏览器数据库 -->
+      <el-card shadow="never">
+        <div>
+          <div class="mr-2 mb-2">清除浏览器数据库</div>
+          <el-button class="bg-red-400 dark:bg-red-600" type="danger">清除</el-button>
+        </div>
+      </el-card>
+    </el-dialog>
   </div>
 </template>
 
@@ -47,6 +68,7 @@ import {
   ChatDotRound,
   HomeFilled,
   SwitchFilled,
+  Tools,
   Sunny,
   Moon,
   Fold,
@@ -54,10 +76,16 @@ import {
 } from '@element-plus/icons-vue'
 import { useDark, useToggle } from "@vueuse/core";
 
+const dialogVisuable = ref(false);
+
 const isDark = useDark();
 const toggleDark = useToggle(isDark);
 
 const isCollapse = ref(true);
+
+const handleClose = () => {
+  console.log("close");
+}
 </script>
 
 <style>
