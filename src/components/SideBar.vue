@@ -1,122 +1,73 @@
 <template>
-  <div class="sidebar-container">
-    <el-menu :collapsed="isCollapsed" default-active="1">
-      <router-link to="/">
-        <el-menu-item index="1">
-          <i :class="isCollapsed ? 'el-icon-s-promotion' : 'el-icon-picture'">
-            <HomeFilled />
-          </i>
-          <span>{{ isCollapsed ? "" : "主页" }}</span>
-        </el-menu-item>
-      </router-link>
-      <router-link to="/chat/0">
-        <el-menu-item index="2">
-          <i :class="isCollapsed ? 'el-icon-s-home' : 'el-icon-s-management'">
-            <ChatRound />
-          </i>
-          <span>{{ isCollapsed ? "" : "聊天" }}</span>
-        </el-menu-item>
-      </router-link>
-      <router-link to="/translate">
-        <el-menu-item index="3">
-          <i
-            :class="isCollapsed ? 'el-icon-s-comment' : 'el-icon-phone-outline'"
-          >
-            <Document />
-          </i>
-          <span>{{ isCollapsed ? "" : "翻译" }}</span>
-        </el-menu-item>
-      </router-link>
-      <div @click="handleUnderConstruction">
-        <el-menu-item index="5">
-          <i
-            :class="isCollapsed ? 'el-icon-s-custom' : 'el-icon-data-analysis'"
-          >
-            <SwitchFilled />
-          </i>
-          <span>{{ isCollapsed ? "" : "游戏" }}</span>
-        </el-menu-item>
-      </div>
+  <div>
+    <el-button class="ml-4 mt-2" :icon="isCollapse ? Expand : Fold" circle @click="isCollapse = !isCollapse" />
+    <el-menu default-active="2" class="el-menu-vertical-demo min-w-40" :collapse="isCollapse">
+      <el-menu-item id="firstItem" index="0"></el-menu-item>
+      <el-menu-item index="1" @click="$router.push('/')">
+        <el-icon>
+          <HomeFilled />
+        </el-icon>
+        <template #title>主页</template>
+      </el-menu-item>
+      <el-menu-item index="2" @click="$router.push('/chat/0')">
+        <el-icon>
+          <ChatDotRound />
+        </el-icon>
+        <template #title>聊天</template>
+      </el-menu-item>
+      <el-menu-item index="3" @click="$router.push('/translate')">
+        <el-icon>
+          <Document />
+        </el-icon>
+        <template #title>翻译</template>
+      </el-menu-item>
+      <el-menu-item index="4" @click="$router.push('/game')">
+        <el-icon>
+          <SwitchFilled />
+        </el-icon>
+        <template #title>游戏</template>
+      </el-menu-item>
+      <el-menu-item @click="toggleDark()">
+        <el-icon v-if="isDark">
+          <Sunny />
+        </el-icon>
+        <el-icon v-else>
+          <Moon />
+        </el-icon>
+        <template #title> {{ isDark ? "开灯" : "关灯" }} </template>
+      </el-menu-item>
     </el-menu>
-    <el-button
-      style="border: none"
-      class="collapse-btn"
-      @click="toggleCollapse"
-      circle
-    >
-      <el-icon
-        ><Expand v-if="isCollapsed" /><Fold v-if="!isCollapsed"
-      /></el-icon>
-    </el-button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue'
 import {
-  ChatRound,
-  Help,
-  SwitchFilled,
   Document,
+  ChatDotRound,
   HomeFilled,
-  Expand,
+  SwitchFilled,
+  Sunny,
+  Moon,
   Fold,
-} from "@element-plus/icons-vue";
-import { ElButton, ElMessage } from "element-plus";
-import 'element-plus/es/components/message/style/css'
+  Expand
+} from '@element-plus/icons-vue'
+import { useDark, useToggle } from "@vueuse/core";
 
-const isCollapsed = ref(false);
+const isDark = useDark();
+const toggleDark = useToggle(isDark);
 
-function toggleCollapse(): void {
-  isCollapsed.value = !isCollapsed.value;
-}
-
-const handleUnderConstruction = () => {
-  ElMessage('功能开发中，敬请期待！')
-}
+const isCollapse = ref(true);
 </script>
 
-<style scoped>
-.sidebar-container {
-  position: relative;
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  border-left: 1px solid #ccc;
-  padding-top: 50px;
-}
-.collapse-btn {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
+<style>
+.el-menu-vertical-demo:not(.el-menu--collapse) {
+  width: 120px;
+  min-height: 400px;
 }
 
-@media (min-width: 960px) {
-  .sidebar-container {
-    flex-direction: row;
-  }
-
-  el-menu {
-    width: 200px;
-  }
-
-  el-menu-item {
-    display: flex;
-    align-items: center;
-
-    justify-content: center;
-  }
-
-  el-menu-item i {
-    font-size: 16px;
-    margin-right: 0;
-  }
-
-  el-menu-item span {
-    display: inline-block;
-    margin-left: 5px;
-    white-space: nowrap;
-  }
+#firstItem {
+  width: 65px;
+  height: 0px;
 }
 </style>

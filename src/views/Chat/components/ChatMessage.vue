@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row items-start p-4 bg-white border border-gray-200 rounded-md">
+  <div class="flex flex-row items-start p-4 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-600 rounded-md">
     <div id="message-avatar" class="flex">
       <el-image class="w-10 rounded-md" :src="avatar" />
     </div>

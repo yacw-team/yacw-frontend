@@ -1,6 +1,6 @@
 <template>
   <div v-show="!isCollapsed">
-    <el-button class="w-full my-4" @click="handleAddNewChat" type="primary">
+    <el-button class="w-full my-4 bg-blue-400 dark:bg-black" @click="handleAddNewChat" type="primary">
       <el-icon>
         <Plus class="mb-1" size="20" />
       </el-icon>
