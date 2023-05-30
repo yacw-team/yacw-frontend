@@ -3,7 +3,12 @@
     <div id="message-avatar" class="flex">
       <el-image class="w-10 rounded-md" :src="avatar" />
     </div>
-    <el-skeleton style="width:100% ;padding:10px " :loading="isloading && role=='assistant'" animated :rows="5">
+    <el-skeleton
+      style="width:100% ;padding:10px "
+      :loading="isloading && role=='assistant'"
+      animated
+      :rows="5"
+    >
       <template #template></template>
       <template #default>
         <div id="message-content" class="mx-4">
@@ -11,7 +16,6 @@
         </div>
       </template>
     </el-skeleton>
-
     <div class="ml-auto absolute top-1 right-1 copy">
       <i class="el-icon-copy" @click="copyText">
         <el-icon>
@@ -29,6 +33,7 @@ import highlight from "highlight.js";
 import "highlight.js/styles/idea.css";
 import { ElMessage } from "element-plus";
 import { CopyDocument } from "@element-plus/icons-vue";
+import { defineProps } from "vue";
 
 const props = defineProps({
   role: {
@@ -72,7 +77,6 @@ const copyText = () => {
   navigator.clipboard.writeText(props.chatContent);
   ElMessage.success("Copied to clipboard!");
 };
-
 const chatContentRandered = DOMPurify.sanitize(marked.parse(props.chatContent));
 </script>
 
