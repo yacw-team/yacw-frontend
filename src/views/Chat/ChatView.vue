@@ -20,6 +20,7 @@
             <div v-if="messages && messages[indexnumber] && indexnumber > -1">
               <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
                 <div v-for="(message, index) in  displayedMessages" :key="index">
+                  <!-- <p>{{ message.content }}</p> -->
                   <ChatMessage
                     class="mb-2"
                     :role="message.type"
@@ -96,7 +97,7 @@ import type { Ref } from "vue";
 import { ArrowRightBold } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 import { v4 as uuidv4 } from "uuid";
-import { db, getAllChatId } from "../../database/db";
+import { db } from "../../database/db";
 import PromptLibrary from "./components/PromptLibrary.vue";
 import promptShop from "@/components/PromptShop.vue";
 import AICharacter from "./components/AIcharacter.vue";
