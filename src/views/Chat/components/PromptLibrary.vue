@@ -29,7 +29,7 @@
             <Cp v-if="createdialog" @createPrompt="(msg: Prompt) => confirmSuccess(msg)" />
           </el-col>
           <br />
-          <el-row v-for="index in userPrompt.Prompts" :key="index" class="item">
+          <el-row v-for="index in userPrompt" :key="index" class="item">
             <el-col :span="24">
               <el-card shadow="always">
                 <span>prompt名字: {{ index.name }}</span>
