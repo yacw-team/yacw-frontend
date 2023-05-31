@@ -40,8 +40,6 @@
                         </el-col>
                     </el-row>
                 </div>
-
-
             </el-col>
         </el-row>
         <teleport to=".mask">
@@ -56,13 +54,15 @@
         </div>
     </div>
 </template>
-  
+
 <script setup lang="ts">
-import { reactive, onMounted, computed, ref, watch } from 'vue'
-import Details from '@/components/LookDetailsPrompt.vue'
+import { reactive, onMounted, computed, ref } from 'vue';
+import Details from '@/components/LookDetailsPrompt.vue';
+import { getPromptsByType } from '@/api/chat/prompt/prompt';
 
-import axios from 'axios'
-
+onMounted(() => {
+    fetchCards(promptType.value);
+});
 
 interface Prompt {
     id: string,
@@ -72,13 +72,10 @@ interface Prompt {
     background: string,
     icon: string
 }
+
 const PromptsList = reactive({
     Prompts: [] as Prompt[],
 })
-
-
-
-
 
 //发送到详情页面的信息
 const jsondata = reactive<Prompt>({
@@ -90,22 +87,18 @@ const jsondata = reactive<Prompt>({
     icon: ''
 });
 
-
 const currentPage = ref(1);
 const isVisible = ref(false);
 const pageSize = 12;
 const promptType = ref();
 const emit = defineEmits(['sendPrompt', 'changeShow1']);
-const promptMessage = ref();  //传递给输入框的prompt信息，来自LookDetailsPrompt
 
 //事件方法的集合
-
 function changeType(index: string) {
     if (index != 'All')
         promptType.value = index;
     else promptType.value = null;
     fetchCards(promptType.value);
-    console.log(index);
 }
 
 //更新当前页面值，并刷新页面
@@ -113,7 +106,6 @@ function updatePage(page: number) {
     currentPage.value = page;
     cardColumns;
 }
-
 
 function sendMessage(col: Prompt) {
     jsondata.id = col.id;
@@ -142,81 +134,24 @@ const getRandomBackground = () => {
     return { background, icon };
 };
 
-let data = ref({ Prompts: [] as Prompt[] });
 const fetchCards = async (index: string) => {
-    //根据类型进行请求
-    let url = '/api/v1/chat/prompts';
-    if (index != null) {
-        url += `?type=${index}`;
-    }
-    axios.get(url).then(response => {
-        data.value = response.data;
-        PromptsList.Prompts = data.value.Prompts.map((prompt: Prompt) => {
+    const prompts = await getPromptsByType(index);
+    if (prompts) {
+        // 构造随机背景色和 emoji
+        PromptsList.Prompts = prompts.map((prompt) => {
             const { background, icon } = getRandomBackground();
             return { ...prompt, background, icon };
-        })
-    }, error => {
-        data.value = {
-            Prompts: [
-                {
-                    'id': '1',
-                    "name": "111",
-                    "description": "string",
-                    "prompts": "string",
-                    "icon": '',
-                    "background": ''
-                },
-                {
-                    'id': '2',
-                    "name": "222",
-                    "description": "大便啊",
-                    "prompts": "大便啊",
-                    "icon": '',
-                    "background": ''
-                },
-                {
-                    'id': '3',
-                    "name": "333",
-                    "description": "我靠",
-                    "prompts": "我靠",
-                    "icon": '',
-                    "background": ''
-                }, {
-                    'id': '4',
-                    "name": "333",
-                    "description": "hhhh",
-                    "prompts": "哇哈哈哈",
-                    "icon": '',
-                    "background": ''
-                }, {
-                    'id': '3',
-                    "name": "333",
-                    "description": "纳尼",
-                    "prompts": "纳尼",
-                    "icon": '',
-                    "background": ''
-                }
-            ]
-        };
-    })
+        });
+    }
 }
 
-
-onMounted(() => {
-    fetchCards(promptType.value);
-});
-
 const cardColumns = computed(() => {
-
     const columns = [];
     let column = [];
     const start = (currentPage.value - 1) * pageSize;
     const end = start + pageSize;
-
-
     for (let i = start; i < PromptsList.Prompts.length && i < end; i++) {
         column.push(PromptsList.Prompts[i]);
-
         if ((i + 1) % 3 === 0 || i === PromptsList.Prompts.length - 1) {
             columns.push(column);
             column = [];
@@ -224,8 +159,6 @@ const cardColumns = computed(() => {
     }
     return columns;
 });
-
-
 
 </script>
   
@@ -236,8 +169,6 @@ const cardColumns = computed(() => {
     flex-wrap: wrap;
     justify-content: left;
 }
-
-
 
 .el-col {
     border-radius: 4px;
@@ -308,7 +239,6 @@ const cardColumns = computed(() => {
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 9999;
 }
-
 
 div {
     position: relative;

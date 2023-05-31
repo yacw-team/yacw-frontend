@@ -3,6 +3,7 @@
     <el-button
       @click="centerDialogVisible = true"
       round
+      size="large"
       style="font-weight: bold; color: white; background-color: coral;"
     >Prompt 商店</el-button>
     <el-dialog
