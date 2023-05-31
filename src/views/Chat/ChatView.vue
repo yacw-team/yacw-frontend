@@ -1,49 +1,28 @@
 <template>
   <div>
-    <promptShop
-      @changeShow="(msg: boolean) => isVisible = msg"
-      v-if="isVisible"
-      @changeShow1="(msg: boolean) => isVisible = msg"
-      @sendPrompt="(msg: string) => textarea = msg"
-    />
-
+    <promptShop @changeShow="(msg: boolean) => isVisible = msg" v-if="isVisible"
+      @changeShow1="(msg: boolean) => isVisible = msg" @sendPrompt="(msg: string) => textarea = msg" />
     <div v-if="!isVisible" class="flex flex-row h-full">
-      <ChatSideBar
-        class="w-1/4 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-md"
-        :changeTitleIndex="changeTitle.index"
-        :changeTitle="changeTitle.title"
-        :newId="getNewid"
-      />
+      <ChatSideBar class="w-1/4 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-md"
+        :changeTitleIndex="changeTitle.index" :changeTitle="changeTitle.title" :newId="getNewid" />
       <div class="flex flex-col w-3/4 h-full">
-        <div class="flex-1 bg-gray-50 dark:bg-black">
-          <div class="flex flex-col">
+        <div class="flex-1 bg-gray-50 dark:bg-black h-1/2">
+          <div class="flex flex-col h-full overflow-y-scroll no-scrollbar">
             <div v-if="messages && messages[indexnumber] && indexnumber > -1">
-              <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
-                <div v-for="(message, index) in  displayedMessages" :key="index">
-                  <!-- <p>{{ message.content }}</p> -->
-                  <!-- <ChatMessage
-                    class="mb-2"
-                    :role="message.type"
-                    :chatContent="message.content"
-                    :isloading="isLoading && firstclick && 
-                    index== displayedMessages.length-1 &&message.content==''"
-                  />-->
+              <div id="chat-messages" class="flex-1 mx-4">
+                <div class="my-4" v-for="(message, index) in  displayedMessages" :key="index">
                   <div
-                    class="flex flex-row items-start p-4 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-600 rounded-md"
-                  >
-                    <div   id="message-avatar" class="flex">
-                      <div v-if="message.type=='user'">
-                      <el-image class="w-10 rounded-md" :src="user_avatar" /></div>
+                    class="flex flex-row items-start p-4 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-600 rounded-md">
+                    <div id="message-avatar" class="flex">
+                      <div v-if="message.type == 'user'">
+                        <el-image class="w-10 rounded-md" :src="user_avatar" />
+                      </div>
                       <div v-else>
-                      <el-image class="w-10 rounded-md" :src="assistant_avatar" /></div>
+                        <el-image class="w-10 rounded-md" :src="assistant_avatar" />
+                      </div>
                     </div>
-                    <el-skeleton
-                      style="width:100% ;padding:10px "
-                      :loading="isLoading && firstclick && 
-                    index== displayedMessages.length-1 &&message.content==''"
-                      animated
-                      :rows="5"
-                    >
+                    <el-skeleton style="width:100% ;padding:10px " :loading="isLoading && firstclick &&
+                      index == displayedMessages.length - 1 && message.content == ''" animated :rows="5">
                       <template #template></template>
                       <template #default>
                         <div id="message-content" class="mx-4">
@@ -71,44 +50,25 @@
         <div class="flex justify-center pt-4">
           <div class="flex flex-row items-center justify-center w-1/2">
             <div class="flex flex-1">
-              <PromptLibrary
-                @response="(msg: string) => textarea += msg"
-                @changeShow="(msg: boolean) => isVisible = msg"
-                style="margin: auto"
-              />
+              <PromptLibrary @response="(msg: string) => textarea += msg" @changeShow="(msg: boolean) => isVisible = msg"
+                style="margin: auto" />
             </div>
             <div class="flex flex-1">
-              <AICharacter
-                @getCharacter="(msg: Personality) => getCharacterinfo(msg)"
-                style="margin: auto"
-              />
+              <AICharacter @getCharacter="(msg: Personality) => getCharacterinfo(msg)" style="margin: auto" />
             </div>
           </div>
-          <span
-            v-if="isShowCharacter"
-            style="background-color: aquamarine; width: fit-content; padding-left: 0.5em; padding-right:0.5em; border-radius: 10px;"
-          >
+          <span v-if="isShowCharacter"
+            style="background-color: aquamarine; width: fit-content; padding-left: 0.5em; padding-right:0.5em; border-radius: 10px;">
             You
             are select
             <strong>{{ Character.name }}</strong>
           </span>
         </div>
         <div id="input-slot" class="flex flex-row mx-4 my-6">
-          <el-input
-            type="textarea"
-            :autosize="{ minRows: 1, maxRows: 4 }"
-            resize="none"
-            v-model="textarea"
-            :disabled="isLoading"
-            placeholder="请输入对话文字，使用 Shift + Enter 发送消息"
-            @keydown.shift.enter.prevent="sendmessage"
-          />
-          <el-button
-            class="ml-4"
-            type="primary"
-            :disabled="textarea.length==0  "
-            @click="sendmessage"
-          >
+          <el-input type="textarea" :autosize="{ minRows: 1, maxRows: 4 }" resize="none" v-model="textarea"
+            :disabled="isLoading" placeholder="请输入对话文字，使用 Shift + Enter 发送消息"
+            @keydown.shift.enter.prevent="sendmessage" />
+          <el-button class="ml-4" type="primary" :disabled="textarea.length == 0" @click="sendmessage">
             <div class="flex flex-row items-center">
               <span>发送</span>
               <el-icon class="ml-1">
@@ -127,7 +87,7 @@ import DOMPurify from "dompurify";
 import ChatSideBar from "./components/ChatSideBar.vue";
 import { ref, watch, onMounted, computed } from "vue";
 import type { Ref } from "vue";
-import { ArrowRightBold,CopyDocument } from "@element-plus/icons-vue";
+import { ArrowRightBold, CopyDocument } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "../../database/db";
@@ -136,7 +96,6 @@ import promptShop from "@/components/PromptShop.vue";
 import AICharacter from "./components/AIcharacter.vue";
 import HomePage from "@/views/Chat/ChatHomePage.vue";
 
-import { delay } from "lodash";
 import { ElMessage } from "element-plus";
 import type { getFirstMessage, getMessage } from "@/api/chat/res";
 import type { sendMessage, firstSendMessage, deleteChat } from "@/api/chat/req";
@@ -161,7 +120,6 @@ const model = ref("");
 
 const route = useRoute();
 
-// eslint-disable-next-line no-redeclare
 const indexnumber = ref(0); //作为具体哪个chatid
 
 const queryId = ref(""); //判断是不是0或1
@@ -184,11 +142,7 @@ interface ChangeTitle {
   id: string;
   title: string;
 }
-interface MessageTitle {
-  id?: number;
-  chatId: string;
-  title: string;
-}
+
 let changeTitle = ref<ChangeTitle>({
   index: -1,
   id: "",
@@ -205,14 +159,14 @@ interface Chat {
   messages: Message[];
 }
 
-const copyText = ( s: string) => {
+const copyText = (s: string) => {
   navigator.clipboard.writeText(s);
   ElMessage.success("Copied to clipboard!");
 };
 
-const chatContentRandered = (s:string)=>{
+const chatContentRandered = (s: string) => {
 
- return DOMPurify.sanitize(marked.parse(s));
+  return DOMPurify.sanitize(marked.parse(s));
 }
 
 async function sendmessage() {
@@ -243,7 +197,6 @@ async function sendmessage() {
       content: "",
     });
     console.log(isLoading.value && firstclick.value);
-    //messages.value[indexnumber.value].chatId = firstchat.chatId;
 
     if (messages.value[indexnumber.value].messages.length == 2) {
       const firstsendmessage: firstSendMessage = {
@@ -257,8 +210,6 @@ async function sendmessage() {
       };
 
       //第一次发送时
-      //console.log(model.value);
-
       textarea.value = "";
       const firstchat: getFirstMessage = await getFirst(firstsendmessage);
 
@@ -353,10 +304,6 @@ watch(
         apiKey: apikey.value,
         chatId: messages.value[indexnumber.value].chatId,
       };
-      // axios.post("/api/v1/chat/deletechat", {
-      //   apiKey: apikey.value,
-      //   chatId: messages.value[indexnumber.value].chatId,
-      // });
 
       deletemessage(deletechat);
 
