@@ -43,7 +43,7 @@ import { ElMessage } from 'element-plus';
   }
   const all = ref({ story: [] as story[] });
   const start = ref(false);
-  const shouldShowGlobalComponentd = inject('shouldShowGlobalComponent')
+  const shouldShowGlobalComponentd = inject('shouldShowGlobalComponent') as Ref<boolean>;
   const selectStory = ref<story>()
   
   
