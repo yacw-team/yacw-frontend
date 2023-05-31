@@ -1,20 +1,20 @@
 <template>
-
-           
     <div class="notebook" @getStory="() => ElMessage.info('sss')">
-    <h1>{{ currentStoryIndex }}</h1>
+       
         <div class="left-pane">
             <h2>{{ myData.Name }}</h2>
             <p>{{ currentStory.story }}</p>
             <button @click="() => { if (currentStoryIndex >= 1) currentStoryIndex-- }">上一页</button>
         </div>
         <div class="right-pane">
-            <div v-if="currentStoryIndex == currentStoryIndex1" class="content">
-                <button v-for="(option, index) in currentStory.choice" :key="index"
-                    @click="selectOption(currentStoryIndex + 1)">
-                    {{ String.fromCharCode(index + 65) }}.{{ option }}
+            <div v-if="currentStoryIndex == currentStoryIndex1" class="content" >
+               
+                <button v-for="(option, index) in currentStory.choice" :key="index" 
+                    @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65))">
+                    {{ String.fromCharCode(index + 65) }}.{{ option[String.fromCharCode(index + 65)] }}
                 </button>
-            </div>
+                </div>
+    
             <div v-else class="content1">
                 <button @click="() => { if (currentStoryIndex < currentStoryIndex1) currentStoryIndex++ }">下一页</button>
             </div>
@@ -34,35 +34,10 @@ interface choice {
 
 interface Story {
     story: string;
-    choice: string[];
+    choice: Array<{ [key: string]: string }>;
     round: number;
 }
 
-const stories = ref<Story[]>(
-    [
-    {
-
-        story: '改编不是乱编,2020年我和傅大帅中美合拍的电影将会和大家见面,请大家多多关注',
-        choice: [
-            '不关注' ,
-            '关注' ,
-            '扔鸡蛋' ,
-            '欢呼' ,
-        ],
-        round: 10
-    },
-    {
-        story: 'aaaa',
-        choice: [
-            '不关注' ,
-            '关注' ,
-              '扔鸡蛋' ,
-             '欢呼' ,
-        ],
-        round: 9
-    }
-    ]
-);
 
 interface selectStory {
     GameId: string,
@@ -82,16 +57,43 @@ const myData = ref<selectStory>({
     Name: props.Name as string,
     Description: props.Description as string,
 });
-
+const loading=ref(true)
 const currentStoryIndex = ref(0);
 const currentStoryIndex1 = ref(0);
 const apiKey = ref('')
 const currentStory = computed(() => stories.value[currentStoryIndex.value]);
 const ModelId = ref('')
 
-function selectOption(option: number) {
-    currentStoryIndex.value = option;
-    currentStoryIndex1.value = currentStoryIndex.value;
+const stories = ref<Story[]>(
+    [
+        {
+
+            story: myData.value.Description,
+            choice: [
+              
+            ],
+            round: 10
+        }
+    ]
+);
+
+
+async function selectOption(next: number, choice: string) {
+
+    try {
+        const response = await axios.post("/api/v1/game/chat", {
+            apiKey: apiKey.value,
+            choiceID: choice,//A,B,C,D
+            modelId: ModelId.value,
+        })
+        stories.value.push(response.data)
+        currentStoryIndex.value = next;
+        currentStoryIndex1.value = currentStoryIndex.value;
+        loading.value=false
+    } catch {
+        ElMessage.info('请求出现故障，请稍等')
+    }
+
 }
 
 onMounted(async () => {
@@ -112,7 +114,8 @@ onMounted(async () => {
             })
 
             stories.value.push(response.data);
-
+            currentStoryIndex.value++;
+            currentStoryIndex1.value=currentStoryIndex.value
         }
     } finally {
         db.close();
