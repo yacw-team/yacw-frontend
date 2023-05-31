@@ -34,7 +34,7 @@
         <template #title>设置</template>
       </el-menu-item>
     </el-menu>
-    <el-dialog v-model="dialogVisuable" title="设置" width="30%" :before-close="handleClose">
+    <el-dialog v-model="dialogVisuable" title="设置" width="30%">
       <!-- 设置白天/黑暗模式 -->
       <el-card class="-mt-4" shadow="never">
         <div>
@@ -54,7 +54,7 @@
       <el-card shadow="never">
         <div>
           <div class="mr-2 mb-2">清除浏览器数据库</div>
-          <el-button class="bg-red-400 dark:bg-red-600" type="danger">清除</el-button>
+          <el-button class="bg-red-400 dark:bg-red-600" type="danger" @click="handleClearMessageData">清除</el-button>
         </div>
       </el-card>
     </el-dialog>
@@ -75,6 +75,8 @@ import {
   Expand
 } from '@element-plus/icons-vue'
 import { useDark, useToggle } from "@vueuse/core";
+import { clearMessageData } from '@/database/db';
+import { ElMessageBox } from 'element-plus';
 
 const dialogVisuable = ref(false);
 
@@ -83,8 +85,29 @@ const toggleDark = useToggle(isDark);
 
 const isCollapse = ref(true);
 
-const handleClose = () => {
-  console.log("close");
+const handleClearMessageData = () => {
+  ElMessageBox.confirm(
+    '确认删除所有本地对话记录吗？',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'error'
+    }
+  )
+  .then(() => {
+    clearMessageData();
+    ElMessageBox.alert('删除成功', '提示', {
+      confirmButtonText: '确定',
+      type: 'success'
+    })
+    .catch(() => {
+      ElMessageBox.alert('删除失败', '提示', {
+        confirmButtonText: '确定',
+        type: 'error'
+      })
+    });
+  })
 }
 </script>
 
