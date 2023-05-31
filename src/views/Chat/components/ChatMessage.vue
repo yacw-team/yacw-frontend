@@ -5,7 +5,7 @@
     </div>
     <el-skeleton
       style="width:100% ;padding:10px "
-      :loading="isloading && role=='assistant'"
+      :loading="isloading"
       animated
       :rows="5"
     >
@@ -33,7 +33,9 @@ import highlight from "highlight.js";
 import "highlight.js/styles/idea.css";
 import { ElMessage } from "element-plus";
 import { CopyDocument } from "@element-plus/icons-vue";
-import { defineProps } from "vue";
+import { defineProps, ref, watch} from "vue";
+
+
 
 const props = defineProps({
   role: {
@@ -48,7 +50,13 @@ const props = defineProps({
     type: Boolean,
   },
 });
-
+// const newcontent =ref('');
+// watch(()=>props.chatContent,
+// (newval)=>{
+//   console.log(newcontent.value)
+//   newcontent.value=newval;
+// })
+  
 marked.setOptions({
   highlight: function (code, lang) {
     const language = highlight.getLanguage(lang) ? lang : "plaintext";
@@ -62,6 +70,7 @@ marked.setOptions({
   smartypants: false,
   xhtml: false,
 });
+
 
 const user_avatar =
   "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNjY2NjY2MiPjwvcmVjdD4KICA8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIyNHB4IiBmaWxsPSIjMzMzMzMzIj5Vc2VyPC90ZXh0PiAgIAo8L3N2Zz4=";

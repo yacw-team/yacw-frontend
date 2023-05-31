@@ -3,7 +3,7 @@ import axios from "axios";
 import type { checkAPIKeyReq } from "./req";
 
 const URLs = {
-    CheckAPIKey: "/api/v1/home/checkAPIKey",
+    CheckAPIKey: "/api/v1/chat/apiKey",
 };
 
 export async function checkAPIKey(APIKey: string): Promise<string> {

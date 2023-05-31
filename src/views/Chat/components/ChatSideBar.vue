@@ -64,6 +64,7 @@ onMounted(async () => {
       });
     });
   }
+  db.close();
 });
 const handleAddNewChat = () => {
   if (!hasNewChat.value) {
@@ -109,7 +110,7 @@ watch(
     console.log(newTitle);
     if (newTitle.changeTitleIndex != undefined) {
       conversations.value[
-        conversations.value.length - newTitle.changeTitleIndex - 1
+        newTitle.changeTitleIndex
       ].title = newTitle.changeTitle as string;
       hasNewChat.value = false;
       // router.push({
