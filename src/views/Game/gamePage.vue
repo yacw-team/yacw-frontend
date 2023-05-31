@@ -30,11 +30,10 @@
   </template>
   <script setup lang="ts">
   import axios from 'axios';
-  import { onMounted, ref, inject, watch } from 'vue';
+  import { onMounted, ref, inject, watch, type Ref } from 'vue';
   import TopBar from "./components/TopBarMenu.vue"
   import Book from './bookTest.vue'
-import type { throwError } from 'element-plus/es/utils';
-import { ElMessage } from 'element-plus';
+
   
   interface story {
     GameId: string,
