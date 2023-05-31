@@ -10,12 +10,13 @@
             <div v-if="currentStoryIndex == currentStoryIndex1" class="content" >
                
                 <button v-for="(option, index) in currentStory.choice" :key="index" 
-                    @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65))">
+                    @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65),option[String.fromCharCode(index + 65)])">
                     {{ String.fromCharCode(index + 65) }}.{{ option[String.fromCharCode(index + 65)] }}
                 </button>
                 </div>
     
             <div v-else class="content1">
+                
                 <button @click="() => { if (currentStoryIndex < currentStoryIndex1) currentStoryIndex++ }">下一页</button>
             </div>
         </div>
@@ -78,7 +79,9 @@ const stories = ref<Story[]>(
 );
 
 
-async function selectOption(next: number, choice: string) {
+async function selectOption(next: number, choice: string,content:string) {
+
+    //应先让它加载
 
     try {
         const response = await axios.post("/api/v1/game/chat", {
@@ -87,9 +90,15 @@ async function selectOption(next: number, choice: string) {
             modelId: ModelId.value,
         })
         stories.value.push(response.data)
+        //把选择的放在右侧，让玩家回顾
+
+        //加载出来后，因为next是选择后的页面，所以生成后应该跳转到最新页面
         currentStoryIndex.value = next;
         currentStoryIndex1.value = currentStoryIndex.value;
+
+        //加载结束
         loading.value=false
+
     } catch {
         ElMessage.info('请求出现故障，请稍等')
     }
