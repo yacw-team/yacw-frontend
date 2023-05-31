@@ -21,13 +21,44 @@
               <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
                 <div v-for="(message, index) in  displayedMessages" :key="index">
                   <!-- <p>{{ message.content }}</p> -->
-                  <ChatMessage
+                  <!-- <ChatMessage
                     class="mb-2"
                     :role="message.type"
                     :chatContent="message.content"
                     :isloading="isLoading && firstclick && 
                     index== displayedMessages.length-1 &&message.content==''"
-                  />
+                  />-->
+                  <div
+                    class="flex flex-row items-start p-4 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-600 rounded-md"
+                  >
+                    <div   id="message-avatar" class="flex">
+                      <div v-if="message.type=='user'">
+                      <el-image class="w-10 rounded-md" :src="user_avatar" /></div>
+                      <div v-else>
+                      <el-image class="w-10 rounded-md" :src="assistant_avatar" /></div>
+                    </div>
+                    <el-skeleton
+                      style="width:100% ;padding:10px "
+                      :loading="isLoading && firstclick && 
+                    index== displayedMessages.length-1 &&message.content==''"
+                      animated
+                      :rows="5"
+                    >
+                      <template #template></template>
+                      <template #default>
+                        <div id="message-content" class="mx-4">
+                          <div v-html="chatContentRandered(message.content)"></div>
+                        </div>
+                      </template>
+                    </el-skeleton>
+                    <div class="ml-auto absolute top-1 right-1 copy">
+                      <i class="el-icon-copy" @click="copyText(message.content)">
+                        <el-icon>
+                          <CopyDocument />
+                        </el-icon>
+                      </i>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -91,10 +122,12 @@
   </div>
 </template>
 <script setup lang="ts">
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 import ChatSideBar from "./components/ChatSideBar.vue";
 import { ref, watch, onMounted, computed } from "vue";
 import type { Ref } from "vue";
-import { ArrowRightBold } from "@element-plus/icons-vue";
+import { ArrowRightBold,CopyDocument } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "../../database/db";
@@ -102,7 +135,7 @@ import PromptLibrary from "./components/PromptLibrary.vue";
 import promptShop from "@/components/PromptShop.vue";
 import AICharacter from "./components/AIcharacter.vue";
 import HomePage from "@/views/Chat/ChatHomePage.vue";
-import ChatMessage from "./components/ChatMessage.vue";
+
 import { delay } from "lodash";
 import { ElMessage } from "element-plus";
 import type { getFirstMessage, getMessage } from "@/api/chat/res";
@@ -133,6 +166,11 @@ const indexnumber = ref(0); //作为具体哪个chatid
 
 const queryId = ref(""); //判断是不是0或1
 const getNewid = ref("");
+
+const user_avatar =
+  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNjY2NjY2MiPjwvcmVjdD4KICA8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIyNHB4IiBmaWxsPSIjMzMzMzMzIj5Vc2VyPC90ZXh0PiAgIAo8L3N2Zz4=";
+const assistant_avatar = "/assistant.jpg";
+
 
 interface Personality {
   id: string;
@@ -165,6 +203,16 @@ interface Message {
 interface Chat {
   chatId: string;
   messages: Message[];
+}
+
+const copyText = ( s: string) => {
+  navigator.clipboard.writeText(s);
+  ElMessage.success("Copied to clipboard!");
+};
+
+const chatContentRandered = (s:string)=>{
+
+ return DOMPurify.sanitize(marked.parse(s));
 }
 
 async function sendmessage() {
@@ -299,6 +347,7 @@ watch(
           .equals(messages.value[indexnumber.value].chatId)
           .delete();
         db.close();
+        console.log("delete success");
       }
       const deletechat: deleteChat = {
         apiKey: apikey.value,
@@ -319,7 +368,7 @@ watch(
       for (let i = 0; i < messages.value.length; i++) {
         if (messages.value[i].chatId == contentid) {
           indexnumber.value = i;
-          displayedMessages.value = currentMessages.value; 
+          displayedMessages.value = currentMessages.value;
           console.log(indexnumber.value);
           console.log(messages.value);
           return;
@@ -331,6 +380,7 @@ watch(
       };
       messages.value.push(newmessage);
       indexnumber.value = messages.value.length - 1;
+      displayedMessages.value = currentMessages.value;
       console.log(indexnumber.value);
     }
   }
