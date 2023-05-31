@@ -24,10 +24,11 @@ const router = createRouter({
       name: "chat",
       component: () => import("@/views/Chat/ChatView.vue"),
     },
-    {
-      path: "/loading",
-      name: "load",
-      component: () => import("@/components/Loading.vue"),
+    
+       {
+      path: "/game",
+      name: "game",
+      component: () => import("@/views/Game/gamePage.vue"),
     }
   ],
 });
