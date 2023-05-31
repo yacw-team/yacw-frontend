@@ -1,22 +1,29 @@
 <template>
     <div class="notebook" @getStory="() => ElMessage.info('sss')">
-       
+
         <div class="left-pane">
             <h2>{{ myData.Name }}</h2>
             <p>{{ currentStory.story }}</p>
             <button @click="() => { if (currentStoryIndex >= 1) currentStoryIndex-- }">上一页</button>
         </div>
         <div class="right-pane">
-            <div v-if="currentStoryIndex == currentStoryIndex1" class="content" >
-               
-                <button v-for="(option, index) in currentStory.choice" :key="index" 
-                    @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65),option[String.fromCharCode(index + 65)])">
+            <div v-if="currentStoryIndex == currentStoryIndex1" class="content">
+
+                <button v-for="(option, index) in currentStory.choice" :key="index"
+                    @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65), option[String.fromCharCode(index + 65)])">
                     {{ String.fromCharCode(index + 65) }}.{{ option[String.fromCharCode(index + 65)] }}
                 </button>
-                </div>
-    
+            </div>
+
             <div v-else class="content1">
-                
+                <div v-if="currentStoryIndex != 0">
+                    <h2>你的选择是</h2>
+                    <p>{{ selectChoice[currentStoryIndex] }}</p>
+                </div>
+                <div v-else >
+                    <h2>故事正在展开</h2>
+                    <p>接下来做出你的选择吧</p>
+                </div>
                 <button @click="() => { if (currentStoryIndex < currentStoryIndex1) currentStoryIndex++ }">下一页</button>
             </div>
         </div>
@@ -26,12 +33,9 @@
 <script setup lang="ts">
 import { db } from '@/database/db';
 import axios from 'axios';
-import { ElMessage, backtopEmits } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import { ref, computed, onMounted } from 'vue';
 
-interface choice {
-    s: string,
-}
 
 interface Story {
     story: string;
@@ -58,20 +62,20 @@ const myData = ref<selectStory>({
     Name: props.Name as string,
     Description: props.Description as string,
 });
-const loading=ref(true)
+const loading = ref(true)
 const currentStoryIndex = ref(0);
 const currentStoryIndex1 = ref(0);
 const apiKey = ref('')
 const currentStory = computed(() => stories.value[currentStoryIndex.value]);
 const ModelId = ref('')
-
+const selectChoice = ref<string[]>([""]);
 const stories = ref<Story[]>(
     [
         {
 
             story: myData.value.Description,
             choice: [
-              
+
             ],
             round: 10
         }
@@ -79,7 +83,7 @@ const stories = ref<Story[]>(
 );
 
 
-async function selectOption(next: number, choice: string,content:string) {
+async function selectOption(next: number, choice: string, content: string) {
 
     //应先让它加载
 
@@ -91,13 +95,13 @@ async function selectOption(next: number, choice: string,content:string) {
         })
         stories.value.push(response.data)
         //把选择的放在右侧，让玩家回顾
-
+        selectChoice.value.push(content);
         //加载出来后，因为next是选择后的页面，所以生成后应该跳转到最新页面
         currentStoryIndex.value = next;
         currentStoryIndex1.value = currentStoryIndex.value;
 
         //加载结束
-        loading.value=false
+        loading.value = false
 
     } catch {
         ElMessage.info('请求出现故障，请稍等')
@@ -124,7 +128,7 @@ onMounted(async () => {
 
             stories.value.push(response.data);
             currentStoryIndex.value++;
-            currentStoryIndex1.value=currentStoryIndex.value
+            currentStoryIndex1.value = currentStoryIndex.value
         }
     } finally {
         db.close();
@@ -166,11 +170,13 @@ onMounted(async () => {
     margin-top: auto;
 }
 
+
 .right-pane {
     width: 50%;
     flex-grow: 1;
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .right-pane .content {
@@ -183,10 +189,17 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     align-items: center;
+   
 }
 
 .right-pane button {
-    margin-top: auto;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
 }
 
 h2,
@@ -208,7 +221,7 @@ p {
 button {
     display: block;
     margin-bottom: 10px;
-    margin-left: 0px;
+
     padding: 5px 10px;
     font-size: 20px;
     background-color: #F2E9D3;
