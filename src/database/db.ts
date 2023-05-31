@@ -53,17 +53,6 @@ export function check(): boolean {
   return true;
 }
 
-export async function getAllChatId(): Promise<string[]> {
-  const uniqueChatIds: Ref<string[]> = ref([]);
-  await db.transaction("r", db.messagetitles, async () => {
-    const messageTitles = await db.messagetitles.toArray();
-    messageTitles.forEach((messageTitle: MessageTitle) => {
-      uniqueChatIds.value.push(messageTitle.chatId);
-    });
-  });
-  return uniqueChatIds.value;
-}
-
 export async function clearMessageData() {
   db.messages.clear();
   db.messagetitles.clear();

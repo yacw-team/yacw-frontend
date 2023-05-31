@@ -19,13 +19,46 @@
           <div class="flex flex-col">
             <div v-if="messages && messages[indexnumber] && indexnumber > -1">
               <div id="chat-messages" class="flex-1 mx-4 overflow-y-scroll no-scrollbar">
-                <div v-for="(message, index) in messages[indexnumber].messages" :key="index">
-                  <ChatMessage
+                <div v-for="(message, index) in  displayedMessages" :key="index">
+                  <!-- <p>{{ message.content }}</p> -->
+                  <!-- <ChatMessage
                     class="mb-2"
                     :role="message.type"
                     :chatContent="message.content"
-                    :isloading="isLoading && firstclick"
-                  />
+                    :isloading="isLoading && firstclick && 
+                    index== displayedMessages.length-1 &&message.content==''"
+                  />-->
+                  <div
+                    class="flex flex-row items-start p-4 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-600 rounded-md"
+                  >
+                    <div   id="message-avatar" class="flex">
+                      <div v-if="message.type=='user'">
+                      <el-image class="w-10 rounded-md" :src="user_avatar" /></div>
+                      <div v-else>
+                      <el-image class="w-10 rounded-md" :src="assistant_avatar" /></div>
+                    </div>
+                    <el-skeleton
+                      style="width:100% ;padding:10px "
+                      :loading="isLoading && firstclick && 
+                    index== displayedMessages.length-1 &&message.content==''"
+                      animated
+                      :rows="5"
+                    >
+                      <template #template></template>
+                      <template #default>
+                        <div id="message-content" class="mx-4">
+                          <div v-html="chatContentRandered(message.content)"></div>
+                        </div>
+                      </template>
+                    </el-skeleton>
+                    <div class="ml-auto absolute top-1 right-1 copy">
+                      <i class="el-icon-copy" @click="copyText(message.content)">
+                        <el-icon>
+                          <CopyDocument />
+                        </el-icon>
+                      </i>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -89,19 +122,21 @@
   </div>
 </template>
 <script setup lang="ts">
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 import ChatSideBar from "./components/ChatSideBar.vue";
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 import type { Ref } from "vue";
-import { ArrowRightBold } from "@element-plus/icons-vue";
+import { ArrowRightBold,CopyDocument } from "@element-plus/icons-vue";
 import { useRoute } from "vue-router";
 import { v4 as uuidv4 } from "uuid";
-import { db, getAllChatId } from "../../database/db";
+import { db } from "../../database/db";
 import PromptLibrary from "./components/PromptLibrary.vue";
 import promptShop from "@/components/PromptShop.vue";
 import AICharacter from "./components/AIcharacter.vue";
 import HomePage from "@/views/Chat/ChatHomePage.vue";
-import ChatMessage from "./components/ChatMessage.vue";
 
+import { delay } from "lodash";
 import { ElMessage } from "element-plus";
 import type { getFirstMessage, getMessage } from "@/api/chat/res";
 import type { sendMessage, firstSendMessage, deleteChat } from "@/api/chat/req";
@@ -125,12 +160,17 @@ const apikey = ref("");
 const model = ref("");
 
 const route = useRoute();
-type indexnumber = number;
+
 // eslint-disable-next-line no-redeclare
 const indexnumber = ref(0); //作为具体哪个chatid
 
 const queryId = ref(""); //判断是不是0或1
 const getNewid = ref("");
+
+const user_avatar =
+  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNjY2NjY2MiPjwvcmVjdD4KICA8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIyNHB4IiBmaWxsPSIjMzMzMzMzIj5Vc2VyPC90ZXh0PiAgIAo8L3N2Zz4=";
+const assistant_avatar = "/assistant.jpg";
+
 
 interface Personality {
   id: string;
@@ -142,6 +182,11 @@ interface Personality {
 interface ChangeTitle {
   index: number;
   id: string;
+  title: string;
+}
+interface MessageTitle {
+  id?: number;
+  chatId: string;
   title: string;
 }
 let changeTitle = ref<ChangeTitle>({
@@ -160,6 +205,16 @@ interface Chat {
   messages: Message[];
 }
 
+const copyText = ( s: string) => {
+  navigator.clipboard.writeText(s);
+  ElMessage.success("Copied to clipboard!");
+};
+
+const chatContentRandered = (s:string)=>{
+
+ return DOMPurify.sanitize(marked.parse(s));
+}
+
 async function sendmessage() {
   if (apikey.value != "" && model.value != "") {
     if (queryId.value == "0" || queryId.value == "1" || queryId.value == "") {
@@ -172,24 +227,23 @@ async function sendmessage() {
       messages.value.push(newmessage);
       indexnumber.value = messages.value.length - 1;
       changeTitle.value.index = indexnumber.value;
+      console.log(indexnumber.value);
     }
     //之后聊天在某一对话中发送对话
     const userMessage: Message = {
       type: "user",
       content: textarea.value,
     };
-
+    isLoading.value = true;
+    firstclick.value = true;
     messages.value[indexnumber.value].messages.push(userMessage);
 
-    //messages.value[indexnumber.value].chatId = firstchat.chatId;
     messages.value[indexnumber.value].messages.push({
       type: "assistant",
       content: "",
     });
-    isLoading.value = true;
-    firstclick.value = true;
     console.log(isLoading.value && firstclick.value);
-    console.log(model.value);
+    //messages.value[indexnumber.value].chatId = firstchat.chatId;
 
     if (messages.value[indexnumber.value].messages.length == 2) {
       const firstsendmessage: firstSendMessage = {
@@ -208,13 +262,7 @@ async function sendmessage() {
       textarea.value = "";
       const firstchat: getFirstMessage = await getFirst(firstsendmessage);
 
-      // messages.value[indexnumber.value].messages[length - 1].content =
-      //   firstchat.content.assistant;
-
       messages.value[indexnumber.value].messages.pop();
-
-      // messages.value[indexnumber.value].messages[1].content =
-      //   firstchat.content.assistant;
 
       changeTitle.value.index = indexnumber.value;
       changeTitle.value.title = firstchat.content.title;
@@ -250,8 +298,6 @@ async function sendmessage() {
       const getchat: getMessage = await getmessage(sendmessage);
 
       messages.value[indexnumber.value].messages.pop();
-
-      console.log(messages.value[indexnumber.value].messages);
       try {
         await db.open();
         db.messages.add({
@@ -281,18 +327,17 @@ async function sendmessage() {
 
 watch(
   () => route.params.id,
-  async (newid) => {
+  (newid) => {
     const contentid = newid;
     firstclick.value = false;
+    console.log(newid);
     queryId.value = newid as string;
-    console.log(contentid);
-    console.log(indexnumber.value);
     if (contentid == "0") {
       indexnumber.value = -1;
       return;
     } else if (contentid == "1") {
       if (messages.value[indexnumber.value].messages.length > 0) {
-        await db.open();
+        db.open();
         db.messages
           .where("chatId")
           .equals(messages.value[indexnumber.value].chatId)
@@ -302,6 +347,7 @@ watch(
           .equals(messages.value[indexnumber.value].chatId)
           .delete();
         db.close();
+        console.log("delete success");
       }
       const deletechat: deleteChat = {
         apiKey: apikey.value,
@@ -312,7 +358,7 @@ watch(
       //   chatId: messages.value[indexnumber.value].chatId,
       // });
 
-      await deletemessage(deletechat);
+      deletemessage(deletechat);
 
       messages.value.splice(indexnumber.value, 1);
       indexnumber.value--;
@@ -322,6 +368,9 @@ watch(
       for (let i = 0; i < messages.value.length; i++) {
         if (messages.value[i].chatId == contentid) {
           indexnumber.value = i;
+          displayedMessages.value = currentMessages.value;
+          console.log(indexnumber.value);
+          console.log(messages.value);
           return;
         }
       }
@@ -331,10 +380,17 @@ watch(
       };
       messages.value.push(newmessage);
       indexnumber.value = messages.value.length - 1;
+      displayedMessages.value = currentMessages.value;
+      console.log(indexnumber.value);
     }
   }
 );
 
+const currentMessages = computed(() => {
+  console.log(messages.value[indexnumber.value]?.messages);
+  return messages.value[indexnumber.value]?.messages || [];
+});
+const displayedMessages = ref(currentMessages.value);
 // 在组件挂载时从 localStorage 中恢复值
 onMounted(() => {
   const savedInput = localStorage.getItem("input");
@@ -369,15 +425,21 @@ onMounted(async () => {
       apikey.value = firtRecord.apikey as string;
       model.value = firtRecord.model as string;
     }
+    if (!db.isOpen()) db.open();
     if ((await db.messagetitles.toArray()).length != 0) {
-      const chatIds = await getAllChatId();
+      const allMessageTitles = await db.messagetitles.toArray();
+      console.log(allMessageTitles);
+      const chatIds = allMessageTitles.map(
+        (messageTitle) => messageTitle.chatId
+      );
+
       for (const chatid of chatIds) {
         const messagesForChat = await db.messages
           .where("chatId")
           .equals(chatid)
           .toArray();
         const messages1: Chat = {
-          chatId: chatid.toString(),
+          chatId: chatid,
           messages: [],
         };
         messagesForChat.forEach((message) => {
@@ -391,6 +453,7 @@ onMounted(async () => {
           });
         });
         messages.value.push(messages1);
+        console.log(messages.value);
       }
     }
   } finally {
