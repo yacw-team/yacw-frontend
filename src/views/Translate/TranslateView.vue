@@ -116,11 +116,15 @@ const handleSubmit = async () => {
     to: toLang.value,
   };
 
-  axios
-    .post("/api/v1/translate/translate",req)
-    .then((response) => {
-      toText.value = response.data.content.translated;
-    })
+  const translateresult : GetTranslateResultRes = await getTranslateResult(req);
+
+  toText.value = translateresult.content.translated;
+
+  // axios
+  //   .post("/api/v1/translate/translate",req)
+  //   .then((response) => {
+  //     toText.value = response.data.content.translated;
+  //   })
 
   // allow user input
   fromTextReadOnly.value = false;
