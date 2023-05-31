@@ -8,7 +8,7 @@
             <div v-if="!start" style="width: 80%; ">
                 <div class="container">
                     <div class="card" v-for="(s, index) in all.story" :key="index" :title=s.Name :name=index>
-                        <img src="https://images.fallenlondon.com/icons/prisonwindow.png" />
+                            <img src="public\Image\prisonwindow.png" />
                         <div style="width: 100%;">
                             <h2 class="name">&emsp;{{ s.Name }}</h2>
                             <div class="content">&emsp;&emsp;{{ s.Description }}</div>
