@@ -1,23 +1,23 @@
 <template>
   <div class="flex flex-col md:flex-row">
-    <div class="w-full p-2 md:w-4/5">
-      <el-card>
+    <div class="flex flex-col w-full p-2 md:w-4/5">
+      <el-card class="flex-1">
         <el-input class="no-border larger-font" v-model="fromText" :rows="6" type="textarea" resize="none"
           placeholder="请输入待翻译的文本，输入完毕后请等待2-3秒，我们将给出结果" :readonly="fromTextReadOnly" @blur.stop="handleSubmit" />
       </el-card>
       <div class="flex my-2">
-        <el-icon size="20" class="flex-1 py-4" >
-          <Sort class="hover:cursor-pointer" @click="handleSwitchText"/>
+        <el-icon size="20" class="flex-1 py-4">
+          <Sort class="hover:cursor-pointer" @click="handleSwitchText" />
         </el-icon>
       </div>
-      <el-skeleton class="" :loading="toTextLoading" animated>
+      <el-skeleton :loading="toTextLoading" animated>
         <template #template>
           <el-card>
             <el-skeleton :rows="4" animated />
           </el-card>
         </template>
         <template #default>
-          <el-card>
+          <el-card class="flex-1">
             <el-input class="no-border larger-font" v-model="toText" :rows="6" type="textarea" resize="none"
               :readonly="toTextReadOnly" placeholder="翻译结果" />
           </el-card>
@@ -102,7 +102,7 @@ const handleSubmit = async () => {
   // start ToText loading
   toTextLoading.value = true;
 
-  
+
 
   const req: GetTranslateResultReq = {
     apiKey: apikey.value, // TODO: 从数据库中获取
@@ -117,7 +117,7 @@ const handleSubmit = async () => {
   };
 
   axios
-    .post("/api/v1/translate/translate",req)
+    .post("/api/v1/translate/translate", req)
     .then((response) => {
       toText.value = response.data.content.translated;
     })
