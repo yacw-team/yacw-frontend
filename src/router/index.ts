@@ -24,11 +24,15 @@ const router = createRouter({
       name: "chat",
       component: () => import("@/views/Chat/ChatView.vue"),
     },
-    
-       {
+    {
       path: "/game",
       name: "game",
       component: () => import("@/views/Game/gamePage.vue"),
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "notFound",
+      component: () => import("@/views/Error/404NotFound.vue"),
     }
   ],
 });
