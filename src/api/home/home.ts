@@ -12,7 +12,7 @@ export async function checkAPIKey(APIKey: string): Promise<string> {
         apiKey: APIKey,
     };
     try{
-        const response=await axios.post(URLs.CheckAPIKey, req);
+       await axios.post(URLs.CheckAPIKey, req);
         
         return "200";
 
