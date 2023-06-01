@@ -44,6 +44,24 @@ export async function getnewprompts(req:sendNewPrompt): Promise<Prompt> {
     return resData;
 }
 
+export async function getPromptsByType(type: string) {
+    let reqURL = "";
+    if (type != null) {
+        reqURL = URL.Getprompts + "?type=" + type;
+    } else {
+        reqURL = URL.Getprompts;
+    }
+    let resData: Prompt[] = [];
+    try {
+        const response = await axios.get(reqURL)
+        resData = response.data.Prompts;
+    } catch (error) {
+        console.error(error);
+        throw new Error('Failed to get message');
+    }
+    return resData;
+}
+
 export async function deleteprompts(req:sendPromptId): Promise<Prompt> {
     let resData: Prompt;
     try {
