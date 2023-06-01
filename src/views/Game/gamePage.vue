@@ -1,18 +1,11 @@
 <template>
-  <div class="whole_container" style>
+  <div class="whole_container">
     <TopBar />
-    <img src="public\Image\prison.png" style="width: 100%;" />
-
+    <img src="/Image/prison.png" style="width: 100%;" />
     <div v-if="!start" style="width: 100%; margin-top:10%">
       <div class="container">
-        <div
-          class="card"
-          v-for="(s, index) in all.story"
-          :key="index"
-          :title="s.Name"
-          :name="index"
-        >
-          <img src="public\Image\prisonwindow.png" />
+        <div class="card" v-for="(s, index) in all.story" :key="index" :title="s.Name" :name="index">
+          <img src="/Image/prisonwindow.png" />
           <div style="width: 100%;">
             <h2 class="name">&emsp;{{ s.Name }}</h2>
             <div class="content">&emsp;&emsp;{{ s.Description }}</div>
@@ -27,18 +20,12 @@
       <Loading />
     </div>
     <div v-else style="width: 100%;">
-      <Book
-        style="justify-self: center; width: 80%;"
-        :Name="getOneStory?.Name"
-        :GameId="getOneStory?.GameId"
-        :Description="getOneStory?.Description"
-        :Choice="myObject.choice"
-      />
+      <Book style="justify-self: center; width: 80%;" :Name="getOneStory?.Name" :GameId="getOneStory?.GameId"
+        :Description="getOneStory?.Description" :Choice="myObject.choice" />
     </div>
   </div>
 </template>
-  <script setup lang="ts">
-import axios from "axios";
+<script setup lang="ts">
 import { onMounted, ref, inject, watch, type Ref } from "vue";
 import TopBar from "./components/TopBarMenu.vue";
 import Book from "./bookTest.vue";
@@ -46,7 +33,7 @@ import Loading from "@/views/Game/components/Loading.vue";
 import { db } from "@/database/db";
 import type { selectStory } from "@/api/game/req";
 import type { getAllStory, getNewChoiceAndStory } from "@/api/game/res";
-import {Selectstory,Getallstory} from "@/api/game/game"
+import { Selectstory, Getallstory } from "@/api/game/game"
 
 interface story {
   GameId: string;
@@ -91,21 +78,19 @@ async function playGame(msg: getAllStory) {
         gameId: msg.GameId,
         modelId: ModelId.value,
       };
-      const get :getNewChoiceAndStory =await Selectstory(selectstory);
-      myObject.choice=get.choice;
-      console.log(get.choice,myObject.choice)
+      const get: getNewChoiceAndStory = await Selectstory(selectstory);
+      myObject.choice = get.choice;
+      console.log(get.choice, myObject.choice)
       console.log("22");
-      isLoading.value=false;
+      isLoading.value = false;
       console.log(isLoading.value)
     }
   } finally {
-    isLoading.value=false;
+    isLoading.value = false;
     db.close();
   }
-  isLoading.value=false;
+  isLoading.value = false;
 }
-
-
 
 watch(
   () => shouldShowGlobalComponentd.value,
@@ -117,38 +102,16 @@ watch(
 );
 
 onMounted(async () => {
-  all.value.story= await Getallstory();
-  // await axios
-  //   .get("/api/v1/game/story")
-  //   .then((response) => {
-  //     all.value.story = response.data;
-  //   })
-  //   .catch(() => {
-  //     all.value = {
-  //       story: [
-  //         {
-  //           GameId: "1",
-  //           Name: "岳阳楼记",
-  //           Description:
-  //             "庆历四年春，滕子京谪守巴陵郡。越明年，政通人和，百废具兴，乃重修岳阳楼，增其旧制，刻唐贤今人诗赋于其上，属予作文以记之。(具 通：俱)" +
-  //             "予观夫巴陵胜状，在洞庭一湖。衔远山，吞长江，浩浩汤汤，横无际涯，朝晖夕阴，气象万千，此则岳阳楼之大观也，前人之述备矣。然则北通巫峡，南极潇湘，迁客骚人，多会于此，览物之情，得无异乎？",
-  //         },
-  //         {
-  //           GameId: "1",
-  //           Name: "故事的名字2",
-  //           Description: "乱写的故事描述2,这个也不短",
-  //         },
-  //       ],
-  //     };
-  //   });
+  all.value.story = await Getallstory();
 });
 </script>
   
-  <style>
+<style>
 TopBar {
   height: fit-content;
   width: 100%;
 }
+
 .whole_container {
   background-color: #1d1d1d;
   padding: 0;
@@ -166,7 +129,8 @@ TopBar {
   margin-left: auto;
   margin-right: auto;
   max-width: 60rem;
-  justify-content: center; /* 水平居中 */
+  justify-content: center;
+  /* 水平居中 */
 }
 
 .card {
