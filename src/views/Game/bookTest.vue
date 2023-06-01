@@ -7,16 +7,12 @@
     </div>
     <div class="right-pane">
       <div v-if="currentStoryIndex == currentStoryIndex1" class="content">
-        <div v-if="isloading">
-          <el-skeleton :rows="5" animated />
-        </div>
-        <div v-else>
-          <button
-            v-for="(option, index) in currentStory.choice"
-            :key="index"
-            @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65), option[String.fromCharCode(index + 65)])"
-          >{{ String.fromCharCode(index + 65) }}.{{ option[String.fromCharCode(index + 65)] }}</button>
-        </div>
+
+      
+            <button v-for="(option, index) in currentStory.choice" :key="index"
+              @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65), option[String.fromCharCode(index + 65)])">{{
+                String.fromCharCode(index + 65) }}.{{ option[String.fromCharCode(index + 65)] }}</button>
+    
       </div>
       <div v-else class="content1">
         <div v-if="currentStoryIndex != 0">
@@ -27,9 +23,7 @@
           <h2>故事正在展开</h2>
           <p>接下来做出你的选择吧</p>
         </div>
-        <button
-          @click="() => { if (currentStoryIndex < currentStoryIndex1) currentStoryIndex++ }"
-        >下一页</button>
+        <button @click="() => { if (currentStoryIndex < currentStoryIndex1) currentStoryIndex++ }">下一页</button>
       </div>
     </div>
   </div>
@@ -60,7 +54,7 @@ const props = defineProps({
   GameId: String,
   Name: String,
   Description: String,
-
+  storyDescription: String,
   apiKey: String,
   modelId: String,
 
@@ -78,6 +72,7 @@ const myData = ref<getAllStory>({
 const isloading = ref(false);
 const currentStoryIndex = ref(0);
 const currentStoryIndex1 = ref(0);
+const storyDescription = ref("");
 const apiKey = ref("");
 const currentStory = computed(() => stories.value[currentStoryIndex.value]);
 const ModelId = ref("");
@@ -90,7 +85,7 @@ const stories = ref<getNewChoiceAndStory[]>([
   },
 ]);
 
-async function selectOption(next: number, choice: string, content: string) {
+function selectOption(next: number, choice: string, content: string) {
   //应先让它加载
   isloading.value = true;
   console.log(currentStoryIndex.value, currentStoryIndex1.value);
@@ -136,9 +131,10 @@ onMounted(() => {
   //   }
   apiKey.value = props.apiKey as string;
   ModelId.value = props.modelId as string;
+  storyDescription.value = props.storyDescription as string;
   console.log(apiKey.value, ModelId.value);
   stories.value.push({
-    story: myData.value.Description,
+    story: storyDescription.value,
     choice: props.Choice,
     round: 10,
   });
