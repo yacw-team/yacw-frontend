@@ -21,7 +21,7 @@
     </div>
     <div v-else style="width: 100%;">
       <Book style="justify-self: center; width: 80%;" :Name="getOneStory?.Name" :GameId="getOneStory?.GameId"
-        :Description="getOneStory?.Description" :Choice="myObject.choice" />
+        :Description="getOneStory?.Description" :Choice="myObject.choice" :apiKey="ApiKey" :modelId="ModelId" />
     </div>
   </div>
 </template>
@@ -57,6 +57,7 @@ const ApiKey = ref("");
 const ModelId = ref("");
 const isLoading = ref(false);
 
+
 async function playGame(msg: getAllStory) {
   shouldShowGlobalComponentd.value = false;
   start.value = true;
@@ -72,6 +73,7 @@ async function playGame(msg: getAllStory) {
       ModelId.value = firtRecord.model as string;
     }
 
+    console.log(ApiKey.value, ModelId.value);
     if (ApiKey.value != "" && ModelId.value != "") {
       const selectstory: selectStory = {
         apiKey: ApiKey.value,
