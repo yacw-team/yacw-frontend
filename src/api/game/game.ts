@@ -49,17 +49,18 @@ export async function Selectstory(req: selectStory): Promise<getNewChoiceAndStor
     }
 }
 
-export async function sendchoice(req: sendChoice): Promise<getNewChoiceAndStory> {
-    try {
-        const response = await axios.post(URL.SendChoice, req);
+export async function sendchoice(req: sendChoice):Promise<getNewChoiceAndStory> {
+    try{
+        const response = await axios.post(URL.SendChoice,req);
         const resData: getNewChoiceAndStory = response.data;
         return resData;
-    }
-    catch (error) {
+    }catch (error) {
+        // 处理错误
         return {
             story: "游戏结束了或因为网络问题而终止",//故事的发展剧情
             choice: [],
             round: -1,
         };
-    }
+      }
+   
 } 

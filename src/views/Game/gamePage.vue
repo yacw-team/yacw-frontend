@@ -21,7 +21,8 @@
     </div>
     <div v-else style="width: 100%;">
       <Book style="justify-self: center; width: 80%;" :Name="getOneStory?.Name" :GameId="getOneStory?.GameId"
-        :Description="getOneStory?.Description" :Choice="myObject.choice" />
+        :Description="getOneStory?.Description" :Choice="myObject.choice" :apiKey="ApiKey" :modelId="ModelId" 
+        :storyDescription="storyDescription"/>
     </div>
   </div>
 </template>
@@ -56,6 +57,7 @@ const getOneStory = ref<getAllStory>();
 const ApiKey = ref("");
 const ModelId = ref("");
 const isLoading = ref(false);
+const storyDescription=ref("")
 
 async function playGame(msg: getAllStory) {
   shouldShowGlobalComponentd.value = false;
@@ -72,18 +74,19 @@ async function playGame(msg: getAllStory) {
       ModelId.value = firtRecord.model as string;
     }
 
+    console.log(ApiKey.value, ModelId.value);
     if (ApiKey.value != "" && ModelId.value != "") {
       const selectstory: selectStory = {
         apiKey: ApiKey.value,
         gameId: msg.GameId,
         modelId: ModelId.value,
       };
-      const get: getNewChoiceAndStory = await Selectstory(selectstory);
-      myObject.choice = get.choice;
-      console.log(get.choice, myObject.choice)
-      console.log("22");
+       await Selectstory(selectstory).then((response)=>{
+        const get: getNewChoiceAndStory =response;
+        myObject.choice = get.choice;
+      storyDescription.value=get.story;
+      });
       isLoading.value = false;
-      console.log(isLoading.value)
     }
   } finally {
     isLoading.value = false;
