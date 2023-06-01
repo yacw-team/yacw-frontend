@@ -216,7 +216,7 @@ const chatContentRandered = (s:string)=>{
 }
 
 async function sendmessage() {
-  if (model.value != "") {
+  if (apikey.value != "" && model.value != "") {
     if (queryId.value == "0" || queryId.value == "1" || queryId.value == "") {
       //如果是在初始页面时候聊天 或 如果是在删除后聊天
       const newmessage = {
