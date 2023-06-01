@@ -28,6 +28,11 @@ const router = createRouter({
       path: "/loading",
       name: "load",
       component: () => import("@/components/Loading.vue"),
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "notFound",
+      component: () => import("@/views/Error/404NotFound.vue"),
     }
   ],
 });
