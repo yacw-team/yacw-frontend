@@ -1,42 +1,37 @@
 <template>
   <div class="notebook" @getStory="() => ElMessage.info('sss')">
     <div class="left-pane">
-      <h2>{{ myData.Name }}</h2>
-      <p>{{ currentStory.story }}</p>
-      <button @click="() => { if (currentStoryIndex >= 1) currentStoryIndex-- }">上一页</button>
+      <h2 class="dark:text-black pt-4">{{ myData.Name }}</h2>
+      <p class="dark:text-black">{{ currentStory.story }}</p>
+      <button class="dark:text-black" @click="() => { if (currentStoryIndex >= 1) currentStoryIndex-- }">上一页</button>
     </div>
     <div class="right-pane">
       <div v-if="currentStoryIndex == currentStoryIndex1" class="content">
         <el-skeleton style="width:100% ;padding:10px " :loading="loading" animated :rows="5">
           <template #template></template>
           <template #default>
-            <button
-              v-for="(option, index) in currentStory.choice"
-              :key="index"
-              @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65), option[String.fromCharCode(index + 65)])"
-            >{{ String.fromCharCode(index + 65) }}.{{ option[String.fromCharCode(index + 65)] }}</button>
+            <button class="dark:text-black" v-for="(option, index) in currentStory.choice" :key="index"
+              @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65), option[String.fromCharCode(index + 65)])">{{
+                String.fromCharCode(index + 65) }}.{{ option[String.fromCharCode(index + 65)] }}</button>
           </template>
         </el-skeleton>
       </div>
       <div v-else class="content1">
         <div v-if="currentStoryIndex != 0">
-          <h2>你的选择是</h2>
-          <p>{{ selectChoice[currentStoryIndex] }}</p>
+          <h2 class="dark:text-black">你的选择是</h2>
+          <p class="dark:text-black">{{ selectChoice[currentStoryIndex] }}</p>
         </div>
         <div v-else>
-          <h2>故事正在展开</h2>
-          <p>接下来做出你的选择吧</p>
+          <h2 class="dark:text-black">故事正在展开</h2>
+          <p class="dark:text-black">接下来做出你的选择吧</p>
         </div>
-        <button
-          @click="() => { if (currentStoryIndex < currentStoryIndex1) currentStoryIndex++ }"
-        >下一页</button>
+        <button class="dark:text-black" @click="() => { if (currentStoryIndex < currentStoryIndex1) currentStoryIndex++ }">下一页</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import axios from "axios";
 import { ElMessage } from "element-plus";
 import { ref, computed, onMounted, defineProps } from "vue";
 import type { sendChoice } from "@/api/game/req";

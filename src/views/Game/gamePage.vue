@@ -1,30 +1,33 @@
 <template>
   <div class="whole_container">
     <TopBar />
-    <img src="/Image/prison.png" style="width: 100%;" />
-    <div v-if="!start" style="width: 100%; margin-top:10%">
-      <div class="container">
-        <div class="card" v-for="(s, index) in all.story" :key="index" :title="s.Name" :name="index">
-          <img src="/Image/prisonwindow.png" />
-          <div style="width: 100%;">
-            <h2 class="name">&emsp;{{ s.Name }}</h2>
-            <div class="content">&emsp;&emsp;{{ s.Description }}</div>
-            <div style="display:flex;justify-content:flex-end;align-items:flex-end; ">
-              <el-button class="playButton" @click="playGame(s)">开始游玩</el-button>
+    <div class="flex flex-col">
+      <img src="/Image/prison.png" class="w-full flex-1" />
+      <div v-if="!start" class="w-full py-10 flex-1">
+        <div class="container w-4/5">
+          <div class="card" v-for="(s, index) in all.story" :key="index" :title="s.Name" :name="index">
+            <img src="/Image/prisonwindow.png" />
+            <div class="w-full">
+              <h2 class="font-bold text-xl my-2 ml-1 dark:text-black">&emsp;{{ s.Name }}</h2>
+              <div class="ml-10 dark:text-black">{{ s.Description }}</div>
+              <div style="display:flex;justify-content:flex-end;align-items:flex-end; ">
+                <el-button class="playButton mr-4 dark:text-black" @click="playGame(s)">开始游玩</el-button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div v-else-if="start && isLoading">
-      <Loading />
-    </div>
-    <div v-else style="width: 100%;">
-      <Book style="justify-self: center; width: 80%;" :Name="getOneStory?.Name" :GameId="getOneStory?.GameId"
-        :Description="getOneStory?.Description" :Choice="myObject.choice" />
+      <div v-else-if="start && isLoading">
+        <Loading />
+      </div>
+      <div v-else class="w-full py-10">
+        <Book style="justify-self: center; width: 80%;" :Name="getOneStory?.Name" :GameId="getOneStory?.GameId"
+          :Description="getOneStory?.Description" :Choice="myObject.choice" />
+      </div>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { onMounted, ref, inject, watch, type Ref } from "vue";
 import TopBar from "./components/TopBarMenu.vue";
@@ -141,18 +144,6 @@ TopBar {
   display: flex;
   flex-direction: row;
   padding: 8px;
-}
-
-.name {
-  font-weight: bolder;
-  font-size: larger;
-  display: block;
-  margin-block-start: 1em;
-  margin-block-end: 1em;
-}
-
-.content {
-  margin-left: 1em;
 }
 
 .playButton {
