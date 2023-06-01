@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import type { checkAPIKeyReq } from "./req";
-import { ca } from "element-plus/es/locale";
+
 
 const URLs = {
     CheckAPIKey: "/api/v1/chat/apiKey",
