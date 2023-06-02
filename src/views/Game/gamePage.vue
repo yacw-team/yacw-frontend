@@ -17,14 +17,14 @@
           </div>
         </div>
       </div>
+      <div v-else="start && isLoading">
+        <Loading />
+      </div>
     </div>
-    <div v-else-if="start && isLoading">
-      <Loading />
-    </div>
-    <div v-else style="width: 100%;">
+    <div style="width: 100%;">
       <Book style="justify-self: center; width: 80%;" :Name="getOneStory?.Name" :GameId="getOneStory?.GameId"
-        :Description="getOneStory?.Description" :Choice="myObject.choice" :apiKey="ApiKey" :modelId="ModelId" 
-        :storyDescription="storyDescription"/>
+        :Description="getOneStory?.Description" :Choice="myObject.choice" :apiKey="ApiKey" :modelId="ModelId"
+        :storyDescription="storyDescription" />
     </div>
   </div>
 </template>
@@ -60,7 +60,7 @@ const getOneStory = ref<getAllStory>();
 const ApiKey = ref("");
 const ModelId = ref("");
 const isLoading = ref(false);
-const storyDescription=ref("")
+const storyDescription = ref("")
 
 async function playGame(msg: getAllStory) {
   shouldShowGlobalComponentd.value = false;
@@ -84,10 +84,10 @@ async function playGame(msg: getAllStory) {
         gameId: msg.GameId,
         modelId: ModelId.value,
       };
-       await Selectstory(selectstory).then((response)=>{
-        const get: getNewChoiceAndStory =response;
+      await Selectstory(selectstory).then((response) => {
+        const get: getNewChoiceAndStory = response;
         myObject.choice = get.choice;
-      storyDescription.value=get.story;
+        storyDescription.value = get.story;
       });
       isLoading.value = false;
     }
