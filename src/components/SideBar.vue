@@ -46,7 +46,7 @@
       <el-card class="my-4" shadow="never">
         <div>
           <span class="mr-2">后端地址</span>
-          <el-input v-model="newURL" class="my-4" placeholder="请输入后端地址" disabled="" />
+          <el-input v-model="newURL" class="my-4" placeholder="请输入后端地址"  />
           <el-button class="bg-blue-400 dark:bg-blue-600" type="primary" @click="changeUrl">设置</el-button>
         </div>
       </el-card>
@@ -76,7 +76,7 @@ import {
 } from '@element-plus/icons-vue'
 import { useDark, useToggle } from "@vueuse/core";
 import { clearMessageData } from '@/database/db';
-import { ElMessageBox } from 'element-plus';
+import { ElMessageBox, ElNotification  } from 'element-plus';
 import axios from 'axios';
 const dialogVisuable = ref(false);
 const newURL=ref()
@@ -87,6 +87,10 @@ const isCollapse = ref(true);
 
 const changeUrl= ()=>{
   axios.defaults.baseURL=newURL.value;
+      ElNotification.success({
+        title: '成功',
+        message: '后端地址保存成功'
+      });
 }
 
 const handleClearMessageData = () => {
