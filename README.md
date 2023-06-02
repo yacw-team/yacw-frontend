@@ -1,52 +1,47 @@
-# yacw-frontend
+![](./img/header.png)
 
-This template should help get you started developing with Vue 3 in Vite.
+<h1 align="center">YACW Frontend</h1>
+<h2 align="center">YACW 项目前端仓库</h2>
 
-## Recommended IDE Setup
+<p align="center"><a href="https://yacw.laoliu.icu">测试站点</a></p>
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+是的，又一个 ChatGPT 网页客户端。
 
-## Type Support for `.vue` Imports in TS
+由 Vue + Element-Plus 构建，前后端分离部署。
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+### 免费 & 开源
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+我们提供源代码，您可以将其部署在任何地方──服务器、电脑，甚至是您的手机上。
 
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+### 注重隐私
 
-## Customize configuration
+我们不会收集任何敏感信息，并采取了多种措施确保所有数据的安全性。
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+### 用户体验优先
 
-## Project Setup
+我们希望可以为您带来最佳的 ChatGPT 使用体验。
 
-```sh
-npm install
+## 自部署
+
+### 使用 Docker Compose *推荐
+
+前往 [yacw](https://github.com/yacw-team/yacw) 仓库。
+
+### 使用 Docker 启动前端
+
+```bash
+docker run -d --name yacw-frontend -p 80:80 laoliu233/yacw-frontend
 ```
 
-### Compile and Hot-Reload for Development
+### 直接启动前端    *开发用途
 
-```sh
+```bash
+# 使用 npm
 npm run dev
+# 使用 yarn
+yarn dev
 ```
 
-### Type-Check, Compile and Minify for Production
+## 反馈
 
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+如果您在使用中有任何问题，请在 GitHub Issue 中提出。
