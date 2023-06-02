@@ -1,11 +1,12 @@
 <template>
-  <div class="notebook" v-loading="isloading">
+  <div class="notebook" >
     <div class="left-pane">
       <h2 class="dark:text-black pt-4">{{ myData.Name }}</h2>
       <p class="dark:text-black">{{ currentStory.story }}</p>
       <button class="dark:text-black" @click="() => { if (currentStoryIndex >= 1) currentStoryIndex-- }">上一页</button>
     </div>
-    <div class="right-pane">
+    <div class="right-pane" >
+    
       <div v-if="currentStoryIndex == currentStoryIndex1" class="content">
         <button v-for="(option, index) in currentStory.choice" :key="index"
           @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65), option[String.fromCharCode(index + 65)])">{{
