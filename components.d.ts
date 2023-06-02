@@ -9,11 +9,6 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    AIcharacter: typeof import('./src/components/AIcharacter.vue')['default']
-    ChatInput: typeof import('./src/components/chatInput.vue')['default']
-    ClickPop: typeof import('./src/components/ClickPop.vue')['default']
-    CreatePersonality: typeof import('./src/components/CreatePersonality.vue')['default']
-    CreatePrompt: typeof import('./src/components/CreatePrompt.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCol: typeof import('element-plus/es')['ElCol']
@@ -27,23 +22,20 @@ declare module '@vue/runtime-core' {
     ElMain: typeof import('element-plus/es')['ElMain']
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
+    ElOption: typeof import('element-plus/es')['ElOption']
     ElPagination: typeof import('element-plus/es')['ElPagination']
     ElRow: typeof import('element-plus/es')['ElRow']
+    ElSelect: typeof import('element-plus/es')['ElSelect']
+    ElSkeleton: typeof import('element-plus/es')['ElSkeleton']
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElText: typeof import('element-plus/es')['ElText']
-    EnterKey: typeof import('./src/components/EnterKey.vue')['default']
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    GetAllStory: typeof import('./src/components/getAllStory.vue')['default']
+    Loading: typeof import('./src/components/Loading.vue')['default']
     LookDetailsPrompt: typeof import('./src/components/LookDetailsPrompt.vue')['default']
-    ModalItem: typeof import('./src/components/ModalItem.vue')['default']
-    Openinterface: typeof import('./src/components/Openinterface.vue')['default']
-    PromptLibrary: typeof import('./src/components/PromptLibrary.vue')['default']
     PromptShop: typeof import('./src/components/PromptShop.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SideBar: typeof import('./src/components/SideBar.vue')['default']
-  }
-  export interface ComponentCustomProperties {
-    vInfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']
   }
 }

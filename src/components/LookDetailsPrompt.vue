@@ -62,21 +62,6 @@ const myData = reactive<Jsondata>({
 const emit = defineEmits(['usePrompt']);
 
 
-
-//原本的实现方式-----使用router.push传递参数
-
-// const router = useRouter();
-
-// function handleClick() {
-//   const data = JSON.stringify(myData.prompts);
-//   //const encodedData = encodeURIComponent(data);
-//   router.push({ name: 'chatInput1', query: { data:data } });
-//   // const data = JSON.stringify(myData.prompts);
-//   // router.push({ name: 'test3', query: { data:data } });
-
-//   console.log(data)
-// }
-
 function handleClick(){
   emit('usePrompt',myData.prompts);
 }

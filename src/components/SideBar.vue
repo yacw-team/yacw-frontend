@@ -1,130 +1,132 @@
 <template>
-  <div class="sidebar-container">
-    <el-menu :collapsed="isCollapsed" default-active="1">
-      <router-link to="/">
-        <el-menu-item index="1">
-          <i :class="isCollapsed ? 'el-icon-s-promotion' : 'el-icon-picture'">
-            <HomeFilled />
-          </i>
-          <span>{{ isCollapsed ? "" : "主页" }}</span>
-        </el-menu-item>
-      </router-link>
-      <router-link to="/chat/1">
-        <el-menu-item index="2">
-          <i :class="isCollapsed ? 'el-icon-s-home' : 'el-icon-s-management'">
-            <ChatRound />
-          </i>
-          <span>{{ isCollapsed ? "" : "聊天" }}</span>
-        </el-menu-item>
-      </router-link>
-      <router-link to="/translate">
-        <el-menu-item index="3">
-          <i
-            :class="isCollapsed ? 'el-icon-s-comment' : 'el-icon-phone-outline'"
-          >
-            <Document />
-          </i>
-          <span>{{ isCollapsed ? "" : "翻译" }}</span>
-        </el-menu-item>
-      </router-link>
-      <div @click="handleUnderConstruction">
-        <el-menu-item index="4">
-          <i :class="isCollapsed ? 'el-icon-s-flag' : 'el-icon-s-platform'">
-            <Help />
-          </i>
-          <span>{{ isCollapsed ? "" : "心理咨询" }}</span>
-        </el-menu-item>
-      </div>
-      <div @click="handleUnderConstruction">
-        <el-menu-item index="5">
-          <i
-            :class="isCollapsed ? 'el-icon-s-custom' : 'el-icon-data-analysis'"
-          >
-            <SwitchFilled />
-          </i>
-          <span>{{ isCollapsed ? "" : "游戏" }}</span>
-        </el-menu-item>
-      </div>
+  <div>
+    <el-button class="ml-4 mt-2" :icon="isCollapse ? Expand : Fold" circle @click="isCollapse = !isCollapse" />
+    <el-menu class="el-menu-vertical-demo min-w-40" :collapse="isCollapse">
+      <el-menu-item id="firstItem" index="0"></el-menu-item>
+      <el-menu-item index="1" @click="$router.push('/')">
+        <el-icon>
+          <HomeFilled />
+        </el-icon>
+        <template #title>主页</template>
+      </el-menu-item>
+      <el-menu-item index="2" @click="$router.push('/chat/0')">
+        <el-icon>
+          <ChatDotRound />
+        </el-icon>
+        <template #title>聊天</template>
+      </el-menu-item>
+      <el-menu-item index="3" @click="$router.push('/translate')">
+        <el-icon>
+          <Document />
+        </el-icon>
+        <template #title>翻译</template>
+      </el-menu-item>
+      <el-menu-item index="4" @click="$router.push('/game')">
+        <el-icon>
+          <SwitchFilled />
+        </el-icon>
+        <template #title>游戏</template>
+      </el-menu-item>
+      <el-menu-item @click="dialogVisuable = true">
+        <el-icon>
+          <Tools />
+        </el-icon>
+        <template #title>设置</template>
+      </el-menu-item>
     </el-menu>
-    <el-button
-      style="border: none"
-      class="collapse-btn"
-      @click="toggleCollapse"
-      circle
-    >
-      <el-icon
-        ><Expand v-if="isCollapsed" /><Fold v-if="!isCollapsed"
-      /></el-icon>
-    </el-button>
+    <el-dialog v-model="dialogVisuable" title="设置" width="30%">
+      <!-- 设置白天/黑暗模式 -->
+      <el-card class="-mt-4" shadow="never">
+        <div>
+          <span class="mr-2"> {{ isDark ? "黑暗模式" : "白天模式" }} </span>
+          <el-switch v-model="isDark" inline-prompt :active-icon="Moon" :inactive-icon="Sunny" />
+        </div>
+      </el-card>
+      <!-- 设置后端地址 -->
+      <el-card class="my-4" shadow="never">
+        <div>
+          <span class="mr-2">后端地址</span>
+          <el-input v-model="newURL" class="my-4" placeholder="请输入后端地址"  />
+          <el-button class="bg-blue-400 dark:bg-blue-600" type="primary" @click="changeUrl">设置</el-button>
+        </div>
+      </el-card>
+      <!-- 清除浏览器数据库 -->
+      <el-card shadow="never">
+        <div>
+          <div class="mr-2 mb-2">清除浏览器数据库</div>
+          <el-button class="bg-red-400 dark:bg-red-600" type="danger" @click="handleClearMessageData">清除</el-button>
+        </div>
+      </el-card>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue'
 import {
-  ChatRound,
-  Help,
-  SwitchFilled,
   Document,
+  ChatDotRound,
   HomeFilled,
-  Expand,
+  SwitchFilled,
+  Tools,
+  Sunny,
+  Moon,
   Fold,
-} from "@element-plus/icons-vue";
-import { ElButton, ElMessage } from "element-plus";
-import 'element-plus/es/components/message/style/css'
+  Expand
+} from '@element-plus/icons-vue'
+import { useDark, useToggle } from "@vueuse/core";
+import { clearMessageData } from '@/database/db';
+import { ElMessageBox, ElNotification  } from 'element-plus';
+import axios from 'axios';
+const dialogVisuable = ref(false);
+const newURL=ref()
+const isDark = useDark();
+const toggleDark = useToggle(isDark);
 
-const isCollapsed = ref(false);
+const isCollapse = ref(true);
 
-function toggleCollapse(): void {
-  isCollapsed.value = !isCollapsed.value;
+const changeUrl= ()=>{
+  axios.defaults.baseURL=newURL.value;
+      ElNotification.success({
+        title: '成功',
+        message: '后端地址保存成功'
+      });
 }
 
-const handleUnderConstruction = () => {
-  ElMessage('功能开发中，敬请期待！')
+const handleClearMessageData = () => {
+  ElMessageBox.confirm(
+    '确认删除所有本地对话记录吗？',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'error'
+    }
+  )
+  .then(() => {
+    clearMessageData();
+    ElMessageBox.alert('删除成功', '提示', {
+      confirmButtonText: '确定',
+      type: 'success'
+    })
+    .catch(() => {
+      ElMessageBox.alert('删除失败', '提示', {
+        confirmButtonText: '确定',
+        type: 'error'
+      })
+    });
+  })
 }
 </script>
 
-<style scoped>
-.sidebar-container {
-  position: relative;
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  border-left: 1px solid #ccc;
-  padding-top: 50px;
-}
-.collapse-btn {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
+<style>
+.el-menu-vertical-demo:not(.el-menu--collapse) {
+  width: 120px;
+  min-height: 400px;
 }
 
-@media (min-width: 960px) {
-  .sidebar-container {
-    flex-direction: row;
-  }
-
-  el-menu {
-    width: 200px;
-  }
-
-  el-menu-item {
-    display: flex;
-    align-items: center;
-
-    justify-content: center;
-  }
-
-  el-menu-item i {
-    font-size: 16px;
-    margin-right: 0;
-  }
-
-  el-menu-item span {
-    display: inline-block;
-    margin-left: 5px;
-    white-space: nowrap;
-  }
+#firstItem {
+  width: 65px;
+  height: 0px;
 }
 </style>

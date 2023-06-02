@@ -24,7 +24,7 @@ export async function getTranslateResult(
     .post(URL.TRANSLATE, reqData)
     .then((response) => {
       res = response.data;
-      console.log(res.content.translated)
+     
       return res;
     })
     .catch((error) => {
