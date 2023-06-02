@@ -20,7 +20,8 @@
           <h2 class="dark:text-black">故事正在展开</h2>
           <p class="dark:text-black">接下来做出你的选择吧</p>
         </div>
-        <button class="dark:text-black" @click="() => { if (currentStoryIndex < currentStoryIndex1) currentStoryIndex++ }">下一页</button>
+        <button class="dark:text-black"
+          @click="() => { if (currentStoryIndex < currentStoryIndex1) currentStoryIndex++ }">下一页</button>
       </div>
     </div>
   </div>
@@ -52,14 +53,7 @@ const myData = ref<getAllStory>({
   Name: props.Name as string,
   Description: props.Description as string,
 });
-const isloading = ref(false);
-const currentStoryIndex = ref(0);
-const currentStoryIndex1 = ref(0);
-const storyDescription = ref("");
-const apiKey = ref("");
-const currentStory = computed(() => stories.value[currentStoryIndex.value]);
-const ModelId = ref("");
-const selectChoice = ref<string[]>([""]);
+
 const stories = ref<getNewChoiceAndStory[]>([
   {
     story: myData.value.Description,
@@ -68,10 +62,18 @@ const stories = ref<getNewChoiceAndStory[]>([
   },
 ]);
 
+const isloading = ref(false);
+const currentStoryIndex = ref(0);
+const currentStoryIndex1 = ref(0);
+const storyDescription = ref("");
+const apiKey = ref("");
+const currentStory = computed(() => stories.value[currentStoryIndex.value]);
+const ModelId = ref("");
+const selectChoice = ref<string[]>([""]);
+
 function selectOption(next: number, choice: string, content: string) {
   //应先让它加载
   isloading.value = true;
-  console.log("loading is true")
   try {
     const sendachoice: sendChoice = {
       apiKey: apiKey.value,
@@ -85,7 +87,6 @@ function selectOption(next: number, choice: string, content: string) {
       })
       .finally(() => {
         isloading.value = false;
-        console.log("loading is false")
       });
     //把选择的放在右侧，让玩家回顾
     selectChoice.value.push(content);
@@ -102,7 +103,6 @@ onMounted(() => {
   apiKey.value = props.apiKey as string;
   ModelId.value = props.modelId as string;
   storyDescription.value = props.storyDescription as string;
-  console.log(apiKey.value, ModelId.value);
   stories.value.push({
     story: storyDescription.value,
     choice: props.Choice,

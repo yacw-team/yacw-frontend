@@ -1,5 +1,5 @@
 <template>
-  <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false" @select="handleSelect">
+  <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false">
     <el-menu-item index="0">YACW</el-menu-item>
     <div class="flex-grow" />
     <el-menu-item index="1" text @click="dialogTableVisible = true">帮助</el-menu-item>
@@ -12,9 +12,7 @@
   </el-menu>
 </template>
 
-
 <script setup lang="ts">
-
 import { ref, inject, type Ref } from 'vue'
 const dialogTableVisible = ref(false)
 const shouldShowGlobalComponent = inject('shouldShowGlobalComponent') as Ref<boolean>
@@ -24,10 +22,6 @@ function showGlobalComponent() {
 }
 
 const activeIndex = ref('1')
-const handleSelect = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
-}
-
 </script>
 
 <style>
@@ -51,10 +45,9 @@ const handleSelect = (key: string, keyPath: string[]) => {
   margin-right: 10px;
 }
 
-.message-size{
+.message-size {
   font-size: larger;
-  font-style:normal;
+  font-style: normal;
   font-weight: 1000;
 }
-
 </style>
