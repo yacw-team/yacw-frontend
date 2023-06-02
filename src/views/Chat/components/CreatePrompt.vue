@@ -48,7 +48,7 @@ const emit = defineEmits(["createPrompt"]);
 const apiKey = ref("");
 const dialogVisible = ref(true);
 const form = ref<Form>({ name: "", description: "", prompts: "" });
-// let data: Data = { id: "", name: "", description: "", prompts: "" };
+
 let data:Prompt; 
 
 const rules = {

@@ -123,9 +123,9 @@ onMounted(() => {
   axios
     .get("/api/v1/chat/personality")
     .then((response) => {
-      console.log('send success')
+   
       filteredPersonalities.value = response.data;
-      console.log("获取的后端personality" + filteredPersonalities.value)
+  
     })
     .catch(() => {
       filteredPersonalities.value = props;

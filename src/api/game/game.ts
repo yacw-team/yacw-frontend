@@ -40,7 +40,7 @@ export async function Selectstory(req: selectStory): Promise<getNewChoiceAndStor
         return resData;
     }
     catch (error) {
-        console.log("11");
+     
         return {
             story: "游戏结束了或因为网络问题而终止",//故事的发展剧情
             choice: [],
