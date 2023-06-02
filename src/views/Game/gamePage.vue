@@ -17,7 +17,7 @@
           </div>
         </div>
       </div>
-      <div v-else="start && isLoading">
+      <div v-else>
         <Loading />
       </div>
     </div>
@@ -33,29 +33,26 @@
 import { onMounted, ref, inject, watch, type Ref } from "vue";
 import TopBar from "./components/TopBarMenu.vue";
 import Book from "./bookTest.vue";
-import Loading from "@/views/Game/components/Loading.vue";
+import Loading from "@/views/Game/components/LoadingView.vue";
 import { db } from "@/database/db";
 import type { selectStory } from "@/api/game/req";
 import type { getAllStory, getNewChoiceAndStory } from "@/api/game/res";
 import { Selectstory, Getallstory } from "@/api/game/game"
 
-interface story {
-  GameId: string;
-  Name: string;
-  Description: string;
-}
 interface MyInterface {
   choice: Array<{ [key: string]: string }>;
 }
+
 let myObject: MyInterface = {
   choice: [],
 };
-const all = ref({ story: [] as getAllStory[] });
-const start = ref(false);
+
 const shouldShowGlobalComponentd = inject(
   "shouldShowGlobalComponent"
 ) as Ref<boolean>;
-//const selectStory = ref<story>();
+
+const all = ref({ story: [] as getAllStory[] });
+const start = ref(false);
 const getOneStory = ref<getAllStory>();
 const ApiKey = ref("");
 const ModelId = ref("");
@@ -66,7 +63,6 @@ async function playGame(msg: getAllStory) {
   shouldShowGlobalComponentd.value = false;
   start.value = true;
   getOneStory.value = msg;
-  console.log(getOneStory.value.Name);
   isLoading.value = true;
   try {
     await db.open();
@@ -76,8 +72,6 @@ async function playGame(msg: getAllStory) {
       ApiKey.value = firtRecord.apikey as string;
       ModelId.value = firtRecord.model as string;
     }
-
-    console.log(ApiKey.value, ModelId.value);
     if (ApiKey.value != "" && ModelId.value != "") {
       const selectstory: selectStory = {
         apiKey: ApiKey.value,
@@ -100,7 +94,7 @@ async function playGame(msg: getAllStory) {
 
 watch(
   () => shouldShowGlobalComponentd.value,
-  (newVal) => {
+  () => {
     if (shouldShowGlobalComponentd.value == true) {
       start.value = false;
     }
