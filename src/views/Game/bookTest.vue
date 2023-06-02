@@ -1,9 +1,9 @@
 <template>
   <div class="notebook" v-loading="isloading">
     <div class="left-pane">
-      <h2>{{ myData.Name }}</h2>
-      <p>{{ currentStory.story }}</p>
-      <button @click="() => { if (currentStoryIndex >= 1) currentStoryIndex-- }">上一页</button>
+      <h2 class="dark:text-black pt-4">{{ myData.Name }}</h2>
+      <p class="dark:text-black">{{ currentStory.story }}</p>
+      <button class="dark:text-black" @click="() => { if (currentStoryIndex >= 1) currentStoryIndex-- }">上一页</button>
     </div>
     <div class="right-pane">
       <div v-if="currentStoryIndex == currentStoryIndex1" class="content">
@@ -13,14 +13,14 @@
       </div>
       <div v-else class="content1">
         <div v-if="currentStoryIndex != 0">
-          <h2>你的选择是</h2>
-          <p>{{ selectChoice[currentStoryIndex] }}</p>
+          <h2 class="dark:text-black">你的选择是</h2>
+          <p class="dark:text-black">{{ selectChoice[currentStoryIndex] }}</p>
         </div>
         <div v-else>
-          <h2>故事正在展开</h2>
-          <p>接下来做出你的选择吧</p>
+          <h2 class="dark:text-black">故事正在展开</h2>
+          <p class="dark:text-black">接下来做出你的选择吧</p>
         </div>
-        <button @click="() => { if (currentStoryIndex < currentStoryIndex1) currentStoryIndex++ }">下一页</button>
+        <button class="dark:text-black" @click="() => { if (currentStoryIndex < currentStoryIndex1) currentStoryIndex++ }">下一页</button>
       </div>
     </div>
   </div>

@@ -1,7 +1,7 @@
 <template>
-  <el-card class="my-2 hover:cursor-pointer">
+  <el-card class="my-2 hover:cursor-pointer"  @click="handleChatSelect">
     <div class="flex flex-row items-center justify-center -my-2">
-      <div class="flex items-center" @click="handleChatSelect">
+      <div class="flex items-center">
         <el-icon size="20">
           <ChatLineSquare />
         </el-icon>
@@ -41,23 +41,28 @@ import { ref, defineProps } from "vue";
 import { useRouter } from "vue-router";
 import type { PropType } from "vue";
 import { ChatLineSquare, Edit, Delete } from "@element-plus/icons-vue";
+import { el } from "element-plus/es/locale";
 
 const router = useRouter();
 
 const input = ref("");
 const changeTitleDialogVisiable = ref(false);
 const deleteChatDialogVisiable = ref(false);
+const newId = ref();
 
 const emit = defineEmits<{
   (e: "deleteChat", chatId: string): void;
 }>();
 
 const handleChatSelect = () => {
+  newId.value = conversation.chatID;
   router.push({ name: "chat", params: { id: conversation.chatID } });
 };
 
 const opendialog = () => {
-  changeTitleDialogVisiable.value = true;
+  if(newId.value == conversation.chatID ){
+    changeTitleDialogVisiable.value = true;
+  }
 };
 
 const closedialog = () => {
@@ -69,7 +74,9 @@ const closedialog = () => {
 };
 
 const handleDeleteChat = () => {
-  deleteChatDialogVisiable.value = true;
+  if(newId.value == conversation.chatID ){
+    deleteChatDialogVisiable.value = true;
+  }
 };
 
 const deleteChat = () => {
