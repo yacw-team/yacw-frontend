@@ -17,14 +17,14 @@
           </div>
         </div>
       </div>
-      <div v-else>
+      <div v-else-if="isLoading && start">
         <Loading />
       </div>
-    </div>
-    <div style="width: 100%;">
+      <div v-else style="width: 100%;">
       <Book style="justify-self: center; width: 80%;" :Name="getOneStory?.Name" :GameId="getOneStory?.GameId"
         :Description="getOneStory?.Description" :Choice="myObject.choice" :apiKey="ApiKey" :modelId="ModelId"
         :storyDescription="storyDescription" />
+    </div>
     </div>
   </div>
 </template>
