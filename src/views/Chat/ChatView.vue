@@ -181,7 +181,7 @@ async function sendmessage() {
       messages.value.push(newmessage);
       indexnumber.value = messages.value.length - 1;
       changeTitle.value.index = indexnumber.value;
-      console.log(indexnumber.value);
+    
     }
     //之后聊天在某一对话中发送对话
     const userMessage: Message = {
@@ -196,7 +196,7 @@ async function sendmessage() {
       type: "assistant",
       content: "",
     });
-    console.log(isLoading.value && firstclick.value);
+   
 
     if (messages.value[indexnumber.value].messages.length == 2) {
       const firstsendmessage: firstSendMessage = {
@@ -266,7 +266,7 @@ async function sendmessage() {
     }
 
     isLoading.value = false;
-    console.log(isLoading.value && firstclick.value);
+  
   } else {
     //缺乏apikey的dialog
     ElMessage({
@@ -281,13 +281,14 @@ watch(
   (newid) => {
     const contentid = newid;
     firstclick.value = false;
-    console.log(newid);
+   
     queryId.value = newid as string;
     if (contentid == "0") {
       indexnumber.value = -1;
       return;
     } else if (contentid == "1") {
       if (messages.value[indexnumber.value].messages.length > 0) {
+       
         db.open();
         db.messages
           .where("chatId")
@@ -298,26 +299,25 @@ watch(
           .equals(messages.value[indexnumber.value].chatId)
           .delete();
         db.close();
-        console.log("delete success");
-      }
+       
+     }
       const deletechat: deleteChat = {
         apiKey: apikey.value,
         chatId: messages.value[indexnumber.value].chatId,
       };
 
       deletemessage(deletechat);
-
+ 
       messages.value.splice(indexnumber.value, 1);
       indexnumber.value--;
       return;
     } else {
-      // console.log(messages.value.length);
+   
       for (let i = 0; i < messages.value.length; i++) {
         if (messages.value[i].chatId == contentid) {
           indexnumber.value = i;
           displayedMessages.value = currentMessages.value;
-          console.log(indexnumber.value);
-          console.log(messages.value);
+    
           return;
         }
       }
@@ -328,13 +328,13 @@ watch(
       messages.value.push(newmessage);
       indexnumber.value = messages.value.length - 1;
       displayedMessages.value = currentMessages.value;
-      console.log(indexnumber.value);
+  
     }
   }
 );
 
 const currentMessages = computed(() => {
-  console.log(messages.value[indexnumber.value]?.messages);
+
   return messages.value[indexnumber.value]?.messages || [];
 });
 const displayedMessages = ref(currentMessages.value);
@@ -357,8 +357,7 @@ watch(
 
 function getCharacterinfo(msg: Personality) {
   characterid.value = msg.id;
-  console.log(characterid.value);
-  console.log(msg);
+
   Character.value = msg;
   isShowCharacter.value = true;
 }
@@ -375,7 +374,7 @@ onMounted(async () => {
     if (!db.isOpen()) db.open();
     if ((await db.messagetitles.toArray()).length != 0) {
       const allMessageTitles = await db.messagetitles.toArray();
-      console.log(allMessageTitles);
+
       const chatIds = allMessageTitles.map(
         (messageTitle) => messageTitle.chatId
       );
@@ -400,7 +399,7 @@ onMounted(async () => {
           });
         });
         messages.value.push(messages1);
-        console.log(messages.value);
+    
       }
     }
   } finally {

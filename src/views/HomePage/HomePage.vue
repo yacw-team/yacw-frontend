@@ -232,7 +232,7 @@ const handleSelectModelSubmit = async (modelValue: string) => {
         apikey: "",
         model: modelValue,
       });
-      console.log(firtRecord);
+      
     }
   } finally {
     db.close();

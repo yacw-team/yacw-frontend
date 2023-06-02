@@ -53,10 +53,10 @@ onMounted(async () => {
 
   await db.open();
   const data = await db.messagetitles.toArray();
-  console.log(data);
+
 
   if (data.length != 0) {
-    console.log(data);
+  
     data.forEach((msgtitle) => {
       conversations.value.push({
         chatId: msgtitle.chatId,
@@ -86,7 +86,7 @@ const handleAddNewChat = () => {
 watch(
   () => newTitle.newId,
   (newval) => {
-    console.log(newTitle.newId);
+  
     const newConversation: ChatConversation = {
       chatId: newTitle.newId as string,
       title: "新对话",
@@ -107,17 +107,13 @@ const router = useRouter();
 watch(
   () => newTitle.changeTitle,
   (newval) => {
-    console.log(newTitle);
+
     if (newTitle.changeTitleIndex != undefined) {
       conversations.value[
         newTitle.changeTitleIndex
       ].title = newTitle.changeTitle as string;
       hasNewChat.value = false;
-      // router.push({
-      //   name: "chat",
-      //   params: { id: conversations.value[newTitle.changeTitleIndex].chatId },
-      // });
-      // location.reload();
+   
     }
   }
 );
@@ -130,13 +126,14 @@ const handleDeleteChat = (chatId: string) => {
   const indexToDelete = conversations.value.findIndex(
     (conversation) => conversation.chatId === chatId
   );
-  console.log(indexToDelete);
+
   if (indexToDelete == conversations.value.length - 1) {
     hasNewChat.value = false;
     conversations.value.splice(indexToDelete, 1);
   } else if (indexToDelete !== -1) {
     conversations.value.splice(indexToDelete, 1);
   }
-  // router.push({ name: "chat", params: { id: "1" } });
+  
+ 
 };
 </script>

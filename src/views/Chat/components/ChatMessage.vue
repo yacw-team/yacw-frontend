@@ -50,12 +50,7 @@ const props = defineProps({
     type: Boolean,
   },
 });
-// const newcontent =ref('');
-// watch(()=>props.chatContent,
-// (newval)=>{
-//   console.log(newcontent.value)
-//   newcontent.value=newval;
-// })
+
   
 marked.setOptions({
   highlight: function (code, lang) {

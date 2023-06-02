@@ -1,7 +1,7 @@
 <template>
-  <el-card class="my-2 hover:cursor-pointer"  @click="handleChatSelect">
+  <el-card class="my-2 hover:cursor-pointer"  >
     <div class="flex flex-row items-center justify-center -my-2">
-      <div class="flex items-center">
+      <div class="flex items-center" @click="handleChatSelect">
         <el-icon size="20">
           <ChatLineSquare />
         </el-icon>
@@ -48,21 +48,21 @@ const router = useRouter();
 const input = ref("");
 const changeTitleDialogVisiable = ref(false);
 const deleteChatDialogVisiable = ref(false);
-const newId = ref();
+
 
 const emit = defineEmits<{
   (e: "deleteChat", chatId: string): void;
 }>();
 
 const handleChatSelect = () => {
-  newId.value = conversation.chatID;
+ 
   router.push({ name: "chat", params: { id: conversation.chatID } });
 };
 
 const opendialog = () => {
-  if(newId.value == conversation.chatID ){
+
     changeTitleDialogVisiable.value = true;
-  }
+  
 };
 
 const closedialog = () => {
@@ -74,9 +74,9 @@ const closedialog = () => {
 };
 
 const handleDeleteChat = () => {
-  if(newId.value == conversation.chatID ){
+ 
     deleteChatDialogVisiable.value = true;
-  }
+  
 };
 
 const deleteChat = () => {
