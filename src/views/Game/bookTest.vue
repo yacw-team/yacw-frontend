@@ -1,5 +1,5 @@
 <template>
-  <div class="notebook" @getStory="() => ElMessage.info('sss')">
+  <div class="notebook" v-loading="isloading">
     <div class="left-pane">
       <h2>{{ myData.Name }}</h2>
       <p>{{ currentStory.story }}</p>
@@ -7,12 +7,9 @@
     </div>
     <div class="right-pane">
       <div v-if="currentStoryIndex == currentStoryIndex1" class="content">
-
-      
-            <button v-for="(option, index) in currentStory.choice" :key="index"
-              @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65), option[String.fromCharCode(index + 65)])">{{
-                String.fromCharCode(index + 65) }}.{{ option[String.fromCharCode(index + 65)] }}</button>
-    
+        <button v-for="(option, index) in currentStory.choice" :key="index"
+          @click="selectOption(currentStoryIndex + 1, String.fromCharCode(index + 65), option[String.fromCharCode(index + 65)])">{{
+            String.fromCharCode(index + 65) }}.{{ option[String.fromCharCode(index + 65)] }}</button>
       </div>
       <div v-else class="content1">
         <div v-if="currentStoryIndex != 0">
@@ -30,25 +27,11 @@
 </template>
 
 <script setup lang="ts">
-import axios from "axios";
 import { ElMessage } from "element-plus";
 import { ref, computed, onMounted, defineProps } from "vue";
 import type { sendChoice } from "@/api/game/req";
 import type { getNewChoiceAndStory, getAllStory } from "@/api/game/res";
 import { sendchoice } from "@/api/game/game";
-import { db } from "@/database/db";
-
-// interface Story {
-//   story: string;
-//   choice: Array<{ [key: string]: string }>;
-//   round: number;
-// }
-
-// interface selectStory {
-//   GameId: string;
-//   Name: string;
-//   Description: string;
-// }
 
 const props = defineProps({
   GameId: String,
@@ -88,14 +71,13 @@ const stories = ref<getNewChoiceAndStory[]>([
 function selectOption(next: number, choice: string, content: string) {
   //应先让它加载
   isloading.value = true;
-  console.log(currentStoryIndex.value, currentStoryIndex1.value);
+  console.log("loading is true")
   try {
     const sendachoice: sendChoice = {
       apiKey: apiKey.value,
       choiceID: choice, //A,B,C,D
       modelId: ModelId.value,
     };
-    console.log(sendachoice);
     sendchoice(sendachoice)
       .then((responseData) => {
         const getnewchoice: getNewChoiceAndStory = responseData;
@@ -103,15 +85,13 @@ function selectOption(next: number, choice: string, content: string) {
       })
       .finally(() => {
         isloading.value = false;
+        console.log("loading is false")
       });
-
     //把选择的放在右侧，让玩家回顾
     selectChoice.value.push(content);
     //加载出来后，因为next是选择后的页面，所以生成后应该跳转到最新页面
     currentStoryIndex.value = next;
     currentStoryIndex1.value = currentStoryIndex.value;
-
-    console.log(isloading.value);
     //加载结束
   } catch {
     ElMessage.info("请求出现故障，请稍等");
@@ -119,16 +99,6 @@ function selectOption(next: number, choice: string, content: string) {
 }
 
 onMounted(() => {
-  // const firtRecord = await db.Apikey.toCollection().first();
-  // if (firtRecord) {
-  //   apiKey.value = firtRecord.apikey;
-  //   ModelId.value = firtRecord.model;
-  // }
-
-  //   if (firtRecord) {
-  //     apiKey.value = firtRecord.apikey as string;
-  //     ModelId.value = firtRecord.model as string;
-  //   }
   apiKey.value = props.apiKey as string;
   ModelId.value = props.modelId as string;
   storyDescription.value = props.storyDescription as string;
@@ -232,5 +202,9 @@ button {
 button:hover {
   background-color: #8b5b34;
   color: #f2e9d3;
+}
+
+.example-showcase .el-loading-mask {
+  z-index: 9;
 }
 </style>
