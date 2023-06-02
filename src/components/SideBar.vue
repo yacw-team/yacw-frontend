@@ -87,18 +87,10 @@ const isCollapse = ref(true);
 
 const changeUrl= ()=>{
   axios.defaults.baseURL=newURL.value;
-    // .then(() => {
       ElNotification.success({
         title: '成功',
         message: '后端地址保存成功'
       });
-    // })
-    // .catch(() => {
-    //   ElNotification.error({
-    //     title: '失败',
-    //     message: '后端地址保存失败'
-    //   });
-    // });
 }
 
 const handleClearMessageData = () => {
