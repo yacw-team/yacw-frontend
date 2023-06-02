@@ -46,8 +46,8 @@
       <el-card class="my-4" shadow="never">
         <div>
           <span class="mr-2">后端地址</span>
-          <el-input class="my-4" placeholder="请输入后端地址" disabled="" />
-          <el-button class="bg-blue-400 dark:bg-blue-600" type="primary">设置</el-button>
+          <el-input v-model="newURL" class="my-4" placeholder="请输入后端地址" disabled="" />
+          <el-button class="bg-blue-400 dark:bg-blue-600" type="primary" @click="changeUrl">设置</el-button>
         </div>
       </el-card>
       <!-- 清除浏览器数据库 -->
@@ -77,13 +77,17 @@ import {
 import { useDark, useToggle } from "@vueuse/core";
 import { clearMessageData } from '@/database/db';
 import { ElMessageBox } from 'element-plus';
-
+import axios from 'axios';
 const dialogVisuable = ref(false);
-
+const newURL=ref()
 const isDark = useDark();
 const toggleDark = useToggle(isDark);
 
 const isCollapse = ref(true);
+
+const changeUrl= ()=>{
+  axios.defaults.baseURL=newURL.value;
+}
 
 const handleClearMessageData = () => {
   ElMessageBox.confirm(
